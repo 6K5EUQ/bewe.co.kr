@@ -4,6 +4,32 @@ const tooltip = document.getElementById('tooltip');
 const popup = document.getElementById('popup');
 const stationCountEl = document.getElementById('station-count');
 
+// ── Landing Page ────────────────────────────────────────────────────────────
+const landing = document.getElementById('landing');
+const globeUiEls = document.querySelectorAll('.globe-ui');
+let landingVisible = true;
+
+function enterGlobe() {
+    landing.classList.add('fade-out');
+    landingVisible = false;
+    setTimeout(() => {
+        landing.style.display = 'none';
+        globeUiEls.forEach(el => el.style.display = '');
+    }, 800);
+}
+
+function showLanding() {
+    globeUiEls.forEach(el => el.style.display = 'none');
+    landing.style.display = '';
+    landing.classList.remove('fade-out');
+    landingVisible = true;
+    closePopup();
+}
+
+document.getElementById('btn-discover').addEventListener('click', enterGlobe);
+document.getElementById('nav-discover').addEventListener('click', (e) => { e.preventDefault(); enterGlobe(); });
+document.getElementById('btn-back').addEventListener('click', showLanding);
+
 // ── Three.js Setup ──────────────────────────────────────────────────────────
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -324,6 +350,8 @@ function closePopup() {
 }
 
 // ── Station Polling ─────────────────────────────────────────────────────────
+const landingStationCount = document.getElementById('landing-station-count');
+
 async function pollStations() {
     try {
         const res = await fetch('/api/stations');
@@ -333,6 +361,7 @@ async function pollStations() {
             stationCountEl.textContent = stations.length === 0
                 ? 'No Stations Online'
                 : `${stations.length} Station${stations.length > 1 ? 's' : ''} Online`;
+            if (landingStationCount) landingStationCount.textContent = stations.length;
         }
     } catch (e) { /* silent */ }
 }

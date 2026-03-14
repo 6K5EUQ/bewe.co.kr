@@ -310,9 +310,10 @@ function showPopup(st) {
     document.getElementById('popup-users').textContent =
         `${st.users} Operator(s) connected`;
 
+    const hostName = st.station_id.includes('_') ? st.station_id.split('_').slice(1).join('_') : st.station_id;
     const tierEl = document.getElementById('popup-tier');
-    tierEl.textContent = st.tier === 1 ? 'Tier 1' : 'Tier 2';
-    tierEl.className = 'popup-tier ' + (st.tier === 1 ? 'tier1' : 'tier2');
+    tierEl.textContent = `host by ${hostName} (Tier ${st.tier})`;
+    tierEl.className = 'popup-tier tier' + st.tier;
 
     popup.classList.remove('hidden');
     tooltip.classList.add('hidden');

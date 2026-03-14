@@ -109,8 +109,9 @@ body {
     font-size: 13px;
     margin-top: 4px;
 }
-.popup-tier.tier1 { color: #4CAF50; }
-.popup-tier.tier2 { color: #FF9800; }
+.popup-tier.tier1 { color: #f44336; }
+.popup-tier.tier2 { color: #FFD600; }
+.popup-tier.tier3 { color: #4CAF50; }
 .popup-close {
     position: absolute;
     top: 8px;

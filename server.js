@@ -1,11 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const net = require('net');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const RELAY_HOST = '124.56.147.40';
-const RELAY_PORT = 7700;
+const RELAY_HOST = process.env.RELAY_HOST || '127.0.0.1';
+const RELAY_PORT = parseInt(process.env.RELAY_PORT) || 7700;
 
 // ── Relay Protocol ──────────────────────────────────────────────────────────
 const RELAY_MAGIC = Buffer.from([0x42, 0x52, 0x4C, 0x59]); // 'BRLY'

@@ -349,13 +349,23 @@ body {
     z-index: 20;
     backdrop-filter: blur(6px);
 }
-.tooltip .tier-tag {
+.tooltip .tier-tag,
+.tooltip .tier-tag-red,
+.tooltip .tier-tag-green {
     font-size: 11px;
     margin-left: 8px;
     padding: 1px 6px;
     border-radius: 3px;
     background: rgba(60,120,200,0.3);
     color: rgba(120,180,255,0.9);
+}
+.tooltip .tier-tag-red {
+    background: rgba(200,60,60,0.3);
+    color: rgba(255,120,120,0.9);
+}
+.tooltip .tier-tag-green {
+    background: rgba(60,200,80,0.3);
+    color: rgba(120,255,140,0.9);
 }
 
 /* ── Station Info Popup ─────────────────────────────────────────────────── */
@@ -399,6 +409,7 @@ body {
 .popup-tier.tier1 { color: #f44336; }
 .popup-tier.tier2 { color: #FFD600; }
 .popup-tier.tier3 { color: #4CAF50; }
+.popup-tier.tier-gray { color: #999; }
 .popup-close {
     position: absolute;
     top: 8px;

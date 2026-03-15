@@ -222,6 +222,9 @@ function animateMarkers(dt) {
 // ── Mouse Interaction ───────────────────────────────────────────────────────
 let isDragging = false;
 let prevMouse = { x: 0, y: 0 };
+let dragAxis = null; // 'x' or 'y' — locked after threshold
+let dragOrigin = { x: 0, y: 0 };
+const AXIS_LOCK_THRESHOLD = 6; // px before axis is decided
 let targetRotX = -0.18; // Initial view: slightly tilted to show Korea
 let targetRotY = -2.22; // ~127E longitude
 let rotX = targetRotX;
@@ -232,22 +235,34 @@ let targetZoom = 3.5;
 canvas.addEventListener('mousedown', (e) => {
     if (e.button === 0) {
         isDragging = true;
+        dragAxis = null;
         prevMouse = { x: e.clientX, y: e.clientY };
+        dragOrigin = { x: e.clientX, y: e.clientY };
     }
 });
 
-window.addEventListener('mouseup', () => { isDragging = false; });
+window.addEventListener('mouseup', () => { isDragging = false; dragAxis = null; });
 
 window.addEventListener('mousemove', (e) => {
     if (isDragging) {
         const dx = e.clientX - prevMouse.x;
         const dy = e.clientY - prevMouse.y;
-        // Scale drag speed by zoom
+
+        // Lock axis once movement exceeds threshold
+        if (!dragAxis) {
+            const totalDx = Math.abs(e.clientX - dragOrigin.x);
+            const totalDy = Math.abs(e.clientY - dragOrigin.y);
+            if (totalDx >= AXIS_LOCK_THRESHOLD || totalDy >= AXIS_LOCK_THRESHOLD) {
+                dragAxis = totalDx >= totalDy ? 'x' : 'y';
+            }
+        }
+
         const scale = zoomDist / 3.5 * 0.005;
-        targetRotY += dx * scale;
-        targetRotX -= dy * scale;
-        // Clamp vertical rotation
-        targetRotX = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, targetRotX));
+        if (dragAxis === 'x') targetRotY += dx * scale;
+        if (dragAxis === 'y') {
+            targetRotX -= dy * scale;
+            targetRotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, targetRotX));
+        }
         prevMouse = { x: e.clientX, y: e.clientY };
     }
     handleHover(e);
@@ -303,8 +318,9 @@ function handleHover(e) {
     const idx = getHoveredStation(e);
     if (idx >= 0) {
         const st = stations[idx];
-        const tierLabel = st.tier === 1 ? 'Tier 1' : 'Tier 2';
-        tooltip.innerHTML = `${st.name} <span class="tier-tag">${tierLabel}</span>`;
+        const tierLabel = `Tier ${st.tier}`;
+        const tierClass = st.tier === 1 ? 'tier-tag-red' : st.tier === 3 ? 'tier-tag-green' : 'tier-tag';
+        tooltip.innerHTML = `${st.name} <span class="${tierClass}">${tierLabel}</span>`;
         tooltip.style.left = (e.clientX + 16) + 'px';
         tooltip.style.top = (e.clientY - 10) + 'px';
         tooltip.classList.remove('hidden');
@@ -338,8 +354,8 @@ function showPopup(st) {
 
     const hostName = st.station_id.includes('_') ? st.station_id.split('_').slice(1).join('_') : st.station_id;
     const tierEl = document.getElementById('popup-tier');
-    tierEl.textContent = `host by ${hostName} (Tier ${st.tier})`;
-    tierEl.className = 'popup-tier tier' + st.tier;
+    tierEl.textContent = `host by ${hostName}`;
+    tierEl.className = 'popup-tier tier-gray';
 
     popup.classList.remove('hidden');
     tooltip.classList.add('hidden');

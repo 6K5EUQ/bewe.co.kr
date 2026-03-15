@@ -365,6 +365,112 @@ function closePopup() {
     popup.classList.add('hidden');
 }
 
+// ── Aircraft Layer (ADS-B via OpenSky) ──────────────────────────────────────
+const MAX_AIRCRAFT = 15000;
+const acGeo = new THREE.BufferGeometry();
+const acPositions = new Float32Array(MAX_AIRCRAFT * 3);
+const acHeadings = new Float32Array(MAX_AIRCRAFT);
+acGeo.setAttribute('position', new THREE.BufferAttribute(acPositions, 3));
+acGeo.setAttribute('heading', new THREE.BufferAttribute(acHeadings, 1));
+acGeo.setDrawRange(0, 0);
+
+function createPlaneTexture() {
+    const size = 64;
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size;
+    const ctx = cv.getContext('2d');
+    const cx = size / 2, cy = size / 2;
+    ctx.fillStyle = '#fff';
+    // fuselage
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 3, 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // wings
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 2);
+    ctx.lineTo(cx - 16, cy + 4);
+    ctx.lineTo(cx - 14, cy + 7);
+    ctx.lineTo(cx, cy + 2);
+    ctx.lineTo(cx + 14, cy + 7);
+    ctx.lineTo(cx + 16, cy + 4);
+    ctx.closePath();
+    ctx.fill();
+    // tail
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + 10);
+    ctx.lineTo(cx - 7, cy + 16);
+    ctx.lineTo(cx - 6, cy + 18);
+    ctx.lineTo(cx, cy + 13);
+    ctx.lineTo(cx + 6, cy + 18);
+    ctx.lineTo(cx + 7, cy + 16);
+    ctx.closePath();
+    ctx.fill();
+    return new THREE.CanvasTexture(cv);
+}
+
+const acTex = createPlaneTexture();
+const acMat = new THREE.ShaderMaterial({
+    uniforms: {
+        uTexture: { value: acTex },
+        uSize: { value: 0.054 }
+    },
+    vertexShader: `
+        attribute float heading;
+        varying float vHeading;
+        uniform float uSize;
+        void main() {
+            vHeading = heading;
+            vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = uSize * (300.0 / -mvPos.z);
+            gl_Position = projectionMatrix * mvPos;
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D uTexture;
+        varying float vHeading;
+        void main() {
+            vec2 uv = gl_PointCoord - 0.5;
+            float angle = -vHeading;
+            float c = cos(angle);
+            float s = sin(angle);
+            vec2 rotUv = vec2(uv.x * c - uv.y * s, uv.x * s + uv.y * c) + 0.5;
+            vec4 texColor = texture2D(uTexture, rotUv);
+            if (texColor.a < 0.1) discard;
+            gl_FragColor = vec4(1.0, 0.75, 0.2, 1.0) * texColor;
+        }
+    `,
+    transparent: true,
+    depthTest: true
+});
+const acPoints = new THREE.Points(acGeo, acMat);
+scene.add(acPoints);
+
+function updateAircraft(data) {
+    const count = Math.min(data.length, MAX_AIRCRAFT);
+    for (let i = 0; i < count; i++) {
+        const lat = data[i][0];
+        const lon = data[i][1];
+        const hdg = (data[i][2] || 0) * Math.PI / 180;
+        const pos = latLonToVec3(lat, lon, GLOBE_RADIUS * 1.012);
+        acPositions[i * 3]     = pos.x;
+        acPositions[i * 3 + 1] = pos.y;
+        acPositions[i * 3 + 2] = pos.z;
+        acHeadings[i] = hdg;
+    }
+    acGeo.attributes.position.needsUpdate = true;
+    acGeo.attributes.heading.needsUpdate = true;
+    acGeo.setDrawRange(0, count);
+}
+
+async function pollAircraft() {
+    try {
+        const res = await fetch('/api/aircraft');
+        if (res.ok) updateAircraft(await res.json());
+    } catch (e) { /* silent */ }
+}
+pollAircraft();
+setInterval(pollAircraft, 10000);
+
 // ── Station Polling ─────────────────────────────────────────────────────────
 const landingStationCount = document.getElementById('landing-station-count');
 
@@ -406,6 +512,7 @@ function animate() {
     // Apply rotation to globe + markers
     globe.rotation.set(rotX, rotY, 0, 'XYZ');
     markerGroup.rotation.set(rotX, rotY, 0, 'XYZ');
+    acPoints.rotation.set(rotX, rotY, 0, 'XYZ');
 
     // Camera zoom
     camera.position.z = zoomDist;

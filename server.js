@@ -92,11 +92,33 @@ async function pollLoop() {
 }
 pollLoop();
 
+// ── OpenSky ADS-B ──────────────────────────────────────────────────────────
+let cachedAircraft = [];
+
+async function fetchAircraft() {
+    try {
+        const resp = await fetch('https://opensky-network.org/api/states/all');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (!data.states) return;
+        cachedAircraft = data.states
+            .filter(s => s[6] != null && s[5] != null)
+            .map(s => [s[6], s[5], s[10] != null ? s[10] : 0]); // [lat, lon, heading]
+    } catch (e) { /* silent */ }
+}
+
+fetchAircraft();
+setInterval(fetchAircraft, 10000);
+
 // ── Express ─────────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/stations', (req, res) => {
     res.json(cachedStations);
+});
+
+app.get('/api/aircraft', (req, res) => {
+    res.json(cachedAircraft);
 });
 
 app.listen(PORT, () => {

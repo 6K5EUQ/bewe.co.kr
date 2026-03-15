@@ -200,7 +200,7 @@ function updateMarkers() {
         const mat = new THREE.SpriteMaterial({
             map: markerTex,
             transparent: true,
-            depthTest: false,
+            depthTest: true,
             blending: THREE.AdditiveBlending
         });
         const sprite = new THREE.Sprite(mat);
@@ -224,7 +224,7 @@ let isDragging = false;
 let prevMouse = { x: 0, y: 0 };
 let dragAxis = null; // 'x' or 'y' — locked after threshold
 let dragOrigin = { x: 0, y: 0 };
-const AXIS_LOCK_THRESHOLD = 6; // px before axis is decided
+const AXIS_LOCK_THRESHOLD = 3; // px before axis is decided
 let targetRotX = -0.18; // Initial view: slightly tilted to show Korea
 let targetRotY = -2.22; // ~127E longitude
 let rotX = targetRotX;
@@ -260,7 +260,7 @@ window.addEventListener('mousemove', (e) => {
         const scale = zoomDist / 3.5 * 0.005;
         if (dragAxis === 'x') targetRotY += dx * scale;
         if (dragAxis === 'y') {
-            targetRotX -= dy * scale;
+            targetRotX += dy * scale;
             targetRotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, targetRotX));
         }
         prevMouse = { x: e.clientX, y: e.clientY };
@@ -294,7 +294,7 @@ function getHoveredStation(e) {
     stations.forEach((st, i) => {
         const pos = latLonToVec3(st.lat, st.lon, GLOBE_RADIUS * 1.005);
         // Apply globe rotation
-        pos.applyEuler(new THREE.Euler(rotX, rotY, 0, 'YXZ'));
+        pos.applyEuler(new THREE.Euler(rotX, rotY, 0, 'XYZ'));
         const projected = pos.clone().project(camera);
         const sx = (projected.x * 0.5 + 0.5) * window.innerWidth;
         const sy = (-projected.y * 0.5 + 0.5) * window.innerHeight;
@@ -404,8 +404,8 @@ function animate() {
     }
 
     // Apply rotation to globe + markers
-    globe.rotation.set(rotX, rotY, 0, 'YXZ');
-    markerGroup.rotation.set(rotX, rotY, 0, 'YXZ');
+    globe.rotation.set(rotX, rotY, 0, 'XYZ');
+    markerGroup.rotation.set(rotX, rotY, 0, 'XYZ');
 
     // Camera zoom
     camera.position.z = zoomDist;

@@ -245,7 +245,7 @@ window.addEventListener('mousemove', (e) => {
         // Scale drag speed by zoom
         const scale = zoomDist / 3.5 * 0.005;
         targetRotY += dx * scale;
-        targetRotX += dy * scale;
+        targetRotX -= dy * scale;
         // Clamp vertical rotation
         targetRotX = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, targetRotX));
         prevMouse = { x: e.clientX, y: e.clientY };

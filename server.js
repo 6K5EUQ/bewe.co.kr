@@ -58,7 +58,7 @@ function fetchStations() {
                     const idBuf = payload.subarray(off, off + 32);
                     const nameBuf = payload.subarray(off + 32, off + 96);
                     const lat = payload.readFloatLE(off + 96);
-                    const lon = payload.readFloatLE(off + 100);
+                    const lon = -payload.readFloatLE(off + 100);
                     const tier = payload[off + 104];
                     const users = payload[off + 105];
 

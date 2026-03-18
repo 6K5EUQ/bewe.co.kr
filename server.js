@@ -147,7 +147,7 @@ async function fetchAircraft() {
 }
 
 fetchAircraft();
-setInterval(fetchAircraft, 30000); // 30초 간격 (크레딧 절약)
+setInterval(fetchAircraft, 60000); // 60초 간격 (크레딧 절약)
 
 // ── Express ─────────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));

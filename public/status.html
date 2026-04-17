@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEWE — Status</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            color: #e0e0e0;
+            font-family: 'Inter', 'Segoe UI', 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+            padding: 32px 48px;
+        }
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        .top-nav .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 5px;
+            color: #fff;
+        }
+        .top-nav .right {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.55);
+        }
+        .top-nav a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .top-nav a:hover { color: #fff; }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .page-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 28px;
+        }
+
+        /* Central card */
+        .central-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 24px;
+            align-items: center;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .badge.online {
+            background: rgba(80, 220, 120, 0.12);
+            color: #6ee089;
+            border: 1px solid rgba(80, 220, 120, 0.4);
+        }
+        .badge.offline {
+            background: rgba(255, 80, 80, 0.12);
+            color: #ff7777;
+            border: 1px solid rgba(255, 80, 80, 0.4);
+        }
+        .badge .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+        .central-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 16px;
+            font-size: 13px;
+        }
+        .meta-item .label {
+            display: block;
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+        }
+        .meta-item .value {
+            color: #fff;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .refresh-info {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Stations table */
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title .count {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 400;
+        }
+        .stations-wrap {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table.stations {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        table.stations th {
+            text-align: left;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        table.stations td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-variant-numeric: tabular-nums;
+        }
+        table.stations tr:last-child td { border-bottom: none; }
+        .status-dot {
+            display: inline-block;
+            width: 10px; height: 10px; border-radius: 50%;
+        }
+        .status-dot.online {
+            background: #6ee089;
+            box-shadow: 0 0 8px rgba(110, 224, 137, 0.6);
+        }
+        .status-dot.offline {
+            background: #ff7777;
+            box-shadow: 0 0 8px rgba(255, 119, 119, 0.5);
+        }
+        .station-name { color: #fff; font-weight: 500; }
+        .station-id { color: rgba(255,255,255,0.5); font-size: 12px; font-family: 'SF Mono', Menlo, monospace; }
+        .tier { font-size: 11px; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .tier-1 { background: rgba(255,80,80,0.15); color: #ff7777; }
+        .tier-2 { background: rgba(255,180,80,0.15); color: #ffb866; }
+        .tier-3 { background: rgba(110,224,137,0.15); color: #6ee089; }
+
+        .empty {
+            padding: 48px;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+        }
+        .error-banner {
+            background: rgba(255,80,80,0.08);
+            border: 1px solid rgba(255,80,80,0.3);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #ff9999;
+            margin-top: 12px;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="logo">BEWE</div>
+        <div class="right">
+            <span id="refresh-info" class="refresh-info">—</span>
+            <a href="/">← Back to Globe</a>
+        </div>
+    </div>
+
+    <h1 class="page-title">System Status</h1>
+    <p class="page-sub">Live health of the central relay and all registered stations.</p>
+
+    <!-- Central -->
+    <div class="central-card">
+        <div>
+            <span id="central-badge" class="badge offline"><span class="dot"></span><span id="central-label">CHECKING</span></span>
+        </div>
+        <div class="central-meta">
+            <div class="meta-item">
+                <span class="label">Endpoint</span>
+                <span class="value" id="central-endpoint">—</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Last Success</span>
+                <span class="value" id="central-last-success">—</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Response</span>
+                <span class="value" id="central-response">—</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Last Attempt</span>
+                <span class="value" id="central-last-attempt">—</span>
+            </div>
+        </div>
+        <div></div>
+        <div id="central-error-wrap" style="grid-column: 1 / -1; display: none;">
+            <div class="error-banner" id="central-error"></div>
+        </div>
+    </div>
+
+    <!-- Stations -->
+    <div class="section-title">
+        Stations <span class="count" id="station-count">(0)</span>
+    </div>
+    <div class="stations-wrap">
+        <table class="stations" id="stations-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;"></th>
+                    <th>Name</th>
+                    <th>Station ID</th>
+                    <th style="width: 80px;">Tier</th>
+                    <th style="width: 90px;">Users</th>
+                    <th style="width: 140px;">Last Seen</th>
+                </tr>
+            </thead>
+            <tbody id="stations-body">
+                <tr><td colspan="6" class="empty">Loading…</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const REFRESH_MS = 2000;
+        let lastFetchAt = 0;
+
+        function fmtAge(ms) {
+            if (ms == null) return '—';
+            if (ms < 1000) return 'just now';
+            const s = Math.floor(ms / 1000);
+            if (s < 60) return s + 's ago';
+            const m = Math.floor(s / 60);
+            if (m < 60) return m + 'm ' + (s % 60) + 's ago';
+            const h = Math.floor(m / 60);
+            return h + 'h ' + (m % 60) + 'm ago';
+        }
+
+        function fmtTime(ts) {
+            if (!ts) return '—';
+            const d = new Date(ts);
+            return d.toLocaleTimeString();
+        }
+
+        function tierLabel(t) {
+            if (t === 1) return { cls: 'tier-1', name: 'Tier 1' };
+            if (t === 2) return { cls: 'tier-2', name: 'Tier 2' };
+            return { cls: 'tier-3', name: 'Tier 3' };
+        }
+
+        function render(data) {
+            const now = data.serverTime;
+
+            // Central
+            const c = data.central;
+            const badge = document.getElementById('central-badge');
+            const label = document.getElementById('central-label');
+            badge.classList.toggle('online', c.reachable);
+            badge.classList.toggle('offline', !c.reachable);
+            label.textContent = c.reachable ? 'ONLINE' : 'OFFLINE';
+
+            document.getElementById('central-endpoint').textContent = c.host + ':' + c.port;
+            document.getElementById('central-last-success').textContent = c.lastSuccessAt
+                ? fmtTime(c.lastSuccessAt) + ' (' + fmtAge(c.ageMs) + ')'
+                : 'never';
+            document.getElementById('central-response').textContent = c.responseMs != null
+                ? c.responseMs + ' ms'
+                : '—';
+            document.getElementById('central-last-attempt').textContent = c.lastAttemptAt
+                ? fmtTime(c.lastAttemptAt)
+                : '—';
+
+            const errWrap = document.getElementById('central-error-wrap');
+            const errEl = document.getElementById('central-error');
+            if (!c.reachable && c.lastError) {
+                errWrap.style.display = 'block';
+                errEl.textContent = 'Last error: ' + c.lastError;
+            } else {
+                errWrap.style.display = 'none';
+            }
+
+            // Stations
+            const tbody = document.getElementById('stations-body');
+            document.getElementById('station-count').textContent = '(' + data.stations.length + ')';
+
+            if (data.stations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty">No stations have been observed yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.stations.map(s => {
+                const tier = tierLabel(s.tier);
+                const dotCls = s.online ? 'online' : 'offline';
+                return `<tr>
+                    <td><span class="status-dot ${dotCls}"></span></td>
+                    <td><span class="station-name">${escapeHtml(s.name || '(unnamed)')}</span></td>
+                    <td><span class="station-id">${escapeHtml(s.station_id)}</span></td>
+                    <td><span class="tier ${tier.cls}">${tier.name}</span></td>
+                    <td>${s.users}</td>
+                    <td>${fmtAge(s.ageMs)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+            }[c]));
+        }
+
+        async function refresh() {
+            try {
+                const r = await fetch('/api/status', { cache: 'no-store' });
+                const data = await r.json();
+                lastFetchAt = Date.now();
+                render(data);
+            } catch (e) {
+                document.getElementById('central-label').textContent = 'WEB ERROR';
+                document.getElementById('central-error-wrap').style.display = 'block';
+                document.getElementById('central-error').textContent = 'Fetch failed: ' + e.message;
+            }
+        }
+
+        function tickCountdown() {
+            if (!lastFetchAt) {
+                document.getElementById('refresh-info').textContent = 'refreshing…';
+                return;
+            }
+            const remain = Math.max(0, REFRESH_MS - (Date.now() - lastFetchAt));
+            document.getElementById('refresh-info').textContent =
+                'next refresh in ' + (remain / 1000).toFixed(1) + 's';
+        }
+
+        refresh();
+        setInterval(refresh, REFRESH_MS);
+        setInterval(tickCountdown, 100);
+    </script>
+</body>
+</html>

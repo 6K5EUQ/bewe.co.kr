@@ -21,11 +21,36 @@ const LIST_RESP_HDR = 131;
 
 let cachedStations = [];
 
+const POLL_INTERVAL_MS = 2000;
+const OFFLINE_THRESHOLD_MS = 15000;
+
+const centralStatus = {
+    reachable: false,
+    lastSuccessAt: null,
+    lastAttemptAt: null,
+    lastError: null,
+    responseMs: null,
+};
+
+const stationLastSeen = new Map(); // station_id → { lastSeenAt, name, lat, lon, tier, users }
+
 function fetchStations() {
     return new Promise((resolve) => {
         const sock = new net.Socket();
         sock.setTimeout(3000);
         const chunks = [];
+        const startedAt = Date.now();
+        centralStatus.lastAttemptAt = startedAt;
+        let settled = false;
+
+        const fail = (reason) => {
+            if (settled) return;
+            settled = true;
+            centralStatus.reachable = false;
+            centralStatus.lastError = reason;
+            centralStatus.responseMs = Date.now() - startedAt;
+            resolve([]);
+        };
 
         sock.connect(RELAY_PORT, RELAY_HOST, () => {
             // Send LIST_REQ
@@ -39,15 +64,16 @@ function fetchStations() {
         sock.on('data', (data) => chunks.push(data));
 
         sock.on('end', () => {
+            if (settled) return;
             try {
                 const buf = Buffer.concat(chunks);
-                if (buf.length < HDR_SIZE) return resolve([]);
+                if (buf.length < HDR_SIZE) return fail('short response');
                 // Verify magic
-                if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) return resolve([]);
-                if (buf[4] !== PKT_LIST_RESP) return resolve([]);
+                if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) return fail('bad magic');
+                if (buf[4] !== PKT_LIST_RESP) return fail('unexpected packet type');
                 const payloadLen = buf.readUInt32LE(5);
                 const payload = buf.subarray(HDR_SIZE, HDR_SIZE + payloadLen);
-                if (payload.length < LIST_RESP_HDR) return resolve([]);
+                if (payload.length < LIST_RESP_HDR) return fail('short payload');
 
                 const count = payload.readUInt16LE(0);
                 const stations = [];
@@ -69,25 +95,41 @@ function fetchStations() {
                         lat, lon, tier, users
                     });
                 }
+                settled = true;
+                centralStatus.reachable = true;
+                centralStatus.lastSuccessAt = Date.now();
+                centralStatus.lastError = null;
+                centralStatus.responseMs = centralStatus.lastSuccessAt - startedAt;
                 resolve(stations);
             } catch (e) {
                 console.error('Parse error:', e.message);
-                resolve([]);
+                fail('parse error: ' + e.message);
             }
         });
 
-        sock.on('error', () => resolve([]));
-        sock.on('timeout', () => { sock.destroy(); resolve([]); });
+        sock.on('error', (e) => fail(e.code || e.message || 'socket error'));
+        sock.on('timeout', () => { sock.destroy(); fail('timeout'); });
     });
 }
 
-// Poll relay every 5 seconds
 async function pollLoop() {
     while (true) {
         try {
             cachedStations = await fetchStations();
+            const now = Date.now();
+            for (const s of cachedStations) {
+                if (!s.station_id) continue;
+                stationLastSeen.set(s.station_id, {
+                    lastSeenAt: now,
+                    name: s.name,
+                    lat: s.lat,
+                    lon: s.lon,
+                    tier: s.tier,
+                    users: s.users,
+                });
+            }
         } catch (e) { /* ignore */ }
-        await new Promise(r => setTimeout(r, 5000));
+        await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
     }
 }
 pollLoop();
@@ -158,6 +200,42 @@ app.get('/api/stations', (req, res) => {
 
 app.get('/api/aircraft', (req, res) => {
     res.json(cachedAircraft);
+});
+
+app.get('/api/status', (req, res) => {
+    const now = Date.now();
+    const stations = [];
+    for (const [station_id, info] of stationLastSeen) {
+        const ageMs = now - info.lastSeenAt;
+        stations.push({
+            station_id,
+            name: info.name,
+            lat: info.lat,
+            lon: info.lon,
+            tier: info.tier,
+            users: info.users,
+            online: ageMs < OFFLINE_THRESHOLD_MS,
+            lastSeenAt: info.lastSeenAt,
+            ageMs,
+        });
+    }
+    stations.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+    res.json({
+        central: {
+            host: RELAY_HOST,
+            port: RELAY_PORT,
+            reachable: centralStatus.reachable,
+            lastSuccessAt: centralStatus.lastSuccessAt,
+            lastAttemptAt: centralStatus.lastAttemptAt,
+            ageMs: centralStatus.lastSuccessAt ? now - centralStatus.lastSuccessAt : null,
+            responseMs: centralStatus.responseMs,
+            lastError: centralStatus.lastError,
+        },
+        stations,
+        serverTime: now,
+        offlineThresholdMs: OFFLINE_THRESHOLD_MS,
+    });
 });
 
 app.listen(PORT, () => {

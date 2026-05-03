@@ -70,52 +70,50 @@ function fetchStations() {
             sock.write(pkt);
         });
 
-        sock.on('data', (data) => chunks.push(data));
-
-        sock.on('end', () => {
+        // Central's list_poller_loop keeps the TCP fd open after sending the
+        // LIST_RESP — we must parse on incoming data and close the socket
+        // ourselves once the full packet is in. Relying on 'end' would hang
+        // until the 3 s timeout.
+        const tryParse = () => {
             if (settled) return;
-            try {
-                const buf = Buffer.concat(chunks);
-                if (buf.length < HDR_SIZE) return fail('short response');
-                // Verify magic
-                if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) return fail('bad magic');
-                if (buf[4] !== PKT_LIST_RESP) return fail('unexpected packet type');
-                const payloadLen = buf.readUInt32LE(5);
-                const payload = buf.subarray(HDR_SIZE, HDR_SIZE + payloadLen);
-                if (payload.length < LIST_RESP_HDR) return fail('short payload');
-
-                const count = payload.readUInt16LE(0);
-                const stations = [];
-
-                for (let i = 0; i < count; i++) {
-                    const off = LIST_RESP_HDR + i * STATION_SIZE;
-                    if (off + STATION_SIZE > payload.length) break;
-
-                    const idBuf = payload.subarray(off, off + 32);
-                    const nameBuf = payload.subarray(off + 32, off + 96);
-                    const lat = payload.readFloatLE(off + 96);
-                    const lon = -payload.readFloatLE(off + 100);
-                    const tier = payload[off + 104];
-                    const users = payload[off + 105];
-
-                    stations.push({
-                        station_id: idBuf.toString('utf8').replace(/\0/g, ''),
-                        name: nameBuf.toString('utf8').replace(/\0/g, ''),
-                        lat, lon, tier, users
-                    });
-                }
-                settled = true;
-                centralStatus.reachable = true;
-                centralStatus.lastSuccessAt = Date.now();
-                centralStatus.lastError = null;
-                centralStatus.responseMs = centralStatus.lastSuccessAt - startedAt;
-                resolve(stations);
-            } catch (e) {
-                console.error('Parse error:', e.message);
-                fail('parse error: ' + e.message);
+            const buf = Buffer.concat(chunks);
+            if (buf.length < HDR_SIZE) return;
+            if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) {
+                return fail('bad magic');
             }
-        });
+            if (buf[4] !== PKT_LIST_RESP) return fail('unexpected packet type');
+            const payloadLen = buf.readUInt32LE(5);
+            if (buf.length < HDR_SIZE + payloadLen) return; // wait for more
+            const payload = buf.subarray(HDR_SIZE, HDR_SIZE + payloadLen);
+            if (payload.length < LIST_RESP_HDR) return fail('short payload');
 
+            const count = payload.readUInt16LE(0);
+            const stations = [];
+            for (let i = 0; i < count; i++) {
+                const off = LIST_RESP_HDR + i * STATION_SIZE;
+                if (off + STATION_SIZE > payload.length) break;
+                const idBuf = payload.subarray(off, off + 32);
+                const nameBuf = payload.subarray(off + 32, off + 96);
+                const lat = payload.readFloatLE(off + 96);
+                const lon = -payload.readFloatLE(off + 100);
+                const tier = payload[off + 104];
+                const users = payload[off + 105];
+                stations.push({
+                    station_id: idBuf.toString('utf8').replace(/\0/g, ''),
+                    name: nameBuf.toString('utf8').replace(/\0/g, ''),
+                    lat, lon, tier, users
+                });
+            }
+            settled = true;
+            centralStatus.reachable = true;
+            centralStatus.lastSuccessAt = Date.now();
+            centralStatus.lastError = null;
+            centralStatus.responseMs = centralStatus.lastSuccessAt - startedAt;
+            sock.destroy();
+            resolve(stations);
+        };
+        sock.on('data', (data) => { chunks.push(data); try { tryParse(); } catch (e) { fail('parse: ' + e.message); } });
+        sock.on('end', () => { try { tryParse(); } catch (e) { fail('parse: ' + e.message); } });
         sock.on('error', (e) => fail(e.code || e.message || 'socket error'));
         sock.on('timeout', () => { sock.destroy(); fail('timeout'); });
     });
@@ -159,53 +157,49 @@ function fetchStationsV2() {
             pkt.writeUInt32LE(0, 5);
             sock.write(pkt);
         });
-        sock.on('data', (d) => chunks.push(d));
-        sock.on('end', () => {
+        const tryParse = () => {
             if (settled) return;
-            try {
-                const buf = Buffer.concat(chunks);
-                if (buf.length < HDR_SIZE) return fail();
-                if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) return fail();
-                if (buf[4] !== PKT_LIST_RESP_V2) return fail();
-                const payloadLen = buf.readUInt32LE(5);
-                const payload = buf.subarray(HDR_SIZE, HDR_SIZE + payloadLen);
-                if (payload.length < LIST_RESP_HDR) return fail();
+            const buf = Buffer.concat(chunks);
+            if (buf.length < HDR_SIZE) return;
+            if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) return fail();
+            if (buf[4] !== PKT_LIST_RESP_V2) return fail();
+            const payloadLen = buf.readUInt32LE(5);
+            if (buf.length < HDR_SIZE + payloadLen) return; // wait for more
+            const payload = buf.subarray(HDR_SIZE, HDR_SIZE + payloadLen);
+            if (payload.length < LIST_RESP_HDR) return fail();
 
-                const count = payload.readUInt16LE(0);
-                const stations = [];
-                for (let i = 0; i < count; i++) {
-                    const off = LIST_RESP_HDR + i * STATION_SIZE_V2;
-                    if (off + STATION_SIZE_V2 > payload.length) break;
-                    const idBuf   = payload.subarray(off, off + 32);
-                    const nameBuf = payload.subarray(off + 32, off + 96);
-                    const lat = payload.readFloatLE(off + 96);
-                    // Wire convention is W-positive; flip to standard E-positive for display.
-                    const lon = -payload.readFloatLE(off + 100);
-                    const tier  = payload[off + 104];
-                    const users = payload[off + 105];
-                    // v2 fields
-                    const opBuf = payload.subarray(off + 108, off + 140);
-                    const center_freq_hz = Number(payload.readBigUInt64LE(off + 140));
-                    const sample_rate_hz = payload.readUInt32LE(off + 148);
-                    const hist_recording = payload[off + 152];
-                    const channel_count  = payload[off + 153];
-                    stations.push({
-                        station_id:    idBuf.toString('utf8').replace(/\0/g, ''),
-                        name:          nameBuf.toString('utf8').replace(/\0/g, ''),
-                        lat, lon, tier, users,
-                        operator_login: opBuf.toString('utf8').replace(/\0/g, ''),
-                        center_freq_hz, sample_rate_hz,
-                        hist_recording: !!hist_recording,
-                        channel_count,
-                    });
-                }
-                settled = true;
-                resolve(stations);
-            } catch (e) {
-                console.error('LIST_V2 parse:', e.message);
-                fail();
+            const count = payload.readUInt16LE(0);
+            const stations = [];
+            for (let i = 0; i < count; i++) {
+                const off = LIST_RESP_HDR + i * STATION_SIZE_V2;
+                if (off + STATION_SIZE_V2 > payload.length) break;
+                const idBuf   = payload.subarray(off, off + 32);
+                const nameBuf = payload.subarray(off + 32, off + 96);
+                const lat = payload.readFloatLE(off + 96);
+                const lon = -payload.readFloatLE(off + 100);
+                const tier  = payload[off + 104];
+                const users = payload[off + 105];
+                const opBuf = payload.subarray(off + 108, off + 140);
+                const center_freq_hz = Number(payload.readBigUInt64LE(off + 140));
+                const sample_rate_hz = payload.readUInt32LE(off + 148);
+                const hist_recording = payload[off + 152];
+                const channel_count  = payload[off + 153];
+                stations.push({
+                    station_id:    idBuf.toString('utf8').replace(/\0/g, ''),
+                    name:          nameBuf.toString('utf8').replace(/\0/g, ''),
+                    lat, lon, tier, users,
+                    operator_login: opBuf.toString('utf8').replace(/\0/g, ''),
+                    center_freq_hz, sample_rate_hz,
+                    hist_recording: !!hist_recording,
+                    channel_count,
+                });
             }
-        });
+            settled = true;
+            sock.destroy();
+            resolve(stations);
+        };
+        sock.on('data', (d) => { chunks.push(d); try { tryParse(); } catch (e) { console.error('LIST_V2 parse:', e.message); fail(); } });
+        sock.on('end', () => { try { tryParse(); } catch (e) { console.error('LIST_V2 parse:', e.message); fail(); } });
         sock.on('error', () => fail());
         sock.on('timeout', () => { sock.destroy(); fail(); });
     });
@@ -239,46 +233,48 @@ function fetchStationDetail(station_id) {
             idBuf.copy(pkt, HDR_SIZE);
             sock.write(pkt);
         });
-        sock.on('data', (d) => chunks.push(d));
-        sock.on('end', () => {
-            try {
-                const buf = Buffer.concat(chunks);
-                if (buf.length < HDR_SIZE) return done(null);
-                if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) return done(null);
-                if (buf[4] !== PKT_STATION_DETAIL_RESP) return done(null);
-                const payloadLen = buf.readUInt32LE(5);
-                if (payloadLen === 0) return done(null);  // station unknown / no state
-                const p = buf.subarray(HDR_SIZE, HDR_SIZE + payloadLen);
-                if (p.length < HSTATE_SIZE) return done(null);
+        const tryParse = () => {
+            if (settled) return;
+            const buf = Buffer.concat(chunks);
+            if (buf.length < HDR_SIZE) return;
+            if (buf[0]!==0x42||buf[1]!==0x52||buf[2]!==0x4C||buf[3]!==0x59) return done(null);
+            if (buf[4] !== PKT_STATION_DETAIL_RESP) return done(null);
+            const payloadLen = buf.readUInt32LE(5);
+            if (buf.length < HDR_SIZE + payloadLen) return; // wait for more
+            if (payloadLen === 0) { sock.destroy(); return done(null); }
+            const p = buf.subarray(HDR_SIZE, HDR_SIZE + payloadLen);
+            if (p.length < HSTATE_SIZE) { sock.destroy(); return done(null); }
 
-                const opBuf = p.subarray(0, 32);
-                const out = {
-                    operator_login: opBuf.toString('utf8').replace(/\0/g, ''),
-                    center_freq_hz: Number(p.readBigUInt64LE(32)),
-                    sample_rate_hz: p.readUInt32LE(40),
-                    hist_recording: !!p[44],
-                    channel_count:  p[45],
-                    channels: [],
-                };
-                const chBase = 48; // 32 + 8 + 4 + 1 + 1 + 2
-                for (let i = 0; i < 10; i++) {
-                    const o = chBase + i * HSTATE_CH_SIZE;
-                    if (!p[o]) continue; // active=0 → skip
-                    out.channels.push({
-                        index: i,
-                        mode:         p[o + 1],
-                        digital_mode: p[o + 2],
-                        iq_rec_on:    !!p[o + 3],
-                        audio_rec_on: !!p[o + 4],
-                        dem_run:      !!p[o + 5],
-                        s_mhz: p.readFloatLE(o + 8),
-                        e_mhz: p.readFloatLE(o + 12),
-                        owner: p.subarray(o + 16, o + 48).toString('utf8').replace(/\0/g, ''),
-                    });
-                }
-                done(out);
-            } catch (e) { console.error('DETAIL parse:', e.message); done(null); }
-        });
+            const opBuf = p.subarray(0, 32);
+            const out = {
+                operator_login: opBuf.toString('utf8').replace(/\0/g, ''),
+                center_freq_hz: Number(p.readBigUInt64LE(32)),
+                sample_rate_hz: p.readUInt32LE(40),
+                hist_recording: !!p[44],
+                channel_count:  p[45],
+                channels: [],
+            };
+            const chBase = 48; // 32 + 8 + 4 + 1 + 1 + 2
+            for (let i = 0; i < 10; i++) {
+                const o = chBase + i * HSTATE_CH_SIZE;
+                if (!p[o]) continue; // active=0 → skip
+                out.channels.push({
+                    index: i,
+                    mode:         p[o + 1],
+                    digital_mode: p[o + 2],
+                    iq_rec_on:    !!p[o + 3],
+                    audio_rec_on: !!p[o + 4],
+                    dem_run:      !!p[o + 5],
+                    s_mhz: p.readFloatLE(o + 8),
+                    e_mhz: p.readFloatLE(o + 12),
+                    owner: p.subarray(o + 16, o + 48).toString('utf8').replace(/\0/g, ''),
+                });
+            }
+            sock.destroy();
+            done(out);
+        };
+        sock.on('data', (d) => { chunks.push(d); try { tryParse(); } catch (e) { console.error('DETAIL parse:', e.message); done(null); } });
+        sock.on('end', () => { try { tryParse(); } catch (e) { console.error('DETAIL parse:', e.message); done(null); } });
         sock.on('error', () => done(null));
         sock.on('timeout', () => { sock.destroy(); done(null); });
     });

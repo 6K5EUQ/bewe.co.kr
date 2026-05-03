@@ -188,6 +188,132 @@
             color: rgba(255,255,255,0.4);
             font-size: 13px;
         }
+        table.stations tr.station-row { cursor: pointer; transition: background 0.1s; }
+        table.stations tr.station-row:hover td { background: rgba(255,255,255,0.04); }
+        .freq-cell, .sr-cell, .coord-cell, .op-cell {
+            font-size: 12px;
+            color: rgba(255,255,255,0.75);
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .rec-flag {
+            display: inline-block;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 3px;
+            background: rgba(255,80,80,0.15);
+            color: #ff7777;
+            border: 1px solid rgba(255,80,80,0.3);
+            margin-left: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ch-count {
+            display: inline-block;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 3px;
+            background: rgba(110,224,137,0.12);
+            color: #6ee089;
+            border: 1px solid rgba(110,224,137,0.3);
+            margin-left: 6px;
+        }
+        /* Modal */
+        .modal-bg {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 60px 24px;
+            z-index: 100;
+            backdrop-filter: blur(2px);
+        }
+        .modal-bg.open { display: flex; }
+        .modal-card {
+            background: #14181f;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            width: min(820px, 100%);
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        }
+        .modal-head {
+            padding: 22px 26px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; gap: 14px;
+        }
+        .modal-head .name { font-size: 18px; font-weight: 700; color: #fff; }
+        .modal-head .id   { font-size: 12px; color: rgba(255,255,255,0.45); font-family: 'SF Mono', Menlo, monospace; }
+        .modal-head .close-btn {
+            margin-left: auto;
+            background: none; border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 22px; line-height: 1;
+            cursor: pointer; padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .modal-head .close-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .modal-section {
+            padding: 18px 26px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .modal-section:last-child { border-bottom: none; }
+        .modal-section h3 {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .kv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            font-size: 13px;
+        }
+        .kv-grid .k {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 3px;
+            display: block;
+        }
+        .kv-grid .v { color: #fff; font-variant-numeric: tabular-nums; font-family: 'SF Mono', Menlo, monospace; }
+        table.channels {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+        table.channels th {
+            padding: 6px 10px;
+            text-align: left;
+            color: rgba(255,255,255,0.45);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        table.channels td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: 'SF Mono', Menlo, monospace;
+            color: rgba(255,255,255,0.85);
+        }
+        .pill {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 3px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pill.on  { background: rgba(110,224,137,0.15); color: #6ee089; border: 1px solid rgba(110,224,137,0.3); }
+        .pill.off { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.06); }
         .error-banner {
             background: rgba(255,80,80,0.08);
             border: 1px solid rgba(255,80,80,0.3);
@@ -251,21 +377,55 @@
                 <tr>
                     <th style="width: 40px;"></th>
                     <th>Name</th>
-                    <th>Station ID</th>
-                    <th style="width: 80px;">Tier</th>
-                    <th style="width: 90px;">Users</th>
-                    <th style="width: 140px;">Last Seen</th>
+                    <th>Operator</th>
+                    <th style="width: 130px;">Coords</th>
+                    <th style="width: 90px;">Tier</th>
+                    <th style="width: 70px;">Users</th>
+                    <th style="width: 140px;">Frequency</th>
+                    <th style="width: 110px;">Sample Rate</th>
+                    <th style="width: 130px;">Last Seen</th>
                 </tr>
             </thead>
             <tbody id="stations-body">
-                <tr><td colspan="6" class="empty">Loading…</td></tr>
+                <tr><td colspan="9" class="empty">Loading…</td></tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Detail modal -->
+    <div class="modal-bg" id="modal-bg" onclick="if(event.target===this) closeModal()">
+        <div class="modal-card" id="modal-card">
+            <div class="modal-head">
+                <div>
+                    <div class="name" id="m-name">—</div>
+                    <div class="id" id="m-id">—</div>
+                </div>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-section">
+                <h3>Tuner</h3>
+                <div class="kv-grid">
+                    <div><span class="k">Operator</span><span class="v" id="m-operator">—</span></div>
+                    <div><span class="k">Center Frequency</span><span class="v" id="m-cf">—</span></div>
+                    <div><span class="k">Sample Rate</span><span class="v" id="m-sr">—</span></div>
+                    <div><span class="k">Coordinates</span><span class="v" id="m-coords">—</span></div>
+                    <div><span class="k">HIST Recording</span><span class="v" id="m-hist">—</span></div>
+                    <div><span class="k">Active Channels</span><span class="v" id="m-chcount">—</span></div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <h3>Channels</h3>
+                <div id="m-channels-wrap">
+                    <div class="empty" style="padding:18px 0;">No active channels.</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         const REFRESH_MS = 2000;
         let lastFetchAt = 0;
+        let lastStations = [];   // latest /api/status snapshot — used by modal summary
 
         function fmtAge(ms) {
             if (ms == null) return '—';
@@ -290,7 +450,32 @@
             return { cls: 'tier-3', name: 'Tier 3' };
         }
 
+        function fmtFreqHz(hz) {
+            if (!hz) return '—';
+            if (hz >= 1e9) return (hz / 1e9).toFixed(3) + ' GHz';
+            if (hz >= 1e6) return (hz / 1e6).toFixed(3) + ' MHz';
+            if (hz >= 1e3) return (hz / 1e3).toFixed(1) + ' kHz';
+            return hz + ' Hz';
+        }
+        function fmtSrHz(hz) {
+            if (!hz) return '—';
+            if (hz >= 1e6) return (hz / 1e6).toFixed(2) + ' MS/s';
+            return (hz / 1e3).toFixed(1) + ' kS/s';
+        }
+        function fmtCoords(lat, lon) {
+            if (lat == null || lon == null || (lat === 0 && lon === 0)) return '—';
+            const ns = lat >= 0 ? 'N' : 'S';
+            const ew = lon >= 0 ? 'E' : 'W';
+            return Math.abs(lat).toFixed(2) + '°' + ns + ' ' +
+                   Math.abs(lon).toFixed(2) + '°' + ew;
+        }
+        const DEMOD_MODE = ['—', 'AM', 'FM', 'MAGIC'];
+        const DIGITAL_MODE = ['—', 'AIS', 'ADS-B', 'DEMOD', 'AUTO-ID'];
+        function demodName(m){ return DEMOD_MODE[m] || ('mode' + m); }
+        function digitalName(m){ return DIGITAL_MODE[m] || ('digi' + m); }
+
         function render(data) {
+            lastStations = data.stations || [];
             const now = data.serverTime;
 
             // Central
@@ -326,23 +511,125 @@
             document.getElementById('station-count').textContent = '(' + data.stations.length + ')';
 
             if (data.stations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty">No stations have been observed yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="empty">No stations have been observed yet.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = data.stations.map(s => {
                 const tier = tierLabel(s.tier);
                 const dotCls = s.online ? 'online' : 'offline';
-                return `<tr>
+                const op = s.operator_login || '—';
+                const histTag  = s.hist_recording ? '<span class="rec-flag">REC</span>' : '';
+                const chTag    = s.channel_count ? `<span class="ch-count">${s.channel_count}ch</span>` : '';
+                return `<tr class="station-row" data-id="${escapeHtml(s.station_id)}">
                     <td><span class="status-dot ${dotCls}"></span></td>
-                    <td><span class="station-name">${escapeHtml(s.name || '(unnamed)')}</span></td>
-                    <td><span class="station-id">${escapeHtml(s.station_id)}</span></td>
+                    <td>
+                        <span class="station-name">${escapeHtml(s.name || '(unnamed)')}</span>
+                        ${histTag}${chTag}
+                        <div class="station-id">${escapeHtml(s.station_id)}</div>
+                    </td>
+                    <td><span class="op-cell">${escapeHtml(op)}</span></td>
+                    <td><span class="coord-cell">${fmtCoords(s.lat, s.lon)}</span></td>
                     <td><span class="tier ${tier.cls}">${tier.name}</span></td>
                     <td>${s.users}</td>
+                    <td><span class="freq-cell">${fmtFreqHz(s.center_freq_hz)}</span></td>
+                    <td><span class="sr-cell">${fmtSrHz(s.sample_rate_hz)}</span></td>
                     <td>${fmtAge(s.ageMs)}</td>
                 </tr>`;
             }).join('');
+
+            // Wire row clicks → detail modal
+            tbody.querySelectorAll('tr.station-row').forEach(tr => {
+                tr.addEventListener('click', () => openModal(tr.dataset.id));
+            });
         }
+
+        // ── Detail modal ────────────────────────────────────────────────
+        let lastModalStation = null;
+
+        async function openModal(stationId) {
+            lastModalStation = stationId;
+            const bg = document.getElementById('modal-bg');
+            // Initial paint with summary from latest /api/status snapshot
+            const summary = lastStations.find(s => s.station_id === stationId);
+            if (summary) paintModalSummary(summary);
+            document.getElementById('m-channels-wrap').innerHTML =
+                '<div class="empty" style="padding:18px 0;">Loading…</div>';
+            bg.classList.add('open');
+            // Fetch detailed channel state
+            try {
+                const r = await fetch('/api/station/' + encodeURIComponent(stationId) + '/detail',
+                                      { cache: 'no-store' });
+                if (!r.ok) {
+                    document.getElementById('m-channels-wrap').innerHTML =
+                        '<div class="empty" style="padding:18px 0;">Detail unavailable.</div>';
+                    return;
+                }
+                const det = await r.json();
+                paintModalDetail(det);
+            } catch (e) {
+                document.getElementById('m-channels-wrap').innerHTML =
+                    '<div class="empty" style="padding:18px 0;">Fetch error: ' + escapeHtml(e.message) + '</div>';
+            }
+        }
+
+        function paintModalSummary(s){
+            document.getElementById('m-name').textContent     = s.name || '(unnamed)';
+            document.getElementById('m-id').textContent       = s.station_id;
+            document.getElementById('m-operator').textContent = s.operator_login || '—';
+            document.getElementById('m-cf').textContent       = fmtFreqHz(s.center_freq_hz);
+            document.getElementById('m-sr').textContent       = fmtSrHz(s.sample_rate_hz);
+            document.getElementById('m-coords').textContent   = fmtCoords(s.lat, s.lon);
+            document.getElementById('m-hist').innerHTML       = s.hist_recording
+                ? '<span class="pill on">RECORDING</span>'
+                : '<span class="pill off">idle</span>';
+            document.getElementById('m-chcount').textContent  = (s.channel_count || 0);
+        }
+
+        function paintModalDetail(det){
+            // Override summary with fresher detail values
+            document.getElementById('m-operator').textContent = det.operator_login || '—';
+            document.getElementById('m-cf').textContent       = fmtFreqHz(det.center_freq_hz);
+            document.getElementById('m-sr').textContent       = fmtSrHz(det.sample_rate_hz);
+            document.getElementById('m-hist').innerHTML       = det.hist_recording
+                ? '<span class="pill on">RECORDING</span>'
+                : '<span class="pill off">idle</span>';
+            document.getElementById('m-chcount').textContent  = det.channels.length;
+
+            const wrap = document.getElementById('m-channels-wrap');
+            if (!det.channels.length) {
+                wrap.innerHTML = '<div class="empty" style="padding:18px 0;">No active channels.</div>';
+                return;
+            }
+            wrap.innerHTML = `<table class="channels"><thead><tr>
+                <th style="width:40px;">#</th>
+                <th>Range (MHz)</th>
+                <th>Demod</th>
+                <th>Digital</th>
+                <th>IQ Rec</th>
+                <th>Audio Rec</th>
+                <th>Demod Run</th>
+                <th>Owner</th>
+            </tr></thead><tbody>` +
+                det.channels.map(c => `<tr>
+                    <td>${c.index}</td>
+                    <td>${c.s_mhz.toFixed(3)} – ${c.e_mhz.toFixed(3)}</td>
+                    <td>${escapeHtml(demodName(c.mode))}</td>
+                    <td>${escapeHtml(digitalName(c.digital_mode))}</td>
+                    <td>${c.iq_rec_on    ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
+                    <td>${c.audio_rec_on ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
+                    <td>${c.dem_run      ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
+                    <td>${escapeHtml(c.owner || '—')}</td>
+                </tr>`).join('') + '</tbody></table>';
+        }
+
+        function closeModal(){
+            document.getElementById('modal-bg').classList.remove('open');
+            lastModalStation = null;
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
 
         function escapeHtml(s) {
             return String(s).replace(/[&<>"']/g, c => ({

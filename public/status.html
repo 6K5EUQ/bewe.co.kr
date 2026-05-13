@@ -163,13 +163,35 @@
             font-variant-numeric: tabular-nums;
         }
         table.stations tr:last-child td { border-bottom: none; }
+        table.stations tr.station-row.online td:first-child {
+            box-shadow: inset 3px 0 0 0 rgba(110,224,137,0.8);
+        }
+        table.stations tr.station-row.offline td {
+            color: rgba(255,255,255,0.45);
+        }
+        table.stations tr.station-row.offline .station-name {
+            color: rgba(255,255,255,0.65);
+        }
         .status-dot {
             display: inline-block;
             width: 10px; height: 10px; border-radius: 50%;
+            position: relative;
         }
         .status-dot.online {
             background: #6ee089;
             box-shadow: 0 0 8px rgba(110, 224, 137, 0.6);
+        }
+        .status-dot.online::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px solid rgba(110, 224, 137, 0.7);
+            animation: pulse 1.8s ease-out infinite;
+        }
+        @keyframes pulse {
+            0%   { transform: scale(0.6); opacity: 0.9; }
+            100% { transform: scale(1.8); opacity: 0; }
         }
         .status-dot.offline {
             background: #ff7777;
@@ -314,6 +336,45 @@
         }
         .pill.on  { background: rgba(110,224,137,0.15); color: #6ee089; border: 1px solid rgba(110,224,137,0.3); }
         .pill.off { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.06); }
+        /* Joined-users grid in detail modal */
+        .joins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+        }
+        .join-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .join-card .avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 12px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .join-card .who {
+            display: flex; flex-direction: column; gap: 3px;
+            min-width: 0;
+        }
+        .join-card .who .name {
+            font-size: 13px; color: #fff; font-weight: 500;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .join-card .who .meta {
+            font-size: 10px; color: rgba(255,255,255,0.45);
+            display: flex; gap: 6px; align-items: center;
+        }
+        .pill.tier-1 { background: rgba(255,80,80,0.15);   color: #ff7777; border: 1px solid rgba(255,80,80,0.3); }
+        .pill.tier-2 { background: rgba(255,180,80,0.15);  color: #ffb866; border: 1px solid rgba(255,180,80,0.3); }
+        .pill.tier-3 { background: rgba(110,224,137,0.12); color: #6ee089; border: 1px solid rgba(110,224,137,0.3); }
+        .pill.guest  { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.08); }
         .error-banner {
             background: rgba(255,80,80,0.08);
             border: 1px solid rgba(255,80,80,0.3);
@@ -411,6 +472,24 @@
                     <div><span class="k">Coordinates</span><span class="v" id="m-coords">—</span></div>
                     <div><span class="k">HIST Recording</span><span class="v" id="m-hist">—</span></div>
                     <div><span class="k">Active Channels</span><span class="v" id="m-chcount">—</span></div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <h3>Joined Users <span id="m-joins-count" style="color: rgba(255,255,255,0.35); font-weight: 500; margin-left: 6px;"></span></h3>
+                <div id="m-joins-wrap">
+                    <div class="empty" style="padding:18px 0;">No one has joined.</div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <h3>HIST Live Recording</h3>
+                <div id="m-hist-wrap">
+                    <div class="empty" style="padding:18px 0;">Not recording.</div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <h3>Scheduled Recordings <span id="m-sched-count" style="color: rgba(255,255,255,0.35); font-weight: 500; margin-left: 6px;"></span></h3>
+                <div id="m-sched-wrap">
+                    <div class="empty" style="padding:18px 0;">No schedules.</div>
                 </div>
             </div>
             <div class="modal-section">
@@ -521,7 +600,7 @@
                 const op = s.operator_login || '—';
                 const histTag  = s.hist_recording ? '<span class="rec-flag">REC</span>' : '';
                 const chTag    = s.channel_count ? `<span class="ch-count">${s.channel_count}ch</span>` : '';
-                return `<tr class="station-row" data-id="${escapeHtml(s.station_id)}">
+                return `<tr class="station-row ${dotCls}" data-id="${escapeHtml(s.station_id)}">
                     <td><span class="status-dot ${dotCls}"></span></td>
                     <td>
                         <span class="station-name">${escapeHtml(s.name || '(unnamed)')}</span>
@@ -555,6 +634,14 @@
             if (summary) paintModalSummary(summary);
             document.getElementById('m-channels-wrap').innerHTML =
                 '<div class="empty" style="padding:18px 0;">Loading…</div>';
+            document.getElementById('m-joins-wrap').innerHTML =
+                '<div class="empty" style="padding:18px 0;">Loading…</div>';
+            document.getElementById('m-joins-count').textContent = '';
+            document.getElementById('m-hist-wrap').innerHTML =
+                '<div class="empty" style="padding:18px 0;">Loading…</div>';
+            document.getElementById('m-sched-wrap').innerHTML =
+                '<div class="empty" style="padding:18px 0;">Loading…</div>';
+            document.getElementById('m-sched-count').textContent = '';
             bg.classList.add('open');
             // Fetch detailed channel state
             try {
@@ -586,6 +673,42 @@
             document.getElementById('m-chcount').textContent  = (s.channel_count || 0);
         }
 
+        function tierPill(t){
+            const cls = (t === 1) ? 'tier-1' : (t === 2) ? 'tier-2' : (t === 3) ? 'tier-3' : 'guest';
+            const lbl = (t >= 1 && t <= 3) ? ('T' + t) : '—';
+            return `<span class="pill ${cls}">${lbl}</span>`;
+        }
+        function fmtAbsTime(ms){
+            if (!ms || ms < 1) return '—';
+            const d = new Date(ms);
+            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+        }
+        function fmtDuration(sec){
+            if (sec == null || sec < 0) return '—';
+            const s = Math.floor(sec);
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const r = s % 60;
+            if (h) return h + 'h ' + String(m).padStart(2,'0') + 'm ' + String(r).padStart(2,'0') + 's';
+            if (m) return m + 'm ' + String(r).padStart(2,'0') + 's';
+            return s + 's';
+        }
+        // SchedEntry::Status — fft_viewer.hpp: WAITING=0, ARMED=1, RECORDING=2, DONE=3, FAILED=4
+        const SCHED_STATUS = ['Waiting', 'Armed', 'Recording', 'Done', 'Failed'];
+        function schedStatusPill(st){
+            const lbl = SCHED_STATUS[st] || ('#' + st);
+            let cls = 'off';
+            if (st === 1) cls = 'tier-2';   // Armed (orange)
+            else if (st === 2) cls = 'on';  // Recording (green)
+            else if (st === 3) cls = 'guest'; // Done (grey)
+            else if (st === 4) cls = 'tier-1'; // Failed (red)
+            return `<span class="pill ${cls}">${escapeHtml(lbl)}</span>`;
+        }
+        function avatarInitial(name){
+            const s = (name || '').trim();
+            return s ? s[0].toUpperCase() : '?';
+        }
+
         function paintModalDetail(det){
             // Override summary with fresher detail values
             document.getElementById('m-operator').textContent = det.operator_login || '—';
@@ -595,6 +718,73 @@
                 ? '<span class="pill on">RECORDING</span>'
                 : '<span class="pill off">idle</span>';
             document.getElementById('m-chcount').textContent  = det.channels.length;
+
+            // HIST live recording
+            const hwrap = document.getElementById('m-hist-wrap');
+            if (det.hist) {
+                const h = det.hist;
+                const startMs = h.start_utc_unix * 1000;
+                const durSec  = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
+                hwrap.innerHTML = `<div class="kv-grid">
+                    <div><span class="k">Status</span><span class="v"><span class="pill on">RECORDING</span></span></div>
+                    <div><span class="k">File</span><span class="v">${escapeHtml(h.filename || '—')}</span></div>
+                    <div><span class="k">Started</span><span class="v">${escapeHtml(fmtAbsTime(startMs))}</span></div>
+                    <div><span class="k">Elapsed</span><span class="v">${escapeHtml(fmtDuration(durSec))}</span></div>
+                    <div><span class="k">Center Freq</span><span class="v">${fmtFreqHz(h.center_freq_hz)}</span></div>
+                    <div><span class="k">Sample Rate</span><span class="v">${fmtSrHz(h.sample_rate_hz)}</span></div>
+                    <div><span class="k">Row Rate</span><span class="v">${h.row_rate_hz.toFixed(2)} Hz</span></div>
+                    <div><span class="k">FFT Size</span><span class="v">${h.fft_size}</span></div>
+                </div>`;
+            } else {
+                hwrap.innerHTML = '<div class="empty" style="padding:18px 0;">Not recording.</div>';
+            }
+
+            // Scheduled recordings
+            const scheds = det.scheds || [];
+            const scount = document.getElementById('m-sched-count');
+            const swrap  = document.getElementById('m-sched-wrap');
+            scount.textContent = scheds.length ? '(' + scheds.length + ')' : '';
+            if (!scheds.length) {
+                swrap.innerHTML = '<div class="empty" style="padding:18px 0;">No schedules.</div>';
+            } else {
+                swrap.innerHTML = `<table class="channels"><thead><tr>
+                    <th>Status</th>
+                    <th>Start</th>
+                    <th>Duration</th>
+                    <th>Frequency</th>
+                    <th>Bandwidth</th>
+                    <th>Operator</th>
+                    <th>Target</th>
+                </tr></thead><tbody>` + scheds.map(s => `<tr>
+                    <td>${schedStatusPill(s.status)}</td>
+                    <td>${escapeHtml(fmtAbsTime(s.start_time * 1000))}</td>
+                    <td>${escapeHtml(fmtDuration(s.duration_sec))}</td>
+                    <td>${s.freq_mhz.toFixed(3)} MHz</td>
+                    <td>${s.bw_khz.toFixed(1)} kHz</td>
+                    <td>${escapeHtml(s.operator_name || '—')}</td>
+                    <td>${escapeHtml(s.target || '—')}</td>
+                </tr>`).join('') + '</tbody></table>';
+            }
+
+            // Joined users
+            const joins = det.joins || [];
+            const jcount = document.getElementById('m-joins-count');
+            const jwrap  = document.getElementById('m-joins-wrap');
+            jcount.textContent = joins.length ? '(' + joins.length + ')' : '';
+            if (!joins.length) {
+                jwrap.innerHTML = '<div class="empty" style="padding:18px 0;">No one has joined.</div>';
+            } else {
+                jwrap.innerHTML = '<div class="joins-grid">' + joins.map(j => {
+                    const display = j.authed && j.name ? j.name : '(guest)';
+                    return `<div class="join-card">
+                        <div class="avatar">${escapeHtml(avatarInitial(display))}</div>
+                        <div class="who">
+                            <span class="name">${escapeHtml(display)}</span>
+                            <span class="meta">${tierPill(j.tier)}<span>conn ${j.conn_id}</span></span>
+                        </div>
+                    </div>`;
+                }).join('') + '</div>';
+            }
 
             const wrap = document.getElementById('m-channels-wrap');
             if (!det.channels.length) {

@@ -26,12 +26,19 @@ const STATION_SIZE_V2   = 156;
 const LIST_RESP_HDR     = 131;
 const HSTATE_CH_SIZE    = 48;
 const HSTATE_SIZE       = 32 + 8 + 4 + 1 + 1 + 2 + HSTATE_CH_SIZE * 10; // 528
+const JOIN_SUMMARY_SIZE = 36;   // central_proto.hpp::CentralJoinSummary
+const HIST_INFO_SIZE    = 96;   // central_proto.hpp::CentralHostHistInfo
+const SCHED_ENTRY_SIZE  = 88;   // net_protocol.hpp::SchedSyncEntry
 
 let cachedStations = [];
 let cachedStationsV2 = [];   // status-page v2 — extended LIST including operator/freq/sr
 
 const POLL_INTERVAL_MS = 2000;
 const OFFLINE_THRESHOLD_MS = 15000;
+// After this much offline time, drop the station from the table entirely.
+// Central drops dead host rooms within seconds, so anything older than this is
+// truly gone — keeping a red dot forever just confused operators.
+const REMOVE_AFTER_MS = 60000;
 
 const centralStatus = {
     reachable: false,
@@ -124,8 +131,10 @@ async function pollLoop() {
         try {
             cachedStations = await fetchStations();
             const now = Date.now();
+            const liveIds = new Set();
             for (const s of cachedStations) {
                 if (!s.station_id) continue;
+                liveIds.add(s.station_id);
                 stationLastSeen.set(s.station_id, {
                     lastSeenAt: now,
                     name: s.name,
@@ -134,6 +143,17 @@ async function pollLoop() {
                     tier: s.tier,
                     users: s.users,
                 });
+            }
+            // Drop entries no longer in the live list once they exceed the
+            // remove threshold — otherwise dead servers stay as red dots forever.
+            // Only cleanup when central is reachable: a central outage returns
+            // an empty list, and we don't want to flush every station then.
+            if (centralStatus.reachable) {
+                for (const [id, info] of stationLastSeen) {
+                    if (!liveIds.has(id) && (now - info.lastSeenAt) > REMOVE_AFTER_MS) {
+                        stationLastSeen.delete(id);
+                    }
+                }
             }
         } catch (e) { /* ignore */ }
         await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
@@ -269,6 +289,60 @@ function fetchStationDetail(station_id) {
                     e_mhz: p.readFloatLE(o + 12),
                     owner: p.subarray(o + 16, o + 48).toString('utf8').replace(/\0/g, ''),
                 });
+            }
+            // Optional trailer sections:
+            //   njoins[1] + CentralJoinSummary[njoins]
+            //   has_hist[1] + CentralHostHistInfo (if has_hist)
+            //   nsched[1] + SchedSyncEntry[nsched]
+            out.joins = [];
+            out.hist  = null;
+            out.scheds = [];
+            let off = HSTATE_SIZE;
+            // joins
+            if (p.length > off) {
+                const nj = p[off++];
+                for (let i = 0; i < nj && off + JOIN_SUMMARY_SIZE <= p.length; i++) {
+                    out.joins.push({
+                        name:    p.subarray(off, off + 32).toString('utf8').replace(/\0/g, ''),
+                        tier:    p[off + 32],
+                        authed:  !!p[off + 33],
+                        conn_id: p.readUInt16LE(off + 34),
+                    });
+                    off += JOIN_SUMMARY_SIZE;
+                }
+            }
+            // hist
+            if (p.length > off) {
+                const has_hist = p[off++];
+                if (has_hist && off + HIST_INFO_SIZE <= p.length) {
+                    out.hist = {
+                        filename:       p.subarray(off, off + 64).toString('utf8').replace(/\0/g, ''),
+                        start_utc_unix: Number(p.readBigUInt64LE(off + 64)),
+                        center_freq_hz: Number(p.readBigUInt64LE(off + 72)),
+                        sample_rate_hz: p.readUInt32LE(off + 80),
+                        fft_size:       p.readUInt32LE(off + 84),
+                        row_rate_hz:    p.readFloatLE(off + 88),
+                    };
+                    off += HIST_INFO_SIZE;
+                }
+            }
+            // scheds
+            if (p.length > off) {
+                const ns = p[off++];
+                for (let i = 0; i < ns && off + SCHED_ENTRY_SIZE <= p.length; i++) {
+                    out.scheds.push({
+                        valid:         p[off],
+                        status:        p[off + 1],
+                        op_index:      p[off + 2],
+                        start_time:    Number(p.readBigInt64LE(off + 4)),
+                        duration_sec:  p.readFloatLE(off + 12),
+                        freq_mhz:      p.readFloatLE(off + 16),
+                        bw_khz:        p.readFloatLE(off + 20),
+                        operator_name: p.subarray(off + 24, off + 56).toString('utf8').replace(/\0/g, ''),
+                        target:        p.subarray(off + 56, off + 88).toString('utf8').replace(/\0/g, ''),
+                    });
+                    off += SCHED_ENTRY_SIZE;
+                }
             }
             sock.destroy();
             done(out);

@@ -239,6 +239,66 @@
             border: 1px solid rgba(110,224,137,0.3);
             margin-left: 6px;
         }
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+        .stat-chip .sv {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-chip .sl {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .stat-chip .dot-g { width:8px; height:8px; border-radius:50%; background:#6ee089; box-shadow:0 0 6px rgba(110,224,137,0.5); flex-shrink:0; }
+        .stat-chip .dot-b { width:8px; height:8px; border-radius:50%; background:#7eb8ff; box-shadow:0 0 6px rgba(126,184,255,0.5); flex-shrink:0; }
+        .stat-chip .dot-r { width:8px; height:8px; border-radius:50%; background:#ff7777; box-shadow:0 0 6px rgba(255,119,119,0.4); flex-shrink:0; }
+        .stat-chip .dot-y { width:8px; height:8px; border-radius:50%; background:#ffb866; box-shadow:0 0 6px rgba(255,184,102,0.4); flex-shrink:0; }
+
+        /* Filter */
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .filter-input {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 7px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: #e0e0e0;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .filter-input::placeholder { color: rgba(255,255,255,0.25); }
+        .filter-input:focus { border-color: rgba(100,160,255,0.5); }
+
+        /* Offline row dim */
+        table.stations tr.station-row.offline-row td { color: rgba(255,255,255,0.45); }
+        table.stations tr.station-row.offline-row .station-name { color: rgba(255,255,255,0.5); }
+
         /* Modal */
         .modal-bg {
             position: fixed; inset: 0;
@@ -428,9 +488,20 @@
         </div>
     </div>
 
+    <!-- Stats bar -->
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip"><span class="dot-g"></span><div><div class="sv" id="st-online">—</div><div class="sl">Online</div></div></div>
+        <div class="stat-chip"><span class="dot-b"></span><div><div class="sv" id="st-channels">—</div><div class="sl">Channels</div></div></div>
+        <div class="stat-chip"><span class="dot-r"></span><div><div class="sv" id="st-rec">—</div><div class="sl">Recording</div></div></div>
+        <div class="stat-chip"><span class="dot-y"></span><div><div class="sv" id="st-users">—</div><div class="sl">Users</div></div></div>
+    </div>
+
     <!-- Stations -->
     <div class="section-title">
         Stations <span class="count" id="station-count">(0)</span>
+    </div>
+    <div class="filter-row">
+        <input type="text" class="filter-input" id="filter-input" placeholder="Filter by name, operator, or frequency…" oninput="applyFilter()">
     </div>
     <div class="stations-wrap">
         <table class="stations" id="stations-table">
@@ -465,12 +536,14 @@
             </div>
             <div class="modal-section">
                 <h3>Tuner</h3>
+                <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px;">
+                    <span id="m-cf" style="font-size:22px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;font-family:'SF Mono',Menlo,monospace;">—</span>
+                    <span id="m-sr" style="font-size:14px;color:rgba(255,255,255,0.5);font-family:'SF Mono',Menlo,monospace;">—</span>
+                    <span id="m-hist">—</span>
+                </div>
                 <div class="kv-grid">
                     <div><span class="k">Operator</span><span class="v" id="m-operator">—</span></div>
-                    <div><span class="k">Center Frequency</span><span class="v" id="m-cf">—</span></div>
-                    <div><span class="k">Sample Rate</span><span class="v" id="m-sr">—</span></div>
                     <div><span class="k">Coordinates</span><span class="v" id="m-coords">—</span></div>
-                    <div><span class="k">HIST Recording</span><span class="v" id="m-hist">—</span></div>
                     <div><span class="k">Active Channels</span><span class="v" id="m-chcount">—</span></div>
                 </div>
             </div>
@@ -505,6 +578,7 @@
         const REFRESH_MS = 2000;
         let lastFetchAt = 0;
         let lastStations = [];   // latest /api/status snapshot — used by modal summary
+        let lastServerTime = 0;  // for client-side age tick
 
         function fmtAge(ms) {
             if (ms == null) return '—';
@@ -550,11 +624,31 @@
         }
         const DEMOD_MODE = ['—', 'AM', 'FM', 'MAGIC'];
         const DIGITAL_MODE = ['—', 'AIS', 'ADS-B', 'DEMOD', 'AUTO-ID'];
+        // Colors for demod types — matching BE_WE sat_view color philosophy
+        const DEMOD_COLOR = { AM: '#7eb8ff', FM: '#6ee089', MAGIC: '#c084fc', AIS: '#ffb866', 'ADS-B': '#fde047' };
         function demodName(m){ return DEMOD_MODE[m] || ('mode' + m); }
         function digitalName(m){ return DIGITAL_MODE[m] || ('digi' + m); }
+        function demodBadge(demod, digital) {
+            const d = demodName(demod);
+            const dg = digital ? digitalName(digital) : null;
+            const label = (dg && dg !== '—') ? dg : d;
+            const col = DEMOD_COLOR[label] || 'rgba(255,255,255,0.6)';
+            return `<span style="color:${col};font-weight:600;">${escapeHtml(label)}</span>`;
+        }
+
+        function applyFilter() {
+            const q = (document.getElementById('filter-input').value || '').toLowerCase();
+            document.querySelectorAll('#stations-body tr.station-row').forEach(tr => {
+                const name  = (tr.dataset.name  || '').toLowerCase();
+                const op    = (tr.dataset.op    || '').toLowerCase();
+                const freq  = (tr.dataset.freq  || '').toLowerCase();
+                tr.style.display = (!q || name.includes(q) || op.includes(q) || freq.includes(q)) ? '' : 'none';
+            });
+        }
 
         function render(data) {
             lastStations = data.stations || [];
+            lastServerTime = data.serverTime;
             const now = data.serverTime;
 
             // Central
@@ -585,7 +679,14 @@
                 errWrap.style.display = 'none';
             }
 
-            // Stations
+            // Stats bar
+            const online = data.stations.filter(s => s.online);
+            document.getElementById('st-online').textContent   = online.length + ' / ' + data.stations.length;
+            document.getElementById('st-channels').textContent = data.stations.reduce((a, s) => a + (s.channel_count || 0), 0);
+            document.getElementById('st-rec').textContent      = data.stations.filter(s => s.hist_recording).length;
+            document.getElementById('st-users').textContent    = data.stations.reduce((a, s) => a + (s.users || 0), 0);
+
+            // Stations — sort: online first, then by name
             const tbody = document.getElementById('stations-body');
             document.getElementById('station-count').textContent = '(' + data.stations.length + ')';
 
@@ -594,13 +695,26 @@
                 return;
             }
 
-            tbody.innerHTML = data.stations.map(s => {
+            const sorted = [...data.stations].sort((a, b) => {
+                if (a.online !== b.online) return a.online ? -1 : 1;
+                return (a.name || '').localeCompare(b.name || '');
+            });
+
+            tbody.innerHTML = sorted.map(s => {
                 const tier = tierLabel(s.tier);
                 const dotCls = s.online ? 'online' : 'offline';
+                const offCls = s.online ? '' : ' offline-row';
                 const op = s.operator_login || '—';
                 const histTag  = s.hist_recording ? '<span class="rec-flag">REC</span>' : '';
                 const chTag    = s.channel_count ? `<span class="ch-count">${s.channel_count}ch</span>` : '';
-                return `<tr class="station-row ${dotCls}" data-id="${escapeHtml(s.station_id)}">
+                const usersCell = s.users > 0
+                    ? `<span style="color:#ffb866;font-weight:600;">${s.users}</span>`
+                    : s.users;
+                return `<tr class="station-row ${dotCls}" data-id="${escapeHtml(s.station_id)}"
+                            data-name="${escapeHtml(s.name || '')}"
+                            data-op="${escapeHtml(op)}"
+                            data-freq="${escapeHtml(fmtFreqHz(s.center_freq_hz) || '')}"
+                            data-seen="${s.lastSeenAt || 0}">
                     <td><span class="status-dot ${dotCls}"></span></td>
                     <td>
                         <span class="station-name">${escapeHtml(s.name || '(unnamed)')}</span>
@@ -610,10 +724,10 @@
                     <td><span class="op-cell">${escapeHtml(op)}</span></td>
                     <td><span class="coord-cell">${fmtCoords(s.lat, s.lon)}</span></td>
                     <td><span class="tier ${tier.cls}">${tier.name}</span></td>
-                    <td>${s.users}</td>
+                    <td>${usersCell}</td>
                     <td><span class="freq-cell">${fmtFreqHz(s.center_freq_hz)}</span></td>
                     <td><span class="sr-cell">${fmtSrHz(s.sample_rate_hz)}</span></td>
-                    <td>${fmtAge(s.ageMs)}</td>
+                    <td class="age-cell">${fmtAge(s.ageMs)}</td>
                 </tr>`;
             }).join('');
 
@@ -621,6 +735,9 @@
             tbody.querySelectorAll('tr.station-row').forEach(tr => {
                 tr.addEventListener('click', () => openModal(tr.dataset.id));
             });
+
+            // Re-apply current filter
+            applyFilter();
         }
 
         // ── Detail modal ────────────────────────────────────────────────
@@ -794,8 +911,7 @@
             wrap.innerHTML = `<table class="channels"><thead><tr>
                 <th style="width:40px;">#</th>
                 <th>Range (MHz)</th>
-                <th>Demod</th>
-                <th>Digital</th>
+                <th>Mode</th>
                 <th>IQ Rec</th>
                 <th>Audio Rec</th>
                 <th>Demod Run</th>
@@ -804,8 +920,7 @@
                 det.channels.map(c => `<tr>
                     <td>${c.index}</td>
                     <td>${c.s_mhz.toFixed(3)} – ${c.e_mhz.toFixed(3)}</td>
-                    <td>${escapeHtml(demodName(c.mode))}</td>
-                    <td>${escapeHtml(digitalName(c.digital_mode))}</td>
+                    <td>${demodBadge(c.mode, c.digital_mode)}</td>
                     <td>${c.iq_rec_on    ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
                     <td>${c.audio_rec_on ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
                     <td>${c.dem_run      ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
@@ -850,9 +965,21 @@
                 'next refresh in ' + (remain / 1000).toFixed(1) + 's';
         }
 
+        // Client-side per-second age tick (no extra fetch needed)
+        function tickAgeCells() {
+            const now = Date.now();
+            document.querySelectorAll('#stations-body tr.station-row').forEach(tr => {
+                const seenAt = parseInt(tr.dataset.seen, 10);
+                if (!seenAt) return;
+                const ageCell = tr.querySelector('.age-cell');
+                if (ageCell) ageCell.textContent = fmtAge(now - seenAt);
+            });
+        }
+
         refresh();
         setInterval(refresh, REFRESH_MS);
         setInterval(tickCountdown, 100);
+        setInterval(tickAgeCells, 1000);
     </script>
 </body>
 </html>

@@ -46,36 +46,37 @@
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" y1="19" x2="12" y2="23"/>
-                        <line x1="8" y1="23" x2="16" y2="23"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <path d="M12 2a10 10 0 0 1 0 20A10 10 0 0 1 12 2"/>
+                        <path d="M12 8a4 4 0 0 1 0 8"/>
+                        <line x1="2" y1="12" x2="6" y2="12"/>
+                        <line x1="18" y1="12" x2="22" y2="12"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Radio-Tuned STT</h3>
-                <p class="feature-desc">Speech-to-text trained on narrowband radio audio. Handles squelch tails, cross-talk, and low-SNR conditions that general-purpose engines choke on. Tune it per net.</p>
+                <h3 class="feature-title">Multi-Station SDR Network</h3>
+                <p class="feature-desc">Global SDR stations connected via relay — up to 10 simultaneous demod channels per station. AM, FM, AIS, ADS-B and digital protocol auto-decode with no manual configuration.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        <path d="M17 6l-2 2M7 18l2-2"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Auto Signal Decode</h3>
-                <p class="feature-desc">Point it at a band and it classifies what's there — DMR, P25, TETRA, D-STAR, NXDN, and more. Filters out noise, locks onto active channels, and starts decoding without manual setup.</p>
+                <h3 class="feature-title">Live Satellite &amp; Aircraft</h3>
+                <p class="feature-desc">TLE-based real-time orbital tracking across LEO, MEO, and GEO bands — click any satellite to trace its full orbit. OpenSky ADS-B aircraft positions overlaid simultaneously.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                        <line x1="8" y1="21" x2="16" y2="21"/>
-                        <line x1="12" y1="17" x2="12" y2="21"/>
-                        <polyline points="6 8 9 11 6 14"/>
-                        <line x1="11" y1="14" x2="18" y2="14"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">IQ Detection Engine</h3>
-                <p class="feature-desc">Drop in raw IQ captures and the detection pipeline kicks off immediately. No format wrangling, no parameter tuning — just load the file and get results.</p>
+                <h3 class="feature-title">IQ History Recording</h3>
+                <p class="feature-desc">Long-term raw IQ stream capture per station alongside per-channel audio recording. Full-bandwidth archives ready for offline reanalysis, replay, and signal forensics.</p>
             </div>
         </div>
 
@@ -110,6 +111,21 @@
         <div class="popup-coords" id="popup-coords"></div>
         <div class="popup-info" id="popup-users"></div>
         <div class="popup-tier" id="popup-tier"></div>
+        <div id="popup-v2" class="popup-v2" style="display:none;">
+            <div class="popup-v2-row">
+                <span class="popup-v2-label">Freq</span>
+                <span class="popup-v2-val" id="popup-freq">—</span>
+            </div>
+            <div class="popup-v2-row">
+                <span class="popup-v2-label">SR</span>
+                <span class="popup-v2-val" id="popup-sr">—</span>
+            </div>
+            <div class="popup-v2-row">
+                <span class="popup-v2-label">Ch</span>
+                <span class="popup-v2-val" id="popup-ch">—</span>
+                <span class="popup-rec" id="popup-rec" style="display:none;">REC</span>
+            </div>
+        </div>
         <div class="popup-close" onclick="closePopup()">&times;</div>
     </div>
 
@@ -127,6 +143,14 @@
 
     <!-- Station count -->
     <div class="station-count globe-ui" style="display:none;" id="station-count">0 Stations Online</div>
+
+    <!-- Satellite mode toggle -->
+    <div class="sat-toggle globe-ui" style="display:none;">
+        <span class="sat-toggle-label">SAT</span>
+        <button class="sat-btn" data-mode="off" onclick="setSatMode('off')">OFF</button>
+        <button class="sat-btn active" data-mode="visual" onclick="setSatMode('visual')">VISUAL</button>
+        <button class="sat-btn" data-mode="starlink" onclick="setSatMode('starlink')">STARLINK</button>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="app.js"></script>

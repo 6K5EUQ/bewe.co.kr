@@ -411,11 +411,87 @@ async function fetchAircraft() {
 fetchAircraft();
 setInterval(fetchAircraft, 60000); // 60초 간격 (크레딧 절약)
 
+// ── TLE (CelesTrak) ─────────────────────────────────────────────────────────
+const TLE_GROUPS_ALLOWED = new Set(['visual', 'starlink', 'stations', 'gnss', 'geo', 'active']);
+const tleCache = {};  // group → { sats: [...], expiresAt: ms }
+
+function parseTleText(text) {
+    const lines = text.split('\n').map(l => l.trimEnd());
+    const sats = [];
+    for (let i = 0; i + 2 < lines.length; i += 3) {
+        const name = lines[i].trim();
+        const l1 = lines[i + 1];
+        const l2 = lines[i + 2];
+        if (!l1 || l1[0] !== '1' || !l2 || l2[0] !== '2') continue;
+        if (l1.length < 64 || l2.length < 64) continue;
+
+        const yy  = parseInt(l1.substring(18, 20), 10);
+        const doy = parseFloat(l1.substring(20, 32));
+        const fullYear = yy < 57 ? 2000 + yy : 1900 + yy;
+        const epoch_utc = Date.UTC(fullYear, 0, 1) + (doy - 1) * 86400000;
+
+        const n = parseFloat(l2.substring(52, 63));
+        if (!(n > 0)) continue;
+
+        sats.push({
+            name,
+            incl: parseFloat(l2.substring(8,  16)),
+            raan: parseFloat(l2.substring(17, 25)),
+            argp: parseFloat(l2.substring(34, 42)),
+            m0:   parseFloat(l2.substring(43, 51)),
+            n,           // rev/day
+            epoch_utc,   // ms since Unix epoch
+        });
+    }
+    return sats;
+}
+
+async function fetchTle(group) {
+    const cached = tleCache[group];
+    if (cached && Date.now() < cached.expiresAt) return cached.sats;
+
+    const url = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${group}&FORMAT=tle`;
+    const resp = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    if (!resp.ok) throw new Error(`CelesTrak ${resp.status}`);
+    const text = await resp.text();
+    const sats = parseTleText(text);
+    tleCache[group] = { sats, expiresAt: Date.now() + 3600000 };
+    console.log(`TLE: cached ${sats.length} sats for group=${group}`);
+    return sats;
+}
+
 // ── Express ─────────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/api/tle', async (req, res) => {
+    const group = req.query.group || 'visual';
+    if (!TLE_GROUPS_ALLOWED.has(group)) return res.status(400).json({ error: 'invalid group' });
+    try {
+        const sats = await fetchTle(group);
+        res.json(sats);
+    } catch (e) {
+        console.error('TLE fetch error:', e.message);
+        res.status(502).json({ error: e.message });
+    }
+});
+
 app.get('/api/stations', (req, res) => {
-    res.json(cachedStations);
+    const v2Index = new Map();
+    for (const s of cachedStationsV2) {
+        if (s.station_id) v2Index.set(s.station_id, s);
+    }
+    const result = cachedStations.map(s => {
+        const v2 = v2Index.get(s.station_id) || {};
+        return {
+            ...s,
+            operator_login:  v2.operator_login  || '',
+            center_freq_hz:  v2.center_freq_hz  || 0,
+            sample_rate_hz:  v2.sample_rate_hz  || 0,
+            hist_recording:  !!v2.hist_recording,
+            channel_count:   v2.channel_count   || 0,
+        };
+    });
+    res.json(result);
 });
 
 app.get('/api/aircraft', (req, res) => {

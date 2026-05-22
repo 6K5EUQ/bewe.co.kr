@@ -456,8 +456,8 @@
         </div>
     </div>
 
-    <h1 class="page-title">System Status</h1>
-    <p class="page-sub">Live health of the central relay and all registered stations.</p>
+    <h1 class="page-title">Network Status</h1>
+    <p class="page-sub">Live health of the Central Server and distributed collection sites.</p>
 
     <!-- Central -->
     <div class="central-card">
@@ -490,18 +490,18 @@
 
     <!-- Stats bar -->
     <div class="stats-bar" id="stats-bar">
-        <div class="stat-chip"><span class="dot-g"></span><div><div class="sv" id="st-online">—</div><div class="sl">Online</div></div></div>
-        <div class="stat-chip"><span class="dot-b"></span><div><div class="sv" id="st-channels">—</div><div class="sl">Channels</div></div></div>
+        <div class="stat-chip"><span class="dot-g"></span><div><div class="sv" id="st-online">—</div><div class="sl">Sites Online</div></div></div>
+        <div class="stat-chip"><span class="dot-b"></span><div><div class="sv" id="st-channels">—</div><div class="sl">Demod Channels</div></div></div>
         <div class="stat-chip"><span class="dot-r"></span><div><div class="sv" id="st-rec">—</div><div class="sl">Recording</div></div></div>
-        <div class="stat-chip"><span class="dot-y"></span><div><div class="sv" id="st-users">—</div><div class="sl">Users</div></div></div>
+        <div class="stat-chip"><span class="dot-y"></span><div><div class="sv" id="st-users">—</div><div class="sl">Analysts</div></div></div>
     </div>
 
     <!-- Stations -->
     <div class="section-title">
-        Stations <span class="count" id="station-count">(0)</span>
+        Collection Sites <span class="count" id="station-count">(0)</span>
     </div>
     <div class="filter-row">
-        <input type="text" class="filter-input" id="filter-input" placeholder="Filter by name, operator, or frequency…" oninput="applyFilter()">
+        <input type="text" class="filter-input" id="filter-input" placeholder="Filter by site, operator, or frequency…" oninput="applyFilter()">
     </div>
     <div class="stations-wrap">
         <table class="stations" id="stations-table">
@@ -512,7 +512,7 @@
                     <th>Operator</th>
                     <th style="width: 130px;">Coords</th>
                     <th style="width: 90px;">Tier</th>
-                    <th style="width: 70px;">Users</th>
+                    <th style="width: 70px;">Analysts</th>
                     <th style="width: 140px;">Frequency</th>
                     <th style="width: 110px;">Sample Rate</th>
                     <th style="width: 130px;">Last Seen</th>
@@ -535,7 +535,7 @@
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
             <div class="modal-section">
-                <h3>Tuner</h3>
+                <h3>Receiver</h3>
                 <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px;">
                     <span id="m-cf" style="font-size:22px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;font-family:'SF Mono',Menlo,monospace;">—</span>
                     <span id="m-sr" style="font-size:14px;color:rgba(255,255,255,0.5);font-family:'SF Mono',Menlo,monospace;">—</span>
@@ -548,15 +548,15 @@
                 </div>
             </div>
             <div class="modal-section">
-                <h3>Joined Users <span id="m-joins-count" style="color: rgba(255,255,255,0.35); font-weight: 500; margin-left: 6px;"></span></h3>
+                <h3>Joined Analysts <span id="m-joins-count" style="color: rgba(255,255,255,0.35); font-weight: 500; margin-left: 6px;"></span></h3>
                 <div id="m-joins-wrap">
-                    <div class="empty" style="padding:18px 0;">No one has joined.</div>
+                    <div class="empty" style="padding:18px 0;">No analysts have joined.</div>
                 </div>
             </div>
             <div class="modal-section">
-                <h3>HIST Live Recording</h3>
+                <h3>Waterfall Archive &mdash; Live Segment</h3>
                 <div id="m-hist-wrap">
-                    <div class="empty" style="padding:18px 0;">Not recording.</div>
+                    <div class="empty" style="padding:18px 0;">No active waterfall segment.</div>
                 </div>
             </div>
             <div class="modal-section">
@@ -566,9 +566,9 @@
                 </div>
             </div>
             <div class="modal-section">
-                <h3>Channels</h3>
+                <h3>Demodulator Channels</h3>
                 <div id="m-channels-wrap">
-                    <div class="empty" style="padding:18px 0;">No active channels.</div>
+                    <div class="empty" style="padding:18px 0;">No active demodulator channels.</div>
                 </div>
             </div>
         </div>
@@ -691,7 +691,7 @@
             document.getElementById('station-count').textContent = '(' + data.stations.length + ')';
 
             if (data.stations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty">No stations have been observed yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="empty">No collection sites observed yet.</td></tr>';
                 return;
             }
 
@@ -853,7 +853,7 @@
                     <div><span class="k">FFT Size</span><span class="v">${h.fft_size}</span></div>
                 </div>`;
             } else {
-                hwrap.innerHTML = '<div class="empty" style="padding:18px 0;">Not recording.</div>';
+                hwrap.innerHTML = '<div class="empty" style="padding:18px 0;">No active waterfall segment.</div>';
             }
 
             // Scheduled recordings
@@ -889,7 +889,7 @@
             const jwrap  = document.getElementById('m-joins-wrap');
             jcount.textContent = joins.length ? '(' + joins.length + ')' : '';
             if (!joins.length) {
-                jwrap.innerHTML = '<div class="empty" style="padding:18px 0;">No one has joined.</div>';
+                jwrap.innerHTML = '<div class="empty" style="padding:18px 0;">No analysts have joined.</div>';
             } else {
                 jwrap.innerHTML = '<div class="joins-grid">' + joins.map(j => {
                     const display = j.authed && j.name ? j.name : '(guest)';
@@ -905,7 +905,7 @@
 
             const wrap = document.getElementById('m-channels-wrap');
             if (!det.channels.length) {
-                wrap.innerHTML = '<div class="empty" style="padding:18px 0;">No active channels.</div>';
+                wrap.innerHTML = '<div class="empty" style="padding:18px 0;">No active demodulator channels.</div>';
                 return;
             }
             wrap.innerHTML = `<table class="channels"><thead><tr>

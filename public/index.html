@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,10 +18,9 @@
         <nav class="landing-nav">
             <div class="nav-logo">BEWE</div>
             <div class="nav-links">
-                <a href="#" class="nav-link">About</a>
-                <a href="#" class="nav-link">Technology</a>
-                <a href="#" class="nav-link">Network</a>
-                <a href="/status.html" class="nav-link">Status</a>
+                <a href="#" class="nav-link" id="nav-about">About</a>
+                <a href="#" class="nav-link" id="nav-technology">Technology</a>
+                <a href="#" class="nav-link" id="nav-network">Network</a>
                 <a href="#" class="nav-link nav-link-accent" id="nav-discover">Discover</a>
             </div>
         </nav>
@@ -105,6 +103,379 @@
         </div>
     </div>
 
+    <!-- ── About / 창업설명 PPT Modal ──────────────────────────────────── -->
+    <div id="about-modal" class="about-modal hidden">
+        <div class="ppt-stage">
+            <button class="ppt-close" id="ppt-close" aria-label="Close">&times;</button>
+            <button class="ppt-nav ppt-prev" id="ppt-prev" aria-label="Previous">&#8249;</button>
+            <button class="ppt-nav ppt-next" id="ppt-next" aria-label="Next">&#8250;</button>
+
+            <div class="ppt-frame">
+                <div class="ppt-slides" id="ppt-slides">
+
+                    <!-- Slide 1 — Cover -->
+                    <section class="ppt-slide ppt-cover active" data-title="표지">
+                        <div class="ppt-cover-bg" style="background-image:url('assets/globe_sat_soi.png');"></div>
+                        <div class="ppt-cover-overlay"></div>
+                        <div class="ppt-cover-content">
+                            <div class="ppt-eyebrow">RF SIGNAL INTELLIGENCE PLATFORM</div>
+                            <h1 class="ppt-cover-title">BEWE</h1>
+                            <p class="ppt-cover-tagline">Behind Everyone We Hear Everything</p>
+                            <p class="ppt-cover-sub">다중 관제소 협업형 SDR 인텔리전스 플랫폼<br>창업 소개</p>
+                            <div class="ppt-cover-meta">
+                                <span>2026</span>
+                                <span class="dot">•</span>
+                                <span>bewe.co.kr</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 2 — Why Now -->
+                    <section class="ppt-slide" data-title="왜 지금">
+                        <div class="ppt-num">02</div>
+                        <h2 class="ppt-h2">왜 지금, RF 인텔리전스인가</h2>
+                        <p class="ppt-lead">스펙트럼은 더 이상 라디오 애호가의 영역이 아닙니다. 안 보이는 위협이 그 위에서 매일 늘어나고 있습니다.</p>
+                        <div class="ppt-grid-2 ppt-grid-tight">
+                            <div class="ppt-pain ppt-pain-accent">
+                                <div class="ppt-pain-num">DRONE</div>
+                                <h4>드론 폭증의 시대</h4>
+                                <p>상업·취미 드론이 모든 영공에 들어왔습니다. 공항·발전소·군 시설 보호엔 2.4 / 5.8 GHz 제어링크 실시간 스캔이 필수가 되었습니다.</p>
+                            </div>
+                            <div class="ppt-pain ppt-pain-accent">
+                                <div class="ppt-pain-num">JAMMING</div>
+                                <h4>불법 · 미인가 송출</h4>
+                                <p>면허 없는 리피터, 신고되지 않은 송출, 통신 방해(jamming) 사례가 매년 증가. 누가, 어디서, 언제 보냈는지 그 자리에서 잡아야 합니다.</p>
+                            </div>
+                            <div class="ppt-pain ppt-pain-accent">
+                                <div class="ppt-pain-num">SAT</div>
+                                <h4>저궤도 위성의 폭증</h4>
+                                <p>Starlink · OneWeb 등 수만 대 LEO 통신 위성, IoT 위성, 정찰 위성. 폭증하는 다운링크를 식별·추적하는 분산 수신망이 필요합니다.</p>
+                            </div>
+                            <div class="ppt-pain ppt-pain-accent">
+                                <div class="ppt-pain-num">5G</div>
+                                <h4>무선 인프라 의존도</h4>
+                                <p>LTE / 5G / Wi-Fi 의존도가 사회 인프라가 된 지금, 간섭·장애·전파 보안 모니터링은 선택이 아니라 기간 인프라입니다.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 3 — 현대 사회의 RF 사각지대 -->
+                    <section class="ppt-slide" data-title="사회 사각지대">
+                        <div class="ppt-num">03</div>
+                        <h2 class="ppt-h2">현대 사회의 RF 사각지대</h2>
+                        <p class="ppt-lead">스펙트럼은 사회의 신경망이지만, 그 위에서 무슨 일이 벌어지는지 실시간으로 보는 사람은 거의 없습니다.</p>
+                        <div class="ppt-grid-2 ppt-grid-tight">
+                            <div class="ppt-pain ppt-pain-warn">
+                                <div class="ppt-pain-num">DRONE</div>
+                                <h4>공항 · 중요시설 드론 침입</h4>
+                                <p>단 1대의 드론으로 활주로가 멈추고, 발전소 · 정유 · 군 시설의 보호망에 구멍이 뚫립니다. Gatwick, 인천 · 김포공항, 청와대 인근 — RF 탐지 없이는 누구의 어떤 드론인지조차 알 수 없습니다.</p>
+                            </div>
+                            <div class="ppt-pain ppt-pain-warn">
+                                <div class="ppt-pain-num">GNSS</div>
+                                <h4>GPS 스푸핑 · 통신 Jamming</h4>
+                                <p>자율주행 · 항공 · 해상 항법이 단 한 채널에 의존. 의도적 위조와 방해가 흑해 · 중동에서 매일 보고되며, 한국 영해 · 공항 인근도 더는 예외가 아닙니다.</p>
+                            </div>
+                            <div class="ppt-pain ppt-pain-warn">
+                                <div class="ppt-pain-num">SCAM</div>
+                                <h4>불법 송출 · 보이스피싱 중계기</h4>
+                                <p>매년 수만 건 신고, RF 추적·검거율은 한 자리 수. 단발성 송출은 그 자리에서 잡지 않으면 영영 사라지고, 피해자만 남습니다.</p>
+                            </div>
+                            <div class="ppt-pain ppt-pain-warn">
+                                <div class="ppt-pain-num">SAT</div>
+                                <h4>식별 없는 위성 다운링크</h4>
+                                <p>수만 대 LEO 위성이 머리 위를 흘러가지만, 누가 무엇을 어디로 송출하는지 검증할 분산 수신망이 없습니다. 우주 보안의 출발점은 지상의 협업 청취입니다.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 4 — Problem -->
+                    <section class="ppt-slide" data-title="문제 인식">
+                        <div class="ppt-num">04</div>
+                        <h2 class="ppt-h2">왜 지금까지의 SDR로는 충분하지 않은가</h2>
+                        <p class="ppt-lead">한 사람, 한 화면 — 무선 신호는 협업의 대상이 되지 못했습니다.</p>
+                        <div class="ppt-grid-2">
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">01</div>
+                                <h4>단독 운용의 한계</h4>
+                                <p>운영자 한 명이 본 워터폴은 그 자리에서 사라집니다. 동료는 같은 신호를 동시에 볼 수 없습니다.</p>
+                            </div>
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">02</div>
+                                <h4>접속 설정의 복잡함</h4>
+                                <p>IP / 포트포워딩 / NAT 우회 — 한 번 연결하기까지의 진입장벽이 너무 높습니다.</p>
+                            </div>
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">03</div>
+                                <h4>놓친 신호의 소실</h4>
+                                <p>한 번 지나간 단발성 송출은 다시 재생할 수 없습니다. 분석할 기회가 사라집니다.</p>
+                            </div>
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">04</div>
+                                <h4>식별 정보의 파편화</h4>
+                                <p>"그 405.10 FM 리피터" — 그 정보는 한 운영자의 머릿속에만 살아있습니다.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 5 — Mission: 왜 우리가 만드는가 -->
+                    <section class="ppt-slide ppt-mission" data-title="미션">
+                        <div class="ppt-num">05</div>
+                        <h2 class="ppt-h2">왜 우리가 만드는가</h2>
+                        <blockquote class="ppt-quote">
+                            모든 도시가 카메라 인프라를 갖춘 시대.<br>
+                            이제는 <span class="ppt-accent">스펙트럼의 CCTV</span>가 필요합니다.
+                        </blockquote>
+                        <div class="ppt-beliefs">
+                            <div class="ppt-belief">
+                                <div class="ppt-belief-no">01</div>
+                                <h5>RF는 사회 인프라다</h5>
+                                <p>카메라처럼 <b>분산 · 상시 · 누구나 접근 가능</b>해야 합니다. 정부 · 대기업의 폐쇄 자산이 아니라 도시의 기반 시설이 되어야 합니다.</p>
+                            </div>
+                            <div class="ppt-belief">
+                                <div class="ppt-belief-no">02</div>
+                                <h5>가격 · 운영 장벽을 깬다</h5>
+                                <p>수억 원 장비와 전담 인력 없이도 <b>RTL-SDR + Raspberry Pi</b>만으로 완성되는 풀스택 SIGINT 노드. GUI · 자동 분석이 진입 장벽을 무너뜨립니다.</p>
+                            </div>
+                            <div class="ppt-belief">
+                                <div class="ppt-belief-no">03</div>
+                                <h5>협업이 정답이다</h5>
+                                <p>한 명이 본 신호는 <b>모두가 본다.</b> 한 명의 머릿속에 갇혀있던 식별 지식이 Signal Library를 거쳐 집단지성이 됩니다.</p>
+                            </div>
+                            <div class="ppt-belief">
+                                <div class="ppt-belief-no">04</div>
+                                <h5>국경을 넘는 인텔리전스</h5>
+                                <p>단일 포트 릴레이로 <b>어디서든 노드 추가, 어디서든 청취.</b> 한국에서 본 신호를 페루의 운영자가 같은 워터폴에서 동시에 봅니다.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 6 — Solution -->
+                    <section class="ppt-slide" data-title="솔루션">
+                        <div class="ppt-num">06</div>
+                        <h2 class="ppt-h2">BE_WE — 모두가 같은 폭포수를 본다</h2>
+                        <p class="ppt-lead">한 HOST가 RF를 받고, 전 세계 어디서든 JOIN한 운영자들이 같은 라이브 스펙트럼을 함께 봅니다.</p>
+                        <div class="ppt-solution-row">
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>실시간 워터폴 공유</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>채널 · 녹음 · 채팅 · 파일 동기화</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>단일 포트 7700 Central 릴레이</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>3D Globe 디스커버리</div>
+                        </div>
+                        <figure class="ppt-figure">
+                            <img src="assets/Main_Page.png" alt="BE_WE main page">
+                            <figcaption>HOST가 송출한 라이브 폭포수를 다수의 JOIN이 동시에 관찰</figcaption>
+                        </figure>
+                    </section>
+
+                    <!-- Slide 7 — 3D Globe Discovery -->
+                    <section class="ppt-slide" data-title="3D Globe 디스커버리">
+                        <div class="ppt-num">07</div>
+                        <h2 class="ppt-h2">좌표만 클릭하면 끝</h2>
+                        <p class="ppt-lead">IP 주소도, 포트 설정도 필요 없습니다. 지구본 위 빛나는 마커가 곧 운영 중인 관제소입니다.</p>
+                        <div class="ppt-split">
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>위·경도 브로드캐스트</b><p>각 스테이션이 Central에 위치를 송출 → 글로벌 지구본에 자동 마커</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>위성 궤적 오버레이</b><p>Starlink / SOI / LEO·MEO·GEO 4계층 TLE 카탈로그 자동 갱신</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>다중 윈도우 운영</b><p>지구본은 미션컨트롤로 두고, 여러 스테이션을 별도 창으로 동시 운용</p></div></div>
+                            </div>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/globe_sat_soi.png" alt="3D Globe with satellites">
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 8 — Spectrum + Time Machine -->
+                    <section class="ppt-slide" data-title="스펙트럼 · 타임머신">
+                        <div class="ppt-num">08</div>
+                        <h2 class="ppt-h2">놓친 신호를 되돌린다</h2>
+                        <p class="ppt-lead">60초 IQ 롤링 버퍼와 Max Hold/Decay — 한 번 지나간 송출도 그 자리에 남습니다.</p>
+                        <div class="ppt-split">
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/max_decay.png" alt="Max decay spectrum">
+                            </figure>
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>GPU 워터폴 + Max Hold/Decay</b><p>한 번 휘둘러 본 대역의 모든 피크가 누적, 페이드 옵션으로 신·구 구분</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>Time Machine</b><p><code>T</code>로 60초 IQ 롤링 녹화, <code>Space</code>로 정지, 마우스로 되감기</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>Region IQ Export</b><p><code>Ctrl+드래그</code>로 시간·주파수 영역을 박스 선택 → <code>R</code>로 즉시 IQ 파일 저장</p></div></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 9 — Channels / Band / Notch -->
+                    <section class="ppt-slide" data-title="채널 · 밴드플랜">
+                        <div class="ppt-num">09</div>
+                        <h2 class="ppt-h2">동시 10채널 + 사용자 정의 밴드플랜</h2>
+                        <p class="ppt-lead">AM / FM 10채널을 동시에 복조하고, 떠난 채널은 Holding 리스트에 살아남습니다.</p>
+                        <div class="ppt-split">
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>Holding List</b><p>채널을 떠나도 스켈치 타이머 유지 — 돌아오면 자동 재참여</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>사용자 정의 밴드플랜</b><p>AIR / Amateur / Marine / TV·DAB 등 카테고리 / 색상 모두 운영자 정의, 모든 JOIN에 자동 동기화</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>글로벌 Notch 풀</b><p>샘플레이트가 바뀌어도 살아있는 Notch 필터로 깨끗한 폭포수 유지</p></div></div>
+                            </div>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/band_plan.png" alt="Band plan overlay">
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 10 — Signal Analyzer -->
+                    <section class="ppt-slide" data-title="신호 분석기">
+                        <div class="ppt-num">10</div>
+                        <h2 class="ppt-h2">Signal Analyzer — 이미터 식별 워크벤치</h2>
+                        <p class="ppt-lead">9개 도메인을 한 화면에서 — 변조 식별부터 송신기 핑거프린트까지.</p>
+                        <div class="ppt-domains">
+                            <div class="ppt-chip">Spectrogram</div>
+                            <div class="ppt-chip">Amp</div>
+                            <div class="ppt-chip">Freq</div>
+                            <div class="ppt-chip">Phase</div>
+                            <div class="ppt-chip">I/Q</div>
+                            <div class="ppt-chip">Const</div>
+                            <div class="ppt-chip">Audio</div>
+                            <div class="ppt-chip">Power</div>
+                            <div class="ppt-chip">Bits</div>
+                        </div>
+                        <div class="ppt-split">
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/analyzer_freq_pri.png" alt="Freq domain with PRI">
+                                <figcaption>Freq 도메인 — 프리앰블 자동 검출 후 PRI/PRF/Pulse Duration/Baud 자동 산출</figcaption>
+                            </figure>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/analyzer_bits.png" alt="Bit map">
+                                <figcaption>Bits 비트맵 — 프레임 싱크·스크램블러·주기성을 한눈에</figcaption>
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 11 — Library + Mission Archive -->
+                    <section class="ppt-slide" data-title="시그널 라이브러리">
+                        <div class="ppt-num">11</div>
+                        <h2 class="ppt-h2">한 사람의 기억 → 모든 스테이션의 자산</h2>
+                        <p class="ppt-lead">Report 한 번이면 .info 가 Central로 모이고, 자동으로 이미터 DB가 자라납니다.</p>
+                        <div class="ppt-split">
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>자동 집계 + Pending 큐</b><p>주파수와 Tags(MMSI·Callsign 등)로 매칭, 모호하면 사람의 Confirm/Reject 대기열로</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>크로스세션 누적</b><p>first_seen / last_seen / 기여 스테이션 / 운영자 메모 — 모두 하나의 레코드에</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>미션 아카이브</b><p>미션 코드(A03 = 1월 3일) 기반으로 IQ / Audio / HIST 자동 분류·Central 푸시</p></div></div>
+                            </div>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/history.png" alt="History long-waterfall">
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 12 — Applications / SIGINT -->
+                    <section class="ppt-slide" data-title="응용 시나리오">
+                        <div class="ppt-num">12</div>
+                        <h2 class="ppt-h2">하나의 플랫폼, 네 가지 임무</h2>
+                        <p class="ppt-lead">민간 · 정부 · 군용 SIGINT — 같은 BE_WE 위에서 동시에 운용됩니다.</p>
+                        <div class="ppt-apps-grid">
+                            <div class="ppt-app-card">
+                                <div class="ppt-app-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M4 4l4 4"/><path d="M20 4l-4 4"/><path d="M4 20l4-4"/><path d="M20 20l-4-4"/><circle cx="4" cy="4" r="2"/><circle cx="20" cy="4" r="2"/><circle cx="4" cy="20" r="2"/><circle cx="20" cy="20" r="2"/></svg>
+                                </div>
+                                <h4>드론 탐지 · 식별</h4>
+                                <p>2.4 / 5.8 GHz 제어링크 · 비디오 다운링크 자동 분류. PRI / PRF / Pulse Duration 자동 산출로 드론 모델 핑거프린트. 다중 스테이션 → TDOA 위치 추정 기반.</p>
+                                <div class="ppt-app-tags">
+                                    <span class="ppt-tag ppt-tag-mil">군</span>
+                                    <span class="ppt-tag ppt-tag-gov">정부</span>
+                                    <span class="ppt-tag ppt-tag-civ">민간</span>
+                                </div>
+                            </div>
+
+                            <div class="ppt-app-card">
+                                <div class="ppt-app-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+                                </div>
+                                <h4>불법 · 미인가 전파 탐지</h4>
+                                <p>사용자 정의 밴드플랜으로 "있어선 안 될 채널"을 시각적으로 즉시 표시. Signal Library에 자동 누적 → 재발 송출자 추적, Pending 큐로 검증 워크플로우.</p>
+                                <div class="ppt-app-tags">
+                                    <span class="ppt-tag ppt-tag-gov">정부</span>
+                                    <span class="ppt-tag ppt-tag-civ">민간</span>
+                                </div>
+                            </div>
+
+                            <div class="ppt-app-card">
+                                <div class="ppt-app-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="4" ry="10"/><circle cx="12" cy="12" r="2"/></svg>
+                                </div>
+                                <h4>위성 신호 모니터링</h4>
+                                <p>SOI 위성 TLE 자동 갱신, 4계층(Starlink/SOT/ETC/SOI) 카탈로그. 패스 예측에 맞춰 자동 IQ 녹화(Mission Archive). 다국가 분산 스테이션 → 도플러 · 핑거프린트 추적.</p>
+                                <div class="ppt-app-tags">
+                                    <span class="ppt-tag ppt-tag-mil">군</span>
+                                    <span class="ppt-tag ppt-tag-gov">정부</span>
+                                    <span class="ppt-tag ppt-tag-civ">민간</span>
+                                </div>
+                            </div>
+
+                            <div class="ppt-app-card">
+                                <div class="ppt-app-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2-8 4 16 2-8h7"/></svg>
+                                </div>
+                                <h4>범용 SIGINT 워크벤치</h4>
+                                <p>9개 분석 도메인 + 변조 식별 + 비트 추출 + 다중 스테이션 협업. 아마추어 · 연구 · 전파관리원 · 전술 SIGINT — 동일 플랫폼·동일 워크플로우.</p>
+                                <div class="ppt-app-tags">
+                                    <span class="ppt-tag ppt-tag-mil">군</span>
+                                    <span class="ppt-tag ppt-tag-gov">정부</span>
+                                    <span class="ppt-tag ppt-tag-civ">민간</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 13 — Hardware & Deployment -->
+                    <section class="ppt-slide" data-title="하드웨어 · 배포">
+                        <div class="ppt-num">13</div>
+                        <h2 class="ppt-h2">즉시 운용 가능한 라디오 인텔 플랫폼</h2>
+                        <p class="ppt-lead">메이저 SDR을 모두 지원, Raspberry Pi 5만 있으면 무인 기지국이 됩니다.</p>
+                        <table class="ppt-table">
+                            <thead>
+                                <tr><th>지원 장비</th><th>주파수 대역</th><th>게인</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>BladeRF</b></td><td>47 MHz – 6 GHz</td><td>0 – 60 dB</td></tr>
+                                <tr><td><b>ADALM-Pluto</b></td><td>70 MHz – 6 GHz</td><td>0 – 71 dB</td></tr>
+                                <tr><td><b>RTL-SDR</b></td><td>500 kHz – 1.766 GHz</td><td>0 – 49.6 dB</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="ppt-deploy">
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>자동 감지 (BladeRF → Pluto → RTL-SDR)</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>런타임 Receiver 교체</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>Raspberry Pi 5 헤드리스 CLI HOST</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>Linux Native · GPU 워터폴</div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 10 — Vision / Closing -->
+                    <section class="ppt-slide ppt-closing" data-title="비전">
+                        <div class="ppt-cover-bg" style="background-image:url('assets/globe_sat_soi.png');"></div>
+                        <div class="ppt-cover-overlay"></div>
+                        <div class="ppt-cover-content">
+                            <div class="ppt-eyebrow">VISION</div>
+                            <h2 class="ppt-closing-title">전 세계에 분산된<br>협업형 RF 인텔리전스 네트워크</h2>
+                            <div class="ppt-applications">
+                                <div class="ppt-app">공공안전 · 해상 · 항공 모니터링</div>
+                                <div class="ppt-app">전파 감리 · 간섭 분석</div>
+                                <div class="ppt-app">교육 · 연구 · 아마추어 네트워크</div>
+                                <div class="ppt-app">SIGINT 워크벤치</div>
+                            </div>
+                            <p class="ppt-closing-cta">bewe.co.kr 에서 지금 라이브 스테이션을 확인하세요</p>
+                            <div class="ppt-cover-meta">
+                                <span>BEWE</span>
+                                <span class="dot">•</span>
+                                <span>Behind Everyone We Hear Everything</span>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+            <div class="ppt-footer">
+                <div class="ppt-progress-bar"><div class="ppt-progress-fill" id="ppt-progress-fill"></div></div>
+                <div class="ppt-pageinfo"><span id="ppt-page">1</span> / <span id="ppt-total">10</span></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ── Globe UI (hidden until Discover) ────────────────────────────── -->
     <!-- Station Info Popup -->
     <div id="popup" class="popup hidden">
@@ -112,21 +483,6 @@
         <div class="popup-coords" id="popup-coords"></div>
         <div class="popup-info" id="popup-users"></div>
         <div class="popup-tier" id="popup-tier"></div>
-        <div id="popup-v2" class="popup-v2" style="display:none;">
-            <div class="popup-v2-row">
-                <span class="popup-v2-label">Freq</span>
-                <span class="popup-v2-val" id="popup-freq">—</span>
-            </div>
-            <div class="popup-v2-row">
-                <span class="popup-v2-label">SR</span>
-                <span class="popup-v2-val" id="popup-sr">—</span>
-            </div>
-            <div class="popup-v2-row">
-                <span class="popup-v2-label">Ch</span>
-                <span class="popup-v2-val" id="popup-ch">—</span>
-                <span class="popup-rec" id="popup-rec" style="display:none;">REC</span>
-            </div>
-        </div>
         <div class="popup-close" onclick="closePopup()">&times;</div>
     </div>
 
@@ -144,14 +500,6 @@
 
     <!-- Station count -->
     <div class="station-count globe-ui" style="display:none;" id="station-count">0 Stations Online</div>
-
-    <!-- Satellite mode toggle -->
-    <div class="sat-toggle globe-ui" style="display:none;">
-        <span class="sat-toggle-label">SAT</span>
-        <button class="sat-btn" data-mode="off" onclick="setSatMode('off')">OFF</button>
-        <button class="sat-btn active" data-mode="visual" onclick="setSatMode('visual')">VISUAL</button>
-        <button class="sat-btn" data-mode="starlink" onclick="setSatMode('starlink')">STARLINK</button>
-    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="app.js"></script>

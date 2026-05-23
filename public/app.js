@@ -42,28 +42,26 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
     const pageEl = document.getElementById('ppt-page');
     const totalEl = document.getElementById('ppt-total');
     const fillEl = document.getElementById('ppt-progress-fill');
+    const ovEl = document.getElementById('ppt-overview');
 
     let cur = 0;
+    let liveTimer = null;
     totalEl.textContent = slides.length;
 
+    // ── KPI count-up
     function animateCounters(slideEl) {
         slideEl.querySelectorAll('.kpi-num').forEach(el => {
             const raw = (el.dataset.target || '').trim();
             const suffix = el.dataset.suffix || '';
             const target = parseFloat(raw);
-            // Non-numeric (e.g., "N / A", "1 : 1") — leave the existing text alone
             if (raw === '' || isNaN(target) || /[^0-9.+\-eE]/.test(raw)) return;
-
             const dur = 1100;
             const start = performance.now();
             const isInt = Number.isInteger(target) && !raw.includes('.');
-            const fmt = (v) => isInt
-                ? Math.round(v).toLocaleString('en-US')
-                : v.toFixed(1);
-
+            const fmt = (v) => isInt ? Math.round(v).toLocaleString('en-US') : v.toFixed(1);
             const tick = (now) => {
                 const p = Math.min(1, (now - start) / dur);
-                const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+                const eased = 1 - Math.pow(1 - p, 3);
                 el.textContent = fmt(target * eased) + suffix;
                 if (p < 1) requestAnimationFrame(tick);
                 else el.textContent = fmt(target) + suffix;
@@ -72,6 +70,105 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
         });
     }
 
+    // ── Live badge polling
+    async function pollLive() {
+        try {
+            const r = await fetch('/api/status');
+            if (!r.ok) return;
+            const d = await r.json();
+            const on = d.stations.filter(s => s.online);
+            const ch = on.reduce((a, s) => a + (s.channel_count || 0), 0);
+            const rec = on.filter(s => s.hist_recording).length;
+            const users = on.reduce((a, s) => a + (s.users || 0), 0);
+            const ageS = d.central.ageMs != null ? (d.central.ageMs / 1000).toFixed(1) : '--';
+            document.querySelectorAll('.ppt-lb-sites').forEach(e => e.textContent = on.length);
+            document.querySelectorAll('.ppt-lb-ch').forEach(e => e.textContent = ch);
+            document.querySelectorAll('.ppt-lb-rec').forEach(e => e.textContent = rec);
+            document.querySelectorAll('.ppt-lb-users').forEach(e => e.textContent = users);
+            document.querySelectorAll('.ppt-lb-age').forEach(e => e.textContent = ageS);
+        } catch(e) { /* silent */ }
+    }
+    function startLive() { if (!liveTimer) { pollLive(); liveTimer = setInterval(pollLive, 2000); } }
+    function stopLive() { if (liveTimer) { clearInterval(liveTimer); liveTimer = null; } }
+
+    // ── TDOA SVG interactive demo
+    function initTDOA() {
+        const svg = document.getElementById('ppt-tdoa');
+        if (!svg || svg._tdoaInit) return;
+        svg._tdoaInit = true;
+        const nodes = [
+            { x: 65,  y: 60,  ringId: 'tdoa-ring-a' },
+            { x: 215, y: 60,  ringId: 'tdoa-ring-b' },
+            { x: 130, y: 162, ringId: 'tdoa-ring-c' }
+        ];
+        let ex = 130, ey = 100, dragging = false;
+        const emitter = document.getElementById('tdoa-emitter');
+        const emitDot = document.getElementById('tdoa-emit-dot');
+        const emitPulse = document.getElementById('tdoa-emit-pulse');
+        const emitLbl = document.getElementById('tdoa-emit-lbl');
+        const coordText = document.getElementById('tdoa-coord');
+        function updateRings() {
+            const dists = nodes.map(n => Math.hypot(ex - n.x, ey - n.y));
+            nodes.forEach((n, i) => document.getElementById(n.ringId).setAttribute('r', Math.round(dists[i])));
+            const lat = (38 - ey / 220 * 5).toFixed(2);
+            const lon = (124 + ex / 280 * 6).toFixed(2);
+            coordText.textContent = `추정 좌표 ${lat}N  ${lon}E  |  CEP ~${Math.round(Math.min(...dists) * 0.3)} m`;
+        }
+        function getSVGXY(clientX, clientY) {
+            const rect = svg.getBoundingClientRect();
+            const vb = svg.viewBox.baseVal;
+            return {
+                x: Math.max(10, Math.min(vb.width - 10, (clientX - rect.left) / rect.width * vb.width)),
+                y: Math.max(10, Math.min(vb.height - 22, (clientY - rect.top) / rect.height * vb.height))
+            };
+        }
+        function moveEmitter(x, y) {
+            ex = x; ey = y;
+            emitDot.setAttribute('cx', x); emitDot.setAttribute('cy', y);
+            emitPulse.setAttribute('cx', x); emitPulse.setAttribute('cy', y);
+            emitLbl.setAttribute('x', x); emitLbl.setAttribute('y', y - 11);
+            updateRings();
+        }
+        emitter.addEventListener('mousedown', (e) => { e.stopPropagation(); dragging = true; emitter.style.cursor = 'grabbing'; });
+        svg.addEventListener('mousemove', (e) => { if (dragging) { const {x, y} = getSVGXY(e.clientX, e.clientY); moveEmitter(x, y); } });
+        document.addEventListener('mouseup', () => { if (dragging) { dragging = false; emitter.style.cursor = 'grab'; } });
+        emitter.addEventListener('touchstart', (e) => { e.stopPropagation(); dragging = true; }, { passive: true });
+        svg.addEventListener('touchmove', (e) => {
+            if (!dragging) return;
+            e.preventDefault();
+            const t = e.touches[0];
+            const {x, y} = getSVGXY(t.clientX, t.clientY);
+            moveEmitter(x, y);
+        }, { passive: false });
+        document.addEventListener('touchend', () => { dragging = false; });
+        updateRings();
+    }
+
+    // ── Overview grid (O key)
+    function buildOverview() {
+        ovEl.innerHTML = '';
+        slides.forEach((s, i) => {
+            const item = document.createElement('div');
+            item.className = 'ppt-ov-item' + (i === cur ? ' ov-active' : '');
+            item.innerHTML = `<span class="ppt-ov-num">${String(i+1).padStart(2,'0')}</span><span class="ppt-ov-title">${s.dataset.title || ''}</span>`;
+            item.addEventListener('click', () => { go(i); closeOverview(); });
+            ovEl.appendChild(item);
+        });
+    }
+    function closeOverview() { ovEl.classList.add('hidden'); }
+    function toggleOverview() {
+        if (ovEl.classList.contains('hidden')) { buildOverview(); ovEl.classList.remove('hidden'); }
+        else closeOverview();
+    }
+
+    // ── URL hash sync
+    function updateHash() { history.replaceState(null, '', '#slide/' + (cur + 1)); }
+    window.addEventListener('hashchange', () => {
+        const m = location.hash.match(/#slide\/(\d+)/);
+        if (m && !modal.classList.contains('hidden')) go(parseInt(m[1]) - 1);
+    });
+
+    // ── Render
     function render() {
         slides.forEach((s, i) => {
             s.classList.toggle('active', i === cur);
@@ -81,51 +178,63 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
         fillEl.style.width = ((cur + 1) / slides.length * 100) + '%';
         prevBtn.disabled = cur === 0;
         nextBtn.disabled = cur === slides.length - 1;
-        // Re-trigger KPI count-up after the slide transition starts
-        setTimeout(() => animateCounters(slides[cur]), 350);
+        setTimeout(() => {
+            animateCounters(slides[cur]);
+            if (slides[cur].querySelector('.ppt-live-badge')) startLive(); else stopLive();
+            if (slides[cur].querySelector('#ppt-tdoa')) initTDOA();
+        }, 350);
+        updateHash();
     }
-    function go(n) {
-        cur = Math.max(0, Math.min(slides.length - 1, n));
-        render();
-    }
+    function go(n) { cur = Math.max(0, Math.min(slides.length - 1, n)); render(); }
     function nextSlide() { go(cur + 1); }
     function prevSlide() { go(cur - 1); }
+
     function openModal() {
-        cur = 0;
+        const m = location.hash.match(/#slide\/(\d+)/);
+        cur = m ? Math.max(0, Math.min(slides.length - 1, parseInt(m[1]) - 1)) : 0;
         modal.classList.remove('hidden');
         render();
     }
     function closeModal() {
+        if (!ovEl.classList.contains('hidden')) { closeOverview(); return; }
         if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+        stopLive();
         modal.classList.add('hidden');
     }
     function toggleFullscreen() {
-        if (document.fullscreenElement) {
-            document.exitFullscreen().catch(()=>{});
-        } else {
-            (modal.requestFullscreen ? modal.requestFullscreen() :
-             modal.webkitRequestFullscreen && modal.webkitRequestFullscreen())
-                ?.catch?.(()=>{});
-        }
+        if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+        else (modal.requestFullscreen ? modal.requestFullscreen() : modal.webkitRequestFullscreen?.())?.catch?.(()=>{});
     }
 
     document.getElementById('nav-about').addEventListener('click', (e) => { e.preventDefault(); openModal(); });
     closeBtn.addEventListener('click', closeModal);
     prevBtn.addEventListener('click', prevSlide);
     nextBtn.addEventListener('click', nextSlide);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
+    // Touch swipe
+    let touchX0 = 0;
+    modal.addEventListener('touchstart', (e) => { touchX0 = e.touches[0].clientX; }, { passive: true });
+    modal.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].clientX - touchX0;
+        if (Math.abs(dx) > 50) { if (dx < 0) nextSlide(); else prevSlide(); }
     });
 
+    // Keyboard
     document.addEventListener('keydown', (e) => {
         if (modal.classList.contains('hidden')) return;
-        if (e.key === 'Escape') closeModal();
-        else if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+        if (e.key === 'Escape') { closeModal(); return; }
+        if (!ovEl.classList.contains('hidden')) {
+            if (e.key === 'o' || e.key === 'O') { e.preventDefault(); closeOverview(); }
+            return;
+        }
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
         else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
         else if (e.key === 'Home') { e.preventDefault(); go(0); }
         else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
         else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
+        else if (e.key === 'o' || e.key === 'O') { e.preventDefault(); toggleOverview(); }
+        else if (e.key >= '1' && e.key <= '9') { e.preventDefault(); go(parseInt(e.key) - 1); }
     });
 
     render();

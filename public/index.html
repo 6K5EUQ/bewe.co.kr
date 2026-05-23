@@ -501,6 +501,7 @@
                             <img src="assets/Main_Page.png" alt="BEWE C2 main page">
                             <figcaption>JOIN 분석관 화면 — 전방 HOST의 라이브 스펙트럼을 다수 분석관이 동시에 관제</figcaption>
                         </figure>
+                        <div class="ppt-live-badge"><span class="ppt-live-dot"></span><span class="ppt-live-label">LIVE</span><span class="ppt-lb-sep">&middot;</span><span>사이트 <b class="ppt-lb-sites">--</b></span><span class="ppt-lb-sep">&middot;</span><span>채널 <b class="ppt-lb-ch">--</b></span><span class="ppt-lb-sep">&middot;</span><span>녹음 <b class="ppt-lb-rec">--</b></span><span class="ppt-lb-sep">&middot;</span><span>분석관 <b class="ppt-lb-users">--</b></span><span class="ppt-lb-sep">&middot;</span><span class="ppt-lb-ago"><b class="ppt-lb-age">--</b>s 전</span></div>
                     </section>
 
                     <!-- Slide 9 — 무인기(UAS) RF 탐지 -->
@@ -518,10 +519,41 @@
                                     <figcaption>이란 Shahed-136 — 우크라이나 전선에서 RF 탐지로 요격한 사례 (CC BY-SA 4.0)</figcaption>
                                 </figure>
                             </div>
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/max_decay.png" alt="UAS RF spectrum">
-                                <figcaption>Max Hold 스펙트럼 — 이탈 후에도 제어링크 피크가 화면에 남는다</figcaption>
-                            </figure>
+                            <div class="ppt-tdoa-wrap">
+                                <svg id="ppt-tdoa" class="ppt-tdoa-svg" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <pattern id="tdoa-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                            <path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+                                        </pattern>
+                                    </defs>
+                                    <rect width="280" height="220" fill="rgba(4,8,28,0.85)" rx="8"/>
+                                    <rect width="280" height="220" fill="url(#tdoa-grid)" rx="8"/>
+                                    <circle id="tdoa-ring-a" cx="65" cy="60" r="0" fill="none" stroke="rgba(248,113,113,0.5)" stroke-width="1.5" stroke-dasharray="5 3"/>
+                                    <circle id="tdoa-ring-b" cx="215" cy="60" r="0" fill="none" stroke="rgba(96,165,250,0.5)" stroke-width="1.5" stroke-dasharray="5 3"/>
+                                    <circle id="tdoa-ring-c" cx="130" cy="162" r="0" fill="none" stroke="rgba(167,243,208,0.5)" stroke-width="1.5" stroke-dasharray="5 3"/>
+                                    <g>
+                                        <circle cx="65" cy="60" r="6" fill="rgba(248,113,113,0.15)" stroke="rgba(248,113,113,0.75)" stroke-width="1.5"/>
+                                        <text x="65" y="48" text-anchor="middle" font-size="8" fill="rgba(248,113,113,0.85)" font-family="monospace">DGS-1</text>
+                                    </g>
+                                    <g>
+                                        <circle cx="215" cy="60" r="6" fill="rgba(96,165,250,0.15)" stroke="rgba(96,165,250,0.75)" stroke-width="1.5"/>
+                                        <text x="215" y="48" text-anchor="middle" font-size="8" fill="rgba(96,165,250,0.85)" font-family="monospace">DGS-2</text>
+                                    </g>
+                                    <g>
+                                        <circle cx="130" cy="162" r="6" fill="rgba(167,243,208,0.15)" stroke="rgba(167,243,208,0.75)" stroke-width="1.5"/>
+                                        <text x="130" y="177" text-anchor="middle" font-size="8" fill="rgba(167,243,208,0.85)" font-family="monospace">DGS-3</text>
+                                    </g>
+                                    <g id="tdoa-emitter" style="cursor:grab">
+                                        <circle id="tdoa-emit-pulse" cx="130" cy="100" r="10" fill="none" stroke="rgba(251,191,36,0.35)" stroke-width="1">
+                                            <animate attributeName="r" values="8;20;8" dur="2s" repeatCount="indefinite"/>
+                                            <animate attributeName="opacity" values="0.7;0;0.7" dur="2s" repeatCount="indefinite"/>
+                                        </circle>
+                                        <circle id="tdoa-emit-dot" cx="130" cy="100" r="5" fill="rgba(251,191,36,0.9)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+                                        <text id="tdoa-emit-lbl" x="130" y="89" text-anchor="middle" font-size="8" fill="rgba(251,191,36,0.9)" font-family="monospace">EMITTER</text>
+                                    </g>
+                                    <text id="tdoa-coord" x="140" y="212" font-size="8" fill="rgba(96,165,250,0.65)" text-anchor="middle" font-family="monospace">드래그로 발신원 이동 -- TDOA 삼각측량</text>
+                                </svg>
+                            </div>
                         </div>
                     </section>
 
@@ -608,13 +640,46 @@
                         </div>
                     </section>
 
+                    <!-- Slide 14 — 운용 시나리오 : GPS 교란 대응 -->
+                    <section class="ppt-slide" data-title="운용 시나리오">
+                        <div class="ppt-num">14</div>
+                        <h2 class="ppt-h2">운용 시나리오 — GPS 교란 실시간 대응</h2>
+                        <p class="ppt-lead">북한이 GPS 교란 전파를 발사하는 순간부터 합참 통보까지 — BEWE가 2분 안에 처리합니다.</p>
+                        <div class="ppt-scenario">
+                            <div class="ppt-sc-head">
+                                <div></div>
+                                <div>T + 0s</div>
+                                <div>T + 15s</div>
+                                <div>T + 30s</div>
+                                <div>T + 2min</div>
+                            </div>
+                            <div class="ppt-sc-track">
+                                <div class="ppt-sc-row threat">
+                                    <div class="ppt-sc-side threat">THREAT</div>
+                                    <div class="ppt-sc-cell"><b>GPS 교란 송신기 가동</b>1575 MHz 고출력 재밍 전파 발사 시작</div>
+                                    <div class="ppt-sc-cell"><b>영향권 확산</b>200 km 반경 항법 장치 오작동 시작</div>
+                                    <div class="ppt-sc-cell"><b>항공기 이상 보고</b>민항기 항법 이상 관제탑 접수</div>
+                                    <div class="ppt-sc-cell"><b>교란 지속</b>재밍 on 상태로 수 시간 운용 가능</div>
+                                </div>
+                                <div class="ppt-sc-gap"><div></div><div class="ppt-sc-gap-cell"></div><div class="ppt-sc-gap-cell"></div><div class="ppt-sc-gap-cell"></div><div class="ppt-sc-gap-cell"></div></div>
+                                <div class="ppt-sc-row bewe">
+                                    <div class="ppt-sc-side bewe">BEWE</div>
+                                    <div class="ppt-sc-cell"><b>3개 노드 동시 탐지</b>L1 대역 이상 신호 자동 경보 · IQ 버퍼 저장</div>
+                                    <div class="ppt-sc-cell"><b>TDOA 삼각측량</b>발신원 좌표 자동 산출 · 오차 반경 &lt;500 m</div>
+                                    <div class="ppt-sc-cell"><b>신호 분석 완료</b>변조 파라미터 · ESM DB 자동 대조</div>
+                                    <div class="ppt-sc-cell"><b>합참 통보 완료</b>좌표 · 증거 IQ · 분석 리포트 패키지 전달</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- ══════════════════════════════════════════════
                          SECTION 6 — 시스템 운용 장면
                          ══════════════════════════════════════════════ -->
 
-                    <!-- Slide 14 — 운용 장면 1 : C2 통합 화면 -->
+                    <!-- Slide 15 — 운용 장면 1 : C2 통합 화면 -->
                     <section class="ppt-slide" data-title="운용 장면 ①">
-                        <div class="ppt-num">14</div>
+                        <div class="ppt-num">15</div>
                         <h2 class="ppt-h2">운용 장면 — C2 통합 화면</h2>
                         <p class="ppt-lead">전방 HOST가 송출하는 라이브 스펙트럼을 분석관이 어디서든 실시간으로 관제합니다.</p>
                         <div class="ppt-solution-row">
@@ -627,11 +692,12 @@
                             <img src="assets/Main_Page.png" alt="BEWE C2 main screen">
                             <figcaption>JOIN 분석관 화면 — 상단 워터폴 / 중단 파워 스펙트럼 / 우측 채널 리스트 · 미션 상태</figcaption>
                         </figure>
+                        <div class="ppt-live-badge"><span class="ppt-live-dot"></span><span class="ppt-live-label">LIVE</span><span class="ppt-lb-sep">&middot;</span><span>사이트 <b class="ppt-lb-sites">--</b></span><span class="ppt-lb-sep">&middot;</span><span>채널 <b class="ppt-lb-ch">--</b></span><span class="ppt-lb-sep">&middot;</span><span>녹음 <b class="ppt-lb-rec">--</b></span><span class="ppt-lb-sep">&middot;</span><span>분석관 <b class="ppt-lb-users">--</b></span><span class="ppt-lb-sep">&middot;</span><span class="ppt-lb-ago"><b class="ppt-lb-age">--</b>s 전</span></div>
                     </section>
 
-                    <!-- Slide 15 — 운용 장면 2 : ELINT 분석 워크벤치 -->
+                    <!-- Slide 16 — 운용 장면 2 : ELINT 분석 워크벤치 -->
                     <section class="ppt-slide" data-title="운용 장면 ②">
-                        <div class="ppt-num">15</div>
+                        <div class="ppt-num">16</div>
                         <h2 class="ppt-h2">운용 장면 — ELINT 분석 워크벤치</h2>
                         <p class="ppt-lead">수집된 신호를 9개 도메인으로 즉시 분석 — 변조 식별부터 비트 역분석까지 한 화면에서.</p>
                         <div class="ppt-split">
@@ -646,9 +712,9 @@
                         </div>
                     </section>
 
-                    <!-- Slide 16 — 운용 장면 3 : Globe C2 -->
+                    <!-- Slide 17 — 운용 장면 3 : Globe C2 -->
                     <section class="ppt-slide" data-title="운용 장면 ③">
-                        <div class="ppt-num">16</div>
+                        <div class="ppt-num">17</div>
                         <h2 class="ppt-h2">운용 장면 — 3D Globe 작전 지도</h2>
                         <p class="ppt-lead">전방 노드 위치와 적성 위성 궤도를 한 화면에 — 분석관 한 명이 전 구역을 동시에 관제합니다.</p>
                         <div class="ppt-split">
@@ -664,9 +730,9 @@
                         </div>
                     </section>
 
-                    <!-- Slide 17 — SIGINT 아카이브 -->
+                    <!-- Slide 18 — SIGINT 아카이브 -->
                     <section class="ppt-slide" data-title="SIGINT 아카이브">
-                        <div class="ppt-num">17</div>
+                        <div class="ppt-num">18</div>
                         <h2 class="ppt-h2">SIGINT 아카이브 — 수집한 모든 신호를 영구 보존</h2>
                         <p class="ppt-lead">한 분석관의 발견이 전 체계의 자산이 됩니다 — 이미터 식별 DB가 미션마다 쌓여갑니다.</p>
                         <div class="ppt-split">
@@ -680,11 +746,12 @@
                                 <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>전역·전보 없이 지식 이전</b><p>first_seen · last_seen · 기여 스테이션 · 분석관 메모가 하나의 레코드에 누적. 인수인계 없이도 지식이 조직에 남습니다.</p></div></div>
                             </div>
                         </div>
+                        <div class="ppt-live-badge"><span class="ppt-live-dot"></span><span class="ppt-live-label">LIVE</span><span class="ppt-lb-sep">&middot;</span><span>사이트 <b class="ppt-lb-sites">--</b></span><span class="ppt-lb-sep">&middot;</span><span>채널 <b class="ppt-lb-ch">--</b></span><span class="ppt-lb-sep">&middot;</span><span>녹음 <b class="ppt-lb-rec">--</b></span><span class="ppt-lb-sep">&middot;</span><span>분석관 <b class="ppt-lb-users">--</b></span><span class="ppt-lb-sep">&middot;</span><span class="ppt-lb-ago"><b class="ppt-lb-age">--</b>s 전</span></div>
                     </section>
 
-                    <!-- Slide 18 — 전방 배치 하드웨어 -->
+                    <!-- Slide 19 — 전방 배치 하드웨어 -->
                     <section class="ppt-slide" data-title="하드웨어">
-                        <div class="ppt-num">18</div>
+                        <div class="ppt-num">19</div>
                         <h2 class="ppt-h2">전방 배치형 COTS 수집 노드</h2>
                         <p class="ppt-lead">RPi5 + 상용 SDR — 수백만 원으로 전방 기지 어디에나 즉시 배치할 수 있는 무인 SIGINT 노드.</p>
                         <table class="ppt-table">
@@ -705,9 +772,9 @@
                         </div>
                     </section>
 
-                    <!-- Slide 19 — BEWE vs 기존 체계 비교 -->
+                    <!-- Slide 20 — BEWE vs 기존 체계 비교 -->
                     <section class="ppt-slide" data-title="경쟁 비교">
-                        <div class="ppt-num">19</div>
+                        <div class="ppt-num">20</div>
                         <h2 class="ppt-h2">BEWE vs 기존 전용 SIGINT 체계 비교</h2>
                         <p class="ppt-lead">단가·배치 속도·협업·아카이브 — 네 가지 핵심 축에서 구조적 우위.</p>
                         <div class="ppt-comp">
@@ -760,13 +827,43 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="ppt-live-badge"><span class="ppt-live-dot"></span><span class="ppt-live-label">LIVE</span><span class="ppt-lb-sep">&middot;</span><span>사이트 <b class="ppt-lb-sites">--</b></span><span class="ppt-lb-sep">&middot;</span><span>채널 <b class="ppt-lb-ch">--</b></span><span class="ppt-lb-sep">&middot;</span><span>녹음 <b class="ppt-lb-rec">--</b></span><span class="ppt-lb-sep">&middot;</span><span>분석관 <b class="ppt-lb-users">--</b></span><span class="ppt-lb-sep">&middot;</span><span class="ppt-lb-ago"><b class="ppt-lb-age">--</b>s 전</span></div>
+                    </section>
+
+                    <!-- Slide 21 — 보안 / OPSEC -->
+                    <section class="ppt-slide" data-title="보안 / OPSEC">
+                        <div class="ppt-num">21</div>
+                        <h2 class="ppt-h2">보안 아키텍처 — 방위사업 도입 요건 충족</h2>
+                        <p class="ppt-lead">네트워크 격리 · 인증 · 데이터 분류 · 감사 추적 — 방위사업청 보안 요구사항을 설계 단계부터 내장합니다.</p>
+                        <div class="ppt-opsec-grid">
+                            <div class="ppt-opsec-card highlight">
+                                <div class="ppt-opsec-icon">[ NET ]</div>
+                                <div class="ppt-opsec-title">네트워크 격리</div>
+                                <div class="ppt-opsec-body">Tailscale 메시 VPN 전용 회선 · 단일 포트 7700만 개방 · 인터넷 단절 에어갭 환경 운용 가능 · 내부망 전용 Central 서버 구성 지원</div>
+                            </div>
+                            <div class="ppt-opsec-card highlight">
+                                <div class="ppt-opsec-icon">[ AUTH ]</div>
+                                <div class="ppt-opsec-title">인증 · 접근 통제</div>
+                                <div class="ppt-opsec-body">Tier 1(수집) / Tier 2(분석) / Tier 3(관제) 3단계 분석관 등급 · 스테이션별 ID/PW 인증 · 미승인 접속 자동 차단</div>
+                            </div>
+                            <div class="ppt-opsec-card">
+                                <div class="ppt-opsec-icon">[ DATA ]</div>
+                                <div class="ppt-opsec-title">데이터 분류 · 격리</div>
+                                <div class="ppt-opsec-body">IQ · Audio · HIST 파일 미션 코드별 격리 저장 · 로컬 디스크 우선 (외부 전송 없음) · Central 다운로드는 승인된 분석관만 접근</div>
+                            </div>
+                            <div class="ppt-opsec-card">
+                                <div class="ppt-opsec-icon">[ AUDIT ]</div>
+                                <div class="ppt-opsec-title">감사 추적 · 공급망</div>
+                                <div class="ppt-opsec-body">분석관 접속 · 녹음 시작 시각 자동 기록 · COTS 부품 펌웨어 검증 가능 · 오픈소스 기반 감사 가능 코드베이스</div>
+                            </div>
+                        </div>
                     </section>
 
                     <!-- ══════════════════════════════════════════════
                          SECTION 7 — 마무리
                          ══════════════════════════════════════════════ -->
 
-                    <!-- Slide 20 — 마무리 -->
+                    <!-- Slide 22 — 마무리 -->
                     <section class="ppt-slide ppt-closing" data-title="마무리">
                         <div class="ppt-cover-bg" style="background-image:url('assets/globe_sat_soi.png');"></div>
                         <div class="ppt-cover-overlay"></div>
@@ -792,6 +889,7 @@
 
 
                 </div>
+                <div id="ppt-overview" class="ppt-overview hidden"></div>
             </div>
 
             <div class="ppt-footer">

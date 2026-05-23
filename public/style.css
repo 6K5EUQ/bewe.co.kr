@@ -530,7 +530,7 @@ body {
 .ppt-slide {
     position: absolute;
     inset: 0;
-    padding: clamp(48px, 7vh, 96px) clamp(80px, 9vw, 160px) clamp(72px, 9vh, 120px);
+    padding: clamp(36px, 5vh, 64px) clamp(52px, 5.5vw, 96px) clamp(58px, 7vh, 92px);
     opacity: 0;
     visibility: hidden;
     transform: translateX(60px);
@@ -538,7 +538,7 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: clamp(12px, 1.6vh, 22px);
+    gap: clamp(14px, 1.8vh, 24px);
 }
 .ppt-slide.active {
     opacity: 1;
@@ -548,6 +548,30 @@ body {
 .ppt-slide.prev {
     transform: translateX(-60px);
 }
+
+/* Stagger entrance: children of active slide fade-up with delay */
+.ppt-slide .stagger-item {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ppt-slide.active .stagger-item {
+    opacity: 1;
+    transform: translateY(0);
+}
+.ppt-slide.active .stagger-item:nth-child(1) { transition-delay: 0.08s; }
+.ppt-slide.active .stagger-item:nth-child(2) { transition-delay: 0.18s; }
+.ppt-slide.active .stagger-item:nth-child(3) { transition-delay: 0.28s; }
+.ppt-slide.active .stagger-item:nth-child(4) { transition-delay: 0.38s; }
+.ppt-slide.active .stagger-item:nth-child(5) { transition-delay: 0.48s; }
+.ppt-slide.active .stagger-item:nth-child(6) { transition-delay: 0.58s; }
+.ppt-slide.active .stagger-item:nth-child(7) { transition-delay: 0.68s; }
+.ppt-slide.active .stagger-item:nth-child(8) { transition-delay: 0.78s; }
+.ppt-slide.active .ppt-grid-2 .stagger-item:nth-child(1) { transition-delay: 0.20s; }
+.ppt-slide.active .ppt-grid-2 .stagger-item:nth-child(2) { transition-delay: 0.32s; }
+.ppt-slide.active .ppt-grid-2 .stagger-item:nth-child(3) { transition-delay: 0.44s; }
+.ppt-slide.active .ppt-grid-2 .stagger-item:nth-child(4) { transition-delay: 0.56s; }
 
 .ppt-num {
     position: absolute;
@@ -701,34 +725,151 @@ body {
 .ppt-pain {
     position: relative;
     padding: 22px 24px 20px;
-    border-radius: 12px;
+    border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.07);
-    background: rgba(255,255,255,0.03);
-    transition: all 0.25s;
+    background: linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1),
+                border-color 0.25s,
+                background 0.25s,
+                box-shadow 0.28s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.ppt-pain::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(96,165,250,0.0), transparent);
+    transition: background 0.3s;
 }
 .ppt-pain:hover {
-    border-color: rgba(96,165,250,0.35);
-    background: rgba(59,130,246,0.06);
+    border-color: rgba(96,165,250,0.40);
+    background: linear-gradient(160deg, rgba(59,130,246,0.10) 0%, rgba(59,130,246,0.03) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.45), 0 0 0 1px rgba(96,165,250,0.20);
+}
+.ppt-pain:hover::before {
+    background: linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.95) 50%, transparent 100%);
 }
 .ppt-pain-num {
     position: absolute;
     top: 14px;
     right: 18px;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    color: rgba(96,165,250,0.5);
-    letter-spacing: 1px;
+    color: rgba(96,165,250,0.55);
+    letter-spacing: 1.5px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    background: rgba(59,130,246,0.10);
+    border: 1px solid rgba(96,165,250,0.22);
+}
+.ppt-pain-accent .ppt-pain-num {
+    background: rgba(96,165,250,0.18);
+    border-color: rgba(96,165,250,0.45);
+    color: #93c5fd;
+}
+.ppt-pain-warn .ppt-pain-num {
+    background: rgba(251,146,60,0.15);
+    border-color: rgba(251,146,60,0.40);
+    color: #fdba74;
 }
 .ppt-pain h4 {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+    padding-right: 70px;
 }
 .ppt-pain p {
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.6;
-    color: rgba(170,190,215,0.8);
+    color: rgba(180,200,225,0.86);
+    margin: 0;
+}
+
+/* KPI metric row inside pain cards */
+.ppt-pain-metrics {
+    display: flex;
+    gap: 14px;
+    margin: 6px 0 2px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.ppt-pain-metric {
+    flex: 1;
+    min-width: 0;
+}
+.ppt-pain-metric .kpi-num {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+}
+.ppt-pain-warn .ppt-pain-metric .kpi-num {
+    background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.ppt-pain-metric .kpi-label {
+    display: block;
+    margin-top: 2px;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: rgba(150,170,200,0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Source / citation row */
+.ppt-pain-source {
+    margin-top: 4px;
+    font-size: 11px;
+    font-style: italic;
+    color: rgba(140,160,190,0.55);
+    letter-spacing: 0.2px;
+}
+.ppt-pain-source::before {
+    content: '— ';
+    opacity: 0.5;
+}
+
+/* Mini progress bar inside pain cards */
+.ppt-pain-bar {
+    margin-top: 8px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+    position: relative;
+}
+.ppt-pain-bar-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+    box-shadow: 0 0 10px rgba(96,165,250,0.5);
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s;
+}
+.ppt-slide.active .ppt-pain-bar-fill {
+    width: var(--bar, 60%);
+}
+.ppt-pain-warn .ppt-pain-bar-fill {
+    background: linear-gradient(90deg, #fdba74, #f97316);
+    box-shadow: 0 0 10px rgba(251,146,60,0.5);
 }
 
 /* Solution pills */

@@ -46,6 +46,32 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
     let cur = 0;
     totalEl.textContent = slides.length;
 
+    function animateCounters(slideEl) {
+        slideEl.querySelectorAll('.kpi-num').forEach(el => {
+            const raw = (el.dataset.target || '').trim();
+            const suffix = el.dataset.suffix || '';
+            const target = parseFloat(raw);
+            // Non-numeric (e.g., "N / A", "1 : 1") — leave the existing text alone
+            if (raw === '' || isNaN(target) || /[^0-9.+\-eE]/.test(raw)) return;
+
+            const dur = 1100;
+            const start = performance.now();
+            const isInt = Number.isInteger(target) && !raw.includes('.');
+            const fmt = (v) => isInt
+                ? Math.round(v).toLocaleString('en-US')
+                : v.toFixed(1);
+
+            const tick = (now) => {
+                const p = Math.min(1, (now - start) / dur);
+                const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+                el.textContent = fmt(target * eased) + suffix;
+                if (p < 1) requestAnimationFrame(tick);
+                else el.textContent = fmt(target) + suffix;
+            };
+            requestAnimationFrame(tick);
+        });
+    }
+
     function render() {
         slides.forEach((s, i) => {
             s.classList.toggle('active', i === cur);
@@ -55,6 +81,8 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
         fillEl.style.width = ((cur + 1) / slides.length * 100) + '%';
         prevBtn.disabled = cur === 0;
         nextBtn.disabled = cur === slides.length - 1;
+        // Re-trigger KPI count-up after the slide transition starts
+        setTimeout(() => animateCounters(slides[cur]), 350);
     }
     function go(n) {
         cur = Math.max(0, Math.min(slides.length - 1, n));

@@ -2023,3 +2023,140 @@ body {
     line-height: 1.4;
     letter-spacing: 0.2px;
 }
+
+/* ── 대표자 소개 슬라이드 ─────────────────────────────────────── */
+.ppt-founder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    flex: 1;
+    min-height: 0;
+}
+.ppt-founder-col { display: flex; flex-direction: column; gap: 14px; }
+.ppt-founder-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.ppt-founder-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(96,165,250,0.70);
+    margin-bottom: 2px;
+}
+.ppt-founder-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+.ppt-founder-dot {
+    width: 5px; height: 5px;
+    background: rgba(96,165,250,0.75);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+.ppt-founder-item b { display: block; font-size: 13px; color: #fff; font-weight: 600; }
+.ppt-founder-item span { display: block; font-size: 11.5px; color: rgba(180,200,225,0.72); margin-top: 2px; }
+.ppt-lic-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+.ppt-lic {
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(96,165,250,0.25);
+    color: #93c5fd;
+}
+.ppt-award-list { display: flex; flex-direction: column; gap: 7px; }
+.ppt-award {
+    padding: 7px 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid rgba(96,165,250,0.50);
+}
+.ppt-award.award-us { border-left-color: rgba(248,185,80,0.75); }
+.ppt-award-title { font-size: 12.5px; color: #fff; font-weight: 600; }
+.ppt-award-from { font-size: 11px; color: rgba(140,160,190,0.65); margin-top: 2px; }
+
+/* ── HUMINT / IMINT / SIGINT 3축 ──────────────────────────────── */
+.ppt-intel-row {
+    display: flex;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+}
+.ppt-intel-pillar {
+    flex: 1;
+    padding: 18px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.ppt-intel-pillar.active {
+    border-color: rgba(96,165,250,0.45);
+    background: rgba(59,130,246,0.09);
+    box-shadow: 0 0 28px rgba(96,165,250,0.14);
+}
+.ppt-intel-code {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba(96,165,250,0.65);
+}
+.ppt-intel-pillar.active .ppt-intel-code { color: #60a5fa; }
+.ppt-intel-pillar h4 { font-size: 15px; font-weight: 700; color: #fff; margin: 0; }
+.ppt-intel-pillar p { font-size: 12.5px; color: rgba(180,200,225,0.75); line-height: 1.5; margin: 0; }
+.ppt-intel-badge {
+    margin-top: auto;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.05);
+    color: rgba(150,170,200,0.60);
+    letter-spacing: 0.5px;
+}
+.ppt-intel-pillar.active .ppt-intel-badge {
+    background: rgba(59,130,246,0.20);
+    color: #93c5fd;
+}
+.ppt-reactive-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+}
+.ppt-reactive-box {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,80,80,0.20);
+    background: rgba(255,60,60,0.05);
+}
+.ppt-proactive-box {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(96,165,250,0.25);
+    background: rgba(59,130,246,0.06);
+}
+.ppt-react-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.ppt-reactive-box .ppt-react-label { color: rgba(252,100,100,0.80); }
+.ppt-proactive-box .ppt-react-label { color: rgba(96,165,250,0.80); }
+.ppt-react-body { font-size: 13px; color: rgba(200,215,235,0.85); line-height: 1.55; }

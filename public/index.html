@@ -132,658 +132,584 @@
                         </div>
                     </section>
 
-                    <!-- Slide 2 — Why Now : 한반도 RF 위협 환경 -->
-                    <section class="ppt-slide" data-title="왜 지금">
+                    <!-- ══════════════════════════════════════════════
+                         SECTION 1 — 개발 배경
+                         ══════════════════════════════════════════════ -->
+
+
+                    <!-- Slide 2 — 개발 배경 1 : 현대전의 RF 위협 -->
+                    <section class="ppt-slide" data-title="개발 배경">
                         <div class="ppt-num">02</div>
-                        <h2 class="ppt-h2">왜 지금, 한국형 분산 SIGINT인가</h2>
-                        <p class="ppt-lead">한반도 상공·해상·접경의 RF 활동은 폭증한다. 고가·소수·정적 수집 자산만으로는 못 따라간다.</p>
+                        <h2 class="ppt-h2">현대전을 지배하는 RF 기반 위협</h2>
+                        <p class="ppt-lead">GPS 교란·무인기 침투·미사일 유도·전술 통신 — 현대 전장에서 무기보다 먼저 오는 것은 전파 신호다.</p>
                         <div class="ppt-grid-2 ppt-grid-tight">
                             <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">DPRK COMMS</div>
-                                <h4>북한 적성 통신 광역화</h4>
-                                <p>北 軍 HF/VHF/UHF 무전, FH·CDMA 디지털 데이터링크, 차량/항공·UAS 제어링크 폭증. 분산·상시 감청 없이 식별·축적 불가.</p>
+                                <div class="ppt-pain-num">GPS 교란</div>
+                                <h4>전파 교란으로 항법을 마비시킨다</h4>
+                                <p>북한은 2010년 이후 서해 일대에 고출력 GPS 교란 전파를 반복 발사하고 있습니다. 단 한 차례의 교란으로 민항기 200여 대의 항법 장치가 오작동하고, 군 무인기의 귀환 경로가 혼란에 빠집니다.</p>
                                 <div class="ppt-pain-metrics">
                                     <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="3000" data-suffix="+">3,000+</span>
-                                        <span class="kpi-label">北 軍 추정 무선 주파수 운용</span>
+                                        <span class="kpi-num" data-target="4" data-suffix="회">4회</span>
+                                        <span class="kpi-label">대규모 교란 캠페인</span>
                                     </div>
                                     <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="24" data-suffix=" h">24 h</span>
-                                        <span class="kpi-label">상시 감청 요구</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:82%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-cite">
-                                    <img src="assets/news_sigint_field.jpg" alt="SIGINT field operation">
-                                    <span class="cite-text">미군 TDEWS 분산 SIGINT — FH 적성 통신 실시간 포착 훈련 (DVIDS / US Army, Public Domain)</span>
-                                </div>
-                            </div>
-                            <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">GNSS DENIAL</div>
-                                <h4>北 GPS Jamming 주기적 실시</h4>
-                                <p>2010·2012·2016·2024 北 西海 GPS jamming — 항공기·선박·軍 UAS 항법 영향. 작전지역 RF 거부 환경 실시간 매핑 자산 부재.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="4" data-suffix=" 회">4 회</span>
-                                        <span class="kpi-label">기록된 대규모 jamming 캠페인</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="200" data-suffix=" km+">200 km+</span>
-                                        <span class="kpi-label">영향 반경 (서해 사례)</span>
+                                        <span class="kpi-num" data-target="200" data-suffix="km+">200km+</span>
+                                        <span class="kpi-label">영향 반경 (2024년)</span>
                                     </div>
                                 </div>
                                 <div class="ppt-pain-bar" style="--bar:76%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">국토부 항행안전 보고 · KARI 분석 · 2024</div>
+                                <div class="ppt-pain-source">국토교통부 항행안전 보고 · KARI · 2024</div>
                             </div>
                             <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">HOSTILE SAT</div>
-                                <h4>적성 LEO/MEO 위성 폭증</h4>
-                                <p>中·러 ISR 위성, Starlink·OneWeb 군사 활용, 北 만리경 운용 시도 — 한반도 통과 적성·미식별 다운링크 폭증.</p>
+                                <div class="ppt-pain-num">무인기 침투</div>
+                                <h4>레이더 아래를 나는 정찰 무인기</h4>
+                                <p>2014년 파주, 2017년 성주, 2022년 서울 용산 상공 3km까지 침투한 북한 소형 무인기. 레이더가 포착하지 못하는 저고도·저속 기체는 RF 제어링크가 유일한 탐지 단서입니다.</p>
                                 <div class="ppt-pain-metrics">
                                     <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="8500" data-suffix="+">8,500+</span>
-                                        <span class="kpi-label">운용 LEO 위성 (전 세계)</span>
+                                        <span class="kpi-num" data-target="3" data-suffix="회">3회</span>
+                                        <span class="kpi-label">확인된 북한 무인기 침투</span>
                                     </div>
                                     <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="200" data-suffix=" / day">200 / day</span>
-                                        <span class="kpi-label">한반도 상공 통과 LEO</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:88%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">Celestrak · FCC filings · 2026 Q1</div>
-                            </div>
-                            <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">HYBRID UAS</div>
-                                <h4>하이브리드 UAS 위협</h4>
-                                <p>北 정찰무인기 (2014·2017·2022), 中 적성 드론, 비국가 행위자 — 저고도·저전력·burst 송출. 레이더가 못 잡는 RF만 감지.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="2.4" data-suffix=" / 5.8 GHz">2.4 / 5.8 GHz</span>
-                                        <span class="kpi-label">제어링크 표준 대역</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="900" data-suffix=" MHz">900 MHz</span>
-                                        <span class="kpi-label">군용·산업용 제어링크</span>
+                                        <span class="kpi-num" data-target="50" data-suffix="m">50m</span>
+                                        <span class="kpi-label">레이더 탐지 하한 고도</span>
                                     </div>
                                 </div>
                                 <div class="ppt-pain-bar" style="--bar:84%;"><div class="ppt-pain-bar-fill"></div></div>
                                 <div class="ppt-pain-cite">
-                                    <img src="assets/news_shahed_drone.jpg" alt="Shahed-136 recovered drones">
-                                    <span class="cite-text">이란 Shahed-136 — 우크라·이라크 전선 회수 실물. 2.4 GHz RF 제어링크 탐지로 격추 (DIA, Public Domain)</span>
+                                    <img src="assets/news_shahed_drone.jpg" alt="Shahed-136">
+                                    <span class="cite-text">이란 Shahed-136 — 우크라이나 전선 회수 실물. RF 제어링크 탐지로 요격 (DIA, Public Domain)</span>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-
-                    <!-- Slide 3 — Operational Gaps -->
-                    <section class="ppt-slide" data-title="작전 공백">
-                        <div class="ppt-num">03</div>
-                        <h2 class="ppt-h2">한국 군사 SIGINT 4대 작전 공백</h2>
-                        <p class="ppt-lead">백두·금강 정찰기, 425 위성, 지상 감청소 — 그래도 메우지 못하는 구조적 공백이 남는다.</p>
-                        <div class="ppt-grid-2 ppt-grid-tight">
                             <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">ISR GAP</div>
-                                <h4>DMZ · NLL · 해안선 상시 ISR 공백</h4>
-                                <p>백두/금강 정찰기는 임무 중에만 커버리지 확보. 접경 전선 250 km 전체를 24/7 감청하는 지상 분산 노드가 없으면 임무 간 공백에 발생하는 RF 활동은 수집 불가.</p>
+                                <div class="ppt-pain-num">미사일 신호</div>
+                                <h4>발사 이전에 RF 신호가 먼저 나온다</h4>
+                                <p>탄도·순항미사일의 유도 체계(GPS 수신기, 능동 레이더 탐색기, 텔레메트리)는 발사 전부터 RF 신호를 방출합니다. 이 신호를 포착하면 수십 초의 선행 경보가 가능합니다.</p>
                                 <div class="ppt-pain-metrics">
                                     <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="250" data-suffix=" km">250 km</span>
-                                        <span class="kpi-label">DMZ·NLL 접경 전선</span>
+                                        <span class="kpi-num" data-target="30" data-suffix="초+">30초+</span>
+                                        <span class="kpi-label">RF 선행 경보 가능 시간</span>
                                     </div>
                                     <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="24" data-suffix=" h">24 h</span>
-                                        <span class="kpi-label">상시 감청 요구</span>
+                                        <span class="kpi-num" data-target="94" data-suffix="회">94회</span>
+                                        <span class="kpi-label">북한 미사일 시험 (2022년)</span>
+                                    </div>
+                                </div>
+                                <div class="ppt-pain-bar" style="--bar:80%;"><div class="ppt-pain-bar-fill"></div></div>
+                                <div class="ppt-pain-source">합참 · 국방부 · 2022 미사일 대응 백서</div>
+                            </div>
+                            <div class="ppt-pain ppt-pain-accent">
+                                <div class="ppt-pain-num">적성 통신</div>
+                                <h4>3,000여 개 주파수를 상시 수집해야 한다</h4>
+                                <p>북한군 HF·VHF·UHF 무전, 주파수 도약(FH) 디지털 데이터링크, 무인기 제어링크. 분산·상시 수집 없이는 신호 패턴과 의도를 파악할 수 없습니다.</p>
+                                <div class="ppt-pain-metrics">
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="3000" data-suffix="+">3,000+</span>
+                                        <span class="kpi-label">북한군 추정 운용 주파수</span>
+                                    </div>
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="24" data-suffix="h">24h</span>
+                                        <span class="kpi-label">요구되는 수집 연속성</span>
                                     </div>
                                 </div>
                                 <div class="ppt-pain-bar" style="--bar:88%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">국방부 작전지원 · 합참 ISR 운용 계획</div>
-                            </div>
-                            <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">GNSS MAP</div>
-                                <h4>작전지역 GNSS 거부 환경 매핑 부재</h4>
-                                <p>北 GPS jamming 발원지·영향범위 실시간 매핑 자산 없음. 서해 사례에서 항공기·군 UAS 항법 혼란 발생 후에야 규모 확인. 분산 수신망으로만 즉각 삼각측량 가능.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="200" data-suffix=" km+">200 km+</span>
-                                        <span class="kpi-label">2024 jamming 영향 반경</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="0" data-suffix=" RT">0 RT</span>
-                                        <span class="kpi-label">실시간 거부구역 매핑</span>
-                                    </div>
+                                <div class="ppt-pain-cite">
+                                    <img src="assets/news_sigint_field.jpg" alt="SIGINT field">
+                                    <span class="cite-text">미군 TDEWS 분산 SIGINT — FH 통신 실시간 포착 훈련 (DVIDS / US Army, Public Domain)</span>
                                 </div>
-                                <div class="ppt-pain-bar" style="--bar:79%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">국토부 항행안전 보고 · KARI 분석 · 2024</div>
-                            </div>
-                            <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">C-UAS</div>
-                                <h4>저고도 UAS RF 식별 자산 부재</h4>
-                                <p>레이더 하단을 비행하는 소형 UAS는 RF 제어링크(2.4·5.8 GHz·FH·burst)만이 식별 단서. 북한 정찰 무인기(2014·2017·2022) 사례 — 분산 RF 탐지망 없이는 통제권 내 침투 불가 탐지.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="3" data-suffix=" 회">3 회</span>
-                                        <span class="kpi-label">北 정찰무인기 침투 사례</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="50" data-suffix=" m+">50 m+</span>
-                                        <span class="kpi-label">레이더 사각 최저 고도</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:84%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">합참 작전 보고 · 국방부 C-UAS 대책</div>
-                            </div>
-                            <div class="ppt-pain ppt-pain-accent">
-                                <div class="ppt-pain-num">SPACE INT</div>
-                                <h4>적성 위성 다운링크 식별 부재</h4>
-                                <p>中·러 ISR 위성 및 北 만리경 시험 위성 — 한반도 통과 시 다운링크 주파수·변조·수신지 식별 불가. 지상 분산 수신망으로만 패스마다 신호 캡처·비교 가능.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="200" data-suffix=" / day">200 / day</span>
-                                        <span class="kpi-label">한반도 상공 통과 LEO</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="0" data-suffix=" KR">0 KR</span>
-                                        <span class="kpi-label">국내 분산 위성 RF 수신망</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:72%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">Celestrak · 합참 우주작전 분석 · 2025</div>
                             </div>
                         </div>
                     </section>
 
-                    <!-- Slide 4 — Legacy SIGINT Limits -->
-                    <section class="ppt-slide" data-title="기존 체계 한계">
-                        <div class="ppt-num">04</div>
-                        <h2 class="ppt-h2">기존 한국 SIGINT 체계 4대 구조 한계</h2>
-                        <p class="ppt-lead">백두·금강·지상 감청소 — 수집 자산은 있다. 그러나 구조적 병목이 전술 SIGINT를 막는다.</p>
-                        <div class="ppt-grid-2">
-                            <div class="ppt-pain">
-                                <div class="ppt-pain-num">STOVEPIPE</div>
-                                <h4>체계 간 데이터 단절 (Stovepipe)</h4>
-                                <p>백두 수집 데이터·지상 감청소·777사령부 분석셀이 각각 독립 운용. 실시간 크로스-스테이션 상관·퓨전 불가. 동일 이미터를 3개 체계가 별도 처리.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="3" data-suffix=" 체계">3 체계</span>
-                                        <span class="kpi-label">독립 운용 (통합 없음)</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="0" data-suffix=" RT">0 RT</span>
-                                        <span class="kpi-label">실시간 크로스-스테이션 상관</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:38%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">합참 정보융합 현황 · 공개 국방백서 기반 추정</div>
-                            </div>
-                            <div class="ppt-pain">
-                                <div class="ppt-pain-num">HIGH BOM</div>
-                                <h4>고비용 플랫폼 — 커버리지 한계</h4>
-                                <p>백두/금강급 유인 정찰기 1회 임무 운용 비용은 수억 원대. 고비용 자산 소수로는 접경 전선 전체를 24/7 커버 불가능 — 임무 공백이 구조적으로 발생.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="1" data-suffix=" : N">1 : N</span>
-                                        <span class="kpi-label">고비용 플랫폼 대 커버 구역</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="24" data-suffix=" h 불가">24 h 불가</span>
-                                        <span class="kpi-label">접경 전 구간 상시 커버</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:55%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">국방획득프로그램 · 방위사업청 사업비 공개자료</div>
-                            </div>
-                            <div class="ppt-pain">
-                                <div class="ppt-pain-num">BURST LOST</div>
-                                <h4>Burst 신호 수집 공백</h4>
-                                <p>北 FH·CDMA·burst 데이터링크는 수 초 이내 단발 송출 후 주파수 이동. 스캔 방식·임무 중심 수집은 이 신호를 구조적으로 놓친다. 상시 광대역 IQ 버퍼 없이는 사후 분석 불가.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="3" data-suffix=" sec">3 sec</span>
-                                        <span class="kpi-label">FH/Burst 평균 지속</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="0" data-suffix=" IQ buf">0 IQ buf</span>
-                                        <span class="kpi-label">기존 체계 롤링 IQ 아카이브</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:64%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">RF 인텔 운용 사례 · EW 교범 분석</div>
-                            </div>
-                            <div class="ppt-pain">
-                                <div class="ppt-pain-num">TRIBAL KNOW.</div>
-                                <h4>이미터 지식의 파편화</h4>
-                                <p>분석관 개인 노트·구두 인수인계에 의존하는 이미터 식별 지식 — 전보·전역 시 100% 손실. 기관 횡단 공유 불가. 같은 북한 주파수를 3개 체계가 각자 재학습.</p>
-                                <div class="ppt-pain-metrics">
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="100" data-suffix="%">100%</span>
-                                        <span class="kpi-label">인수인계 시 암묵지 손실</span>
-                                    </div>
-                                    <div class="ppt-pain-metric">
-                                        <span class="kpi-num" data-target="0" data-suffix=" DB">0 DB</span>
-                                        <span class="kpi-label">통합 이미터 식별 데이터베이스</span>
-                                    </div>
-                                </div>
-                                <div class="ppt-pain-bar" style="--bar:45%;"><div class="ppt-pain-bar-fill"></div></div>
-                                <div class="ppt-pain-source">SIGINT 운용 사례 · 합참 정보 축적 현황</div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Slide 5 — Mission -->
-                    <section class="ppt-slide ppt-mission" data-title="미션">
-                        <div class="ppt-num">05</div>
-                        <h2 class="ppt-h2">왜 우리가 만드는가</h2>
+                    <!-- Slide 3 — 개발 배경 2 : RF 신호는 무기보다 먼저 온다 -->
+                    <section class="ppt-slide ppt-mission" data-title="개발 동기">
+                        <div class="ppt-num">03</div>
+                        <h2 class="ppt-h2">RF 신호는 무기보다 먼저 온다</h2>
                         <blockquote class="ppt-quote">
-                            Behind every emitter —<br>
-                            <span class="ppt-accent">we hear everything.</span>
+                            미사일이 발사되기 전, 무인기가 국경을 넘기 전 —<br>
+                            <span class="ppt-accent">전파 신호가 먼저 공간을 가득 채운다.</span>
                         </blockquote>
                         <div class="ppt-beliefs">
                             <div class="ppt-belief">
                                 <div class="ppt-belief-no">01</div>
-                                <h5>신호는 전장 인프라다</h5>
-                                <p>무선 스펙트럼은 현대 전장의 신경망. <b>모든 RF 활동이 작전 정보</b>다 — 광대역·분산·상시 수집 없이는 전술 우위를 점할 수 없다.</p>
+                                <h5>신호를 먼저 듣는 쪽이 먼저 대응한다</h5>
+                                <p>발사 전 탐색기 활성화, 이륙 전 제어링크 점검 — 무기가 움직이기 전에 RF 신호가 나온다. 이를 포착하면 수십 초의 선행 경보를 확보할 수 있습니다.</p>
                             </div>
                             <div class="ppt-belief">
                                 <div class="ppt-belief-no">02</div>
-                                <h5>COTS 전방 노드로 격차를 메운다</h5>
-                                <p>RPi5 + BladeRF / Pluto / RTL-SDR — <b>수백만 원으로 전방 수집 노드 구축.</b> 고비용 플랫폼이 못 채우는 접경·해안 사각지대를 밀도 있게 배치.</p>
+                                <h5>분산 수집이 단일 센서를 이긴다</h5>
+                                <p>한 곳의 감청소는 지형·거리·교란에 취약합니다. 여러 지점에서 동시에 수집한 신호를 교차 검증하면 단일 센서로는 불가능한 위치 추적과 패턴 분석이 가능합니다.</p>
                             </div>
                             <div class="ppt-belief">
                                 <div class="ppt-belief-no">03</div>
-                                <h5>한 분석관의 발견 = 전 체계의 자산</h5>
-                                <p>한 스테이션이 식별한 이미터 정보는 <b>Signal Library를 통해 모든 스테이션에 즉시 공유.</b> 인수인계 없이 지식이 축적된다.</p>
+                                <h5>기록이 쌓여야 패턴이 보인다</h5>
+                                <p>단발 신호 하나는 잡음일 수 있습니다. 그러나 같은 주파수가 반복적으로 등장하는 패턴은 작전 의도의 징후입니다. 영구 기록 없이는 이 패턴을 발견할 수 없습니다.</p>
                             </div>
                             <div class="ppt-belief">
                                 <div class="ppt-belief-no">04</div>
-                                <h5>영구 보존이 전술 우위다</h5>
-                                <p>놓친 Burst도, 지나간 위성 패스도 — <b>IQ 아카이브에 남는다.</b> 사후 재분석·증거 보전·크로스세션 상관이 가능한 유일한 구조.</p>
+                                <h5>현장 인원이 직접 운용할 수 있어야 한다</h5>
+                                <p>전문 분석관이 없어도 전방 기지에서 실시간으로 활용할 수 있어야 합니다. 복잡한 세팅 없이 전원만 켜면 작동하는 SIGINT 플랫폼이 목표입니다.</p>
                             </div>
                         </div>
                     </section>
 
-                    <!-- Slide 6 — Solution -->
-                    <section class="ppt-slide" data-title="솔루션">
+                    <!-- ══════════════════════════════════════════════
+                         SECTION 2 — 사전 정보
+                         ══════════════════════════════════════════════ -->
+
+                    <!-- Slide 4 — 사전 정보 : 방어에서 탐지로 -->
+                    <section class="ppt-slide" data-title="사전 정보">
+                        <div class="ppt-num">04</div>
+                        <h2 class="ppt-h2">방어 무기만으로는 충분하지 않다</h2>
+                        <p class="ppt-lead">THAAD·패트리어트·현무 — 모두 공격이 시작된 뒤에 작동합니다. 아무리 뛰어난 방어 체계도 100% 요격은 불가능합니다.</p>
+                        <div class="ppt-reactive-row">
+                            <div class="ppt-reactive-box">
+                                <div class="ppt-react-label">방어 무기 (Reactive)</div>
+                                <div class="ppt-react-body">미사일이 날아오면 요격 — 이미 공격은 시작되었습니다. 탐지부터 요격까지 수십 초 안에 모든 것이 결정되며, 포화 공격(salvo attack) 앞에서 요격 성공률은 급격히 낮아집니다. 우크라이나 전쟁은 이를 실전으로 증명했습니다.</div>
+                            </div>
+                            <div class="ppt-proactive-box">
+                                <div class="ppt-react-label">사전 탐지 (Proactive)</div>
+                                <div class="ppt-react-body">공격 전 징후를 포착해 경보를 발령하고 대피·외교·대응을 준비합니다. 인명 피해와 재산 손실을 줄이는 가장 효과적인 방법은 막는 것이 아니라 먼저 아는 것입니다.</div>
+                            </div>
+                        </div>
+                        <p style="font-size:13px;color:rgba(180,200,225,0.75);margin-bottom:10px;flex-shrink:0;">전 세계 국가는 사전 탐지를 위해 세 가지 정보 체계를 운용합니다. BEWE는 그 중 <b style="color:#93c5fd;">신호정보(SIGINT)</b>를 전담합니다.</p>
+                        <div class="ppt-intel-row">
+                            <div class="ppt-intel-pillar">
+                                <div class="ppt-intel-code">HUMINT</div>
+                                <h4>인간정보</h4>
+                                <p>첩보원·협력자를 통한 직접 수집. 깊은 맥락을 제공하지만 확보에 시간이 걸립니다.</p>
+                                <div class="ppt-intel-badge">Human Intelligence</div>
+                            </div>
+                            <div class="ppt-intel-pillar">
+                                <div class="ppt-intel-code">IMINT</div>
+                                <h4>영상정보</h4>
+                                <p>위성·항공 영상으로 시설·장비·배치를 파악합니다. 날씨와 위성 재방문 주기에 제약이 있습니다.</p>
+                                <div class="ppt-intel-badge">Imagery Intelligence</div>
+                            </div>
+                            <div class="ppt-intel-pillar active">
+                                <div class="ppt-intel-code">SIGINT</div>
+                                <h4>신호정보</h4>
+                                <p>전자기 신호를 수집·분석해 적의 능력과 의도를 실시간으로 파악합니다. 날씨·시간·가시성에 무관합니다.</p>
+                                <div class="ppt-intel-badge ppt-intel-badge">Signal Intelligence — BEWE</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ══════════════════════════════════════════════
+                         SECTION 3 — 대표자 배경
+                         ══════════════════════════════════════════════ -->
+
+                    <!-- Slide 5 — 대표자 소개 -->
+                    <section class="ppt-slide" data-title="대표자 소개">
+                        <div class="ppt-num">05</div>
+                        <h2 class="ppt-h2">대표자 소개</h2>
+                        <p class="ppt-lead">국방정보본부 ELINT 분석관 출신 — 이론이 아닌 현장에서 검증된 SIGINT 역량으로 BEWE를 설계했습니다.</p>
+                        <div class="ppt-founder-grid">
+                            <div class="ppt-founder-col">
+                                <div class="ppt-founder-box">
+                                    <div class="ppt-founder-label">경력</div>
+                                    <div class="ppt-founder-item">
+                                        <span class="ppt-founder-dot"></span>
+                                        <div>
+                                            <b>국방정보본부</b>
+                                            <span>첩보 수집·분석 업무 3년 · Tech ELINT Analyst</span>
+                                        </div>
+                                    </div>
+                                    <div class="ppt-founder-item">
+                                        <span class="ppt-founder-dot"></span>
+                                        <div>
+                                            <b>과학기술정보통신부 위성전파감시센터</b>
+                                            <span>RF 스펙트럼 감시 인턴 3개월</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ppt-founder-box">
+                                    <div class="ppt-founder-label">무선 자격</div>
+                                    <div class="ppt-lic-wrap">
+                                        <span class="ppt-lic">제1급 아마추어무선기사</span>
+                                        <span class="ppt-lic">항공무선통신사</span>
+                                        <span class="ppt-lic">해상무선통신사</span>
+                                        <span class="ppt-lic">육상무선통신사</span>
+                                        <span class="ppt-lic">제한무선통신사</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ppt-founder-col">
+                                <div class="ppt-founder-box" style="flex:1;">
+                                    <div class="ppt-founder-label">수상</div>
+                                    <div class="ppt-award-list">
+                                        <div class="ppt-award">
+                                            <div class="ppt-award-title">고가치 첩보 수집 유공</div>
+                                            <div class="ppt-award-from">국방정보본부장</div>
+                                        </div>
+                                        <div class="ppt-award">
+                                            <div class="ppt-award-title">신호정보 발전 유공</div>
+                                            <div class="ppt-award-from">777 부대장</div>
+                                        </div>
+                                        <div class="ppt-award">
+                                            <div class="ppt-award-title">통신감청 교육과정 최우수</div>
+                                            <div class="ppt-award-from">777 사령관</div>
+                                        </div>
+                                        <div class="ppt-award award-us">
+                                            <div class="ppt-award-title">SIGINT 발전 및 대미관계 공헌 유공</div>
+                                            <div class="ppt-award-from">USAF — 미 공군</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ══════════════════════════════════════════════
+                         SECTION 4 — 이미 존재하는 시스템
+                         ══════════════════════════════════════════════ -->
+
+                    <!-- Slide 6 — 기존 한국 SIGINT 자산 -->
+                    <section class="ppt-slide" data-title="기존 SIGINT 자산">
                         <div class="ppt-num">06</div>
-                        <h2 class="ppt-h2">BEWE — 3-Tier 분산 SIGINT 아키텍처</h2>
-                        <p class="ppt-lead">전방 수집 · C2 분석 · SIGINT 융합 — 단일 플랫폼이 세 역할을 동시에 수행한다.</p>
-                        <div class="ppt-solution-row">
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>HOST — 전방 수집 노드 (RPi5 + SDR)</div>
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>JOIN — C2 분석관 워크스테이션</div>
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>Central — SIGINT 융합 릴레이 (포트 7700)</div>
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>IQ · Audio · HIST 자동 아카이브</div>
-                        </div>
-                        <figure class="ppt-figure">
-                            <img src="assets/Main_Page.png" alt="BEWE C2 main page">
-                            <figcaption>JOIN 분석관 화면 — 전방 HOST 라이브 스펙트럼을 다수 분석관이 동시 관제</figcaption>
-                        </figure>
-                    </section>
-
-                    <!-- Slide 7 — Operational C2 View -->
-                    <section class="ppt-slide" data-title="C2 작전도">
-                        <div class="ppt-num">07</div>
-                        <h2 class="ppt-h2">Operational C2 View — 전방 노드 실시간 관제</h2>
-                        <p class="ppt-lead">3D Globe가 전술 작전도 — 전방 HOST 위치·상태를 분석관이 한눈에, 적성 위성 패스를 겹쳐서 본다.</p>
-                        <div class="ppt-split">
-                            <div class="ppt-split-text">
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>전방 노드 실시간 마커</b><p>각 HOST가 위·경도·운용 상태를 Central로 송출 → Globe에 즉시 표시. IP 설정 없이 클릭 한 번으로 해당 스테이션 스펙트럼 접속.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>적성 위성 궤적 오버레이</b><p>LEO/MEO/GEO 4계층 TLE 자동 갱신 — 中·러·北 ISR 위성 패스를 전방 노드 위치와 겹쳐 수집 기회 창 예측.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>다중 스테이션 동시 관제</b><p>Globe는 작전지도, 각 전방 노드는 별도 창 — 분석관 1인이 DMZ·NLL·해안 전 구역을 동시 감시.</p></div></div>
-                            </div>
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/globe_sat_soi.png" alt="Operational C2 Globe">
-                            </figure>
-                        </div>
-                    </section>
-
-                    <!-- Slide 8 — Time Machine / Burst Recovery -->
-                    <section class="ppt-slide" data-title="Burst 신호 회수">
-                        <div class="ppt-num">08</div>
-                        <h2 class="ppt-h2">Burst 신호 회수 — 타임머신 IQ 아카이브</h2>
-                        <p class="ppt-lead">3초짜리 北 FH 송출도, 위성 패스 중 단발 다운링크도 — IQ 롤링 버퍼에 남아 사후 복원된다.</p>
-                        <div class="ppt-split">
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/max_decay.png" alt="Max Hold Decay spectrum">
-                            </figure>
-                            <div class="ppt-split-text">
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>Max Hold / Decay 워터폴</b><p>광대역 스캔 중 모든 피크 누적 — 임무 공백 이전 RF 활동 흔적 보존. Decay로 신·구 활동 시각 분리.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>Time Machine (60 sec IQ 롤링)</b><p>상시 녹화 중인 IQ 버퍼를 정지·되감기 — 이미 지나간 Burst를 스펙트럼에서 즉시 재생.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>Region IQ Export</b><p>Ctrl+드래그로 시간·주파수 영역 박스 선택 → R키로 IQ 파일 즉시 추출. 증거 보전·심층 분석 워크플로우.</p></div></div>
-                                <figure class="ppt-context-photo">
-                                    <img src="assets/news_ew_ukraine.jpg" alt="Ukraine Proximus EW system">
-                                    <figcaption>우크라 전선 Proximus Prometheus EW — 러 FH burst 실시간 포착 실제 운용 (CC BY-SA 4.0)</figcaption>
-                                </figure>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Slide 9 — Multi-channel Surveillance -->
-                    <section class="ppt-slide" data-title="다중 채널 감청">
-                        <div class="ppt-num">09</div>
-                        <h2 class="ppt-h2">다중 채널 적성 통신 동시 감청</h2>
-                        <p class="ppt-lead">HF · VHF · UHF 10채널 동시 복조 — 주파수를 옮겨도 Holding List가 추적을 유지한다.</p>
-                        <div class="ppt-split">
-                            <div class="ppt-split-text">
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>10채널 동시 복조 + Holding List</b><p>AM/FM/USB/LSB/CW 복조 10채널 병렬 운용. 분석관이 채널을 이탈해도 스켈치 타이머 유지 — 재활성 시 자동 재참여.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>전술 밴드플랜 동기화</b><p>北 軍 주파수 할당·UAS 제어 대역·위성 다운링크 대역을 카테고리·색상으로 정의 → 모든 JOIN 분석관에 실시간 동기화.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>글로벌 Notch 필터 풀</b><p>샘플레이트 변경 후에도 Notch 유지 — 재밍·간섭 제거로 표적 신호 식별 정확도 보존.</p></div></div>
-                            </div>
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/band_plan.png" alt="Tactical band plan overlay">
-                            </figure>
-                        </div>
-                    </section>
-
-                    <!-- Slide 10 — ELINT/COMINT Workbench -->
-                    <section class="ppt-slide" data-title="ELINT/COMINT 분석">
-                        <div class="ppt-num">10</div>
-                        <h2 class="ppt-h2">ELINT / COMINT 분석 워크벤치</h2>
-                        <p class="ppt-lead">9개 분석 도메인을 한 화면에서 — 변조 식별·PRI/PRF 측정·비트 추출·송신기 핑거프린트.</p>
-                        <div class="ppt-domains">
-                            <div class="ppt-chip">Spectrogram</div>
-                            <div class="ppt-chip">Amp</div>
-                            <div class="ppt-chip">Freq (PRI/PRF)</div>
-                            <div class="ppt-chip">Phase</div>
-                            <div class="ppt-chip">I/Q</div>
-                            <div class="ppt-chip">Constellation</div>
-                            <div class="ppt-chip">Audio (COMINT)</div>
-                            <div class="ppt-chip">Power</div>
-                            <div class="ppt-chip">Bits (ELINT)</div>
-                        </div>
-                        <div class="ppt-split">
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/analyzer_freq_pri.png" alt="Freq domain PRI measurement">
-                                <figcaption>Freq 도메인 — 프리앰블 자동 검출, PRI / PRF / Pulse Duration / Baud Rate 자동 산출 (레이더·데이터링크 ELINT)</figcaption>
-                            </figure>
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/analyzer_bits.png" alt="Bit map ELINT">
-                                <figcaption>Bits 비트맵 — 프레임 싱크·스크램블러·주기성 시각화 (디지털 COMINT 역분석)</figcaption>
-                            </figure>
-                        </div>
-                    </section>
-
-                    <!-- Slide 11 — National SIGINT Library -->
-                    <section class="ppt-slide" data-title="SIGINT 누적 DB">
-                        <div class="ppt-num">11</div>
-                        <h2 class="ppt-h2">국가 SIGINT 누적 — 이미터 식별 DB</h2>
-                        <p class="ppt-lead">분석관 한 명의 식별이 전 체계의 자산이 된다 — Central이 모든 스테이션의 이미터 레코드를 통합 관리한다.</p>
-                        <div class="ppt-split">
-                            <div class="ppt-split-text">
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>자동 집계 + Pending 큐</b><p>주파수·Tags(MMSI·Callsign·유닛 식별자)로 자동 매칭. 모호한 신규 이미터는 분석관 Confirm/Reject 대기열로 — 지식 품질 보증.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>크로스세션 누적 레코드</b><p>first_seen / last_seen / 기여 스테이션 / 운용자 분석 메모 — 전보·전역 후에도 레코드는 남는다. 인수인계 없는 지식 이전.</p></div></div>
-                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>미션 아카이브 자동 분류</b><p>미션 코드(A03 = 1월 3일) 기반으로 IQ / Audio / HIST를 Central 자동 분류·푸시. 임무 단위 사후 재분석 지원.</p></div></div>
-                            </div>
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/history.png" alt="HIST long-waterfall archive">
-                            </figure>
-                        </div>
-                    </section>
-
-                    <!-- Slide 12 — Korean Military Missions -->
-                    <section class="ppt-slide" data-title="한국군 4대 임무">
-                        <div class="ppt-num">12</div>
-                        <h2 class="ppt-h2">한국군 4대 SIGINT 임무</h2>
-                        <p class="ppt-lead">C-UAS · 對北 COMINT · Space SIGINT · EW 지원 — 단일 BEWE 플랫폼이 동시에 커버한다.</p>
-                        <div class="ppt-apps-grid">
-                            <div class="ppt-app-card">
-                                <div class="ppt-app-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M4 4l4 4"/><path d="M20 4l-4 4"/><path d="M4 20l4-4"/><path d="M20 20l-4-4"/><circle cx="4" cy="4" r="2"/><circle cx="20" cy="4" r="2"/><circle cx="4" cy="20" r="2"/><circle cx="20" cy="20" r="2"/></svg>
-                                </div>
-                                <h4>C-UAS — 對드론 RF 탐지</h4>
-                                <p>2.4 / 5.8 GHz 제어링크 · FPV 다운링크 자동 분류. PRI / PRF / Baud 자동 산출로 기체 모델 핑거프린트. 다중 스테이션 TDOA로 발신 위치 삼각측량.</p>
-                                <div class="ppt-app-tags">
-                                    <span class="ppt-tag ppt-tag-mil">합참</span>
-                                    <span class="ppt-tag ppt-tag-mil">육·해·공</span>
-                                </div>
-                            </div>
-
-                            <div class="ppt-app-card">
-                                <div class="ppt-app-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
-                                </div>
-                                <h4>對北 COMINT — 적성 통신 수집</h4>
-                                <p>北 軍 HF/VHF/UHF 무전·FH 데이터링크 상시 수집. 밴드플랜으로 미인가 채널 즉시 시각화. Signal Library에 자동 누적 → 재활성 이미터 자동 경보.</p>
-                                <div class="ppt-app-tags">
-                                    <span class="ppt-tag ppt-tag-mil">정보사</span>
-                                    <span class="ppt-tag ppt-tag-mil">777사령부</span>
-                                </div>
-                            </div>
-
-                            <div class="ppt-app-card">
-                                <div class="ppt-app-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="4" ry="10"/><circle cx="12" cy="12" r="2"/></svg>
-                                </div>
-                                <h4>Space SIGINT — 적성 위성 다운링크</h4>
-                                <p>中·러·北 ISR 위성 TLE 연동, 한반도 통과 패스마다 자동 IQ 수집. 도플러·편파·변조 분석으로 위성 용도 식별. 분산 스테이션으로 다운링크 수신지 삼각측량.</p>
-                                <div class="ppt-app-tags">
-                                    <span class="ppt-tag ppt-tag-mil">항우연</span>
-                                    <span class="ppt-tag ppt-tag-mil">합참 우주작전</span>
-                                </div>
-                            </div>
-
-                            <div class="ppt-app-card">
-                                <div class="ppt-app-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2-8 4 16 2-8h7"/></svg>
-                                </div>
-                                <h4>EW 지원 — ESM 위협 라이브러리</h4>
-                                <p>수집된 신호 파라미터(주파수·PRI·PRF·변조)를 ESM 위협 라이브러리에 축적. 전자전 작전 전 위협 에미터 식별 지원. SIGINT → EW 통합 워크플로우.</p>
-                                <div class="ppt-app-tags">
-                                    <span class="ppt-tag ppt-tag-mil">전자전여단</span>
-                                    <span class="ppt-tag ppt-tag-mil">EW 지원대</span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Slide 13 — Forward-deployed COTS Hardware -->
-                    <section class="ppt-slide" data-title="전방 배치 하드웨어">
-                        <div class="ppt-num">13</div>
-                        <h2 class="ppt-h2">Forward-deployed COTS 수집 노드</h2>
-                        <p class="ppt-lead">RPi5 + 상용 SDR — 수백만 원으로 전방 기지 어디에나 배치 가능한 무인 SIGINT 노드.</p>
-                        <table class="ppt-table">
-                            <thead>
-                                <tr><th>SDR</th><th>주파수 대역</th><th>게인</th><th>운용 용도</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td><b>BladeRF xA4/xA9</b></td><td>47 MHz – 6 GHz</td><td>0 – 60 dB</td><td>광대역 수집 · UAS · 위성</td></tr>
-                                <tr><td><b>ADALM-Pluto</b></td><td>70 MHz – 6 GHz</td><td>0 – 71 dB</td><td>VHF/UHF 통신 · C-UAS</td></tr>
-                                <tr><td><b>RTL-SDR v4</b></td><td>500 kHz – 1.766 GHz</td><td>0 – 49.6 dB</td><td>HF 감청 · GPS 모니터링</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="ppt-deploy">
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>자동 감지 (BladeRF → Pluto → RTL-SDR)</div>
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>RPi5 헤드리스 CLI HOST — 무인 전방 배치</div>
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>런타임 Receiver 교체 (재부팅 불필요)</div>
-                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>Tailscale 메시 — 단일 포트 7700 Central 연결</div>
-                        </div>
-                    </section>
-
-                    <!-- Slide 14 — Korean SIGINT Asset Map -->
-                    <section class="ppt-slide" data-title="SIGINT 자산 현황">
-                        <div class="ppt-num">14</div>
-                        <h2 class="ppt-h2">한국 SIGINT 자산 현황 — BEWE의 보완 위치</h2>
-                        <p class="ppt-lead">기존 고가 자산이 커버 못하는 공백을 COTS 분산 노드로 밀도 있게 채운다.</p>
+                        <h2 class="ppt-h2">한국이 보유한 SIGINT 자산</h2>
+                        <p class="ppt-lead">백두·금강 정찰기, 777부대, 지상 고정 감청소 — 강력한 자산들이지만 구조적 공백이 존재합니다.</p>
                         <div class="ppt-asset-grid">
                             <div class="ppt-asset-col">
-                                <div class="ppt-asset-col-label">기존 자산</div>
+                                <div class="ppt-asset-col-label">항공 SIGINT</div>
                                 <div class="ppt-asset-card">
-                                    <b>백두 / 금강 정찰기</b>
-                                    <p>RC-800 계열 유인 SIGINT 항공기. 임무 비행 중에만 커버리지 확보 — 상시 운용 불가.</p>
+                                    <b>백두·금강 정찰기</b>
+                                    <p>RC-800 계열 유인 신호정보 수집기. COMINT·ELINT 수집 능력 보유. 임무 비행 중에만 커버리지 확보 — 상시 운용 불가.</p>
                                 </div>
                                 <div class="ppt-asset-card">
-                                    <b>425 정찰위성 (SAR/EO)</b>
-                                    <p>레이더·광학 영상 중심. 신호정보(SIGINT) 수집 기능 제한적. 재방문 주기 존재.</p>
+                                    <b>425 정찰위성</b>
+                                    <p>SAR·EO 영상 중심. RF 신호정보 수집 기능은 제한적. 재방문 주기가 존재해 실시간 감시에 한계.</p>
+                                </div>
+                            </div>
+                            <div class="ppt-asset-col">
+                                <div class="ppt-asset-col-label">지상·조직 SIGINT</div>
+                                <div class="ppt-asset-card">
+                                    <b>777부대 (국군정보사)</b>
+                                    <p>전자정보 수집 전문 부대. 고정 위치 기반 운용. 접경 전선 전체를 동시 커버하는 분산 수집 체계 부재.</p>
                                 </div>
                                 <div class="ppt-asset-card">
-                                    <b>지상 감청소 (777/정보사)</b>
-                                    <p>고정 위치, 거점 커버. 접경 전선 전체·해안·도심 UAS 대역 동시 커버 불가.</p>
+                                    <b>지상 고정 감청소</b>
+                                    <p>접경 지역 전략 거점 배치. 거점 간 데이터 연동(실시간 공유)이 제한적. 개인 분석관에 의존하는 지식 관리.</p>
                                 </div>
                             </div>
                             <div class="ppt-asset-col ppt-asset-col-gap">
                                 <div class="ppt-asset-col-label">구조적 공백</div>
                                 <div class="ppt-asset-card ppt-asset-card-gap">
                                     <b>임무 간 접경 공백</b>
-                                    <p>백두/금강 비행이 없는 시간대 DMZ·NLL 상시 감청 공백.</p>
+                                    <p>백두·금강이 비행하지 않는 시간대 — DMZ·NLL 상시 감청 공백.</p>
                                 </div>
                                 <div class="ppt-asset-card ppt-asset-card-gap">
-                                    <b>GNSS 거부 실시간 매핑</b>
-                                    <p>jammig 발원·영향 범위 실시간 삼각측량 자산 부재.</p>
+                                    <b>저고도 UAS·burst 신호</b>
+                                    <p>3초 이내 단발 송출하는 FH 데이터링크·무인기 제어링크는 스캔 방식으로 수집 불가.</p>
                                 </div>
                                 <div class="ppt-asset-card ppt-asset-card-gap">
-                                    <b>저고도 UAS RF / 위성 다운링크</b>
-                                    <p>레이더 사각 소형 UAS 제어링크, 적성 위성 다운링크 수집망 없음.</p>
-                                </div>
-                            </div>
-                            <div class="ppt-asset-col ppt-asset-col-bewe">
-                                <div class="ppt-asset-col-label">BEWE 보완</div>
-                                <div class="ppt-asset-card ppt-asset-card-bewe">
-                                    <b>전방 분산 노드 (24/7)</b>
-                                    <p>RPi5 + BladeRF/Pluto/RTL-SDR — 접경·해안·기지 주변 24시간 상시 수집.</p>
-                                </div>
-                                <div class="ppt-asset-card ppt-asset-card-bewe">
-                                    <b>TDOA 분산 삼각측량</b>
-                                    <p>3개 이상 노드로 jammig 발원지·UAS 위치 실시간 추정.</p>
-                                </div>
-                                <div class="ppt-asset-card ppt-asset-card-bewe">
-                                    <b>IQ 영구 아카이브</b>
-                                    <p>모든 수집 신호 Central 집중 보관 — 사후 재분석·증거 보전.</p>
+                                    <b>다거점 실시간 융합 부재</b>
+                                    <p>체계 간 실시간 크로스-스테이션 상관 없음. TDOA 위치 추정 불가.</p>
                                 </div>
                             </div>
                         </div>
                     </section>
 
-                    <!-- Slide 15 — CONOPS Diagram -->
-                    <section class="ppt-slide" data-title="CONOPS">
+                    <!-- Slide 7 — BEWE 보완 포지션 -->
+                    <section class="ppt-slide" data-title="BEWE 보완 포지션">
+                        <div class="ppt-num">07</div>
+                        <h2 class="ppt-h2">BEWE는 기존 체계를 대체하지 않습니다</h2>
+                        <p class="ppt-lead">고가 자산이 다루지 못하는 저고도·상시·분산 영역을 COTS 노드로 조밀하게 채웁니다.</p>
+                        <div class="ppt-grid-2">
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">STOVEPIPE</div>
+                                <h4>체계 간 데이터 단절</h4>
+                                <p>백두 수집 데이터·지상 감청소·777 분석셀이 각각 독립 운용. 동일 이미터를 여러 체계가 별도로 분석하며, 실시간 크로스-스테이션 상관이 불가합니다.</p>
+                                <div class="ppt-pain-metrics">
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="0">0</span>
+                                        <span class="kpi-label">실시간 체계 간 공유</span>
+                                    </div>
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="3" data-suffix="개 체계">3개 체계</span>
+                                        <span class="kpi-label">독립 운용 중</span>
+                                    </div>
+                                </div>
+                                <div class="ppt-pain-bar" style="--bar:38%;"><div class="ppt-pain-bar-fill"></div></div>
+                            </div>
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">HIGH COST</div>
+                                <h4>고비용 플랫폼의 커버리지 한계</h4>
+                                <p>유인 정찰기 1회 임무 운용 비용은 수억 원대. 소수의 고가 자산으로는 접경 전선 250km 전체를 24시간 커버하는 것이 구조적으로 불가합니다.</p>
+                                <div class="ppt-pain-metrics">
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="250" data-suffix="km">250km</span>
+                                        <span class="kpi-label">커버 필요 접경 전선</span>
+                                    </div>
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="24" data-suffix="h 불가">24h 불가</span>
+                                        <span class="kpi-label">상시 커버</span>
+                                    </div>
+                                </div>
+                                <div class="ppt-pain-bar" style="--bar:55%;"><div class="ppt-pain-bar-fill"></div></div>
+                            </div>
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">BURST LOSS</div>
+                                <h4>단발 신호 수집 공백</h4>
+                                <p>북한 FH·CDMA·burst 데이터링크는 수 초 이내 단발 송출 후 주파수를 이동합니다. 임무 중심의 스캔 방식으로는 이 신호를 구조적으로 놓칩니다.</p>
+                                <div class="ppt-pain-metrics">
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="3" data-suffix="초">3초</span>
+                                        <span class="kpi-label">FH/burst 평균 지속 시간</span>
+                                    </div>
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="0" data-suffix=" IQ 버퍼">0 IQ</span>
+                                        <span class="kpi-label">기존 체계 롤링 버퍼</span>
+                                    </div>
+                                </div>
+                                <div class="ppt-pain-bar" style="--bar:64%;"><div class="ppt-pain-bar-fill"></div></div>
+                            </div>
+                            <div class="ppt-pain">
+                                <div class="ppt-pain-num">TRIBAL KN.</div>
+                                <h4>분석관 개인에 의존하는 지식</h4>
+                                <p>이미터 식별 정보가 분석관 개인의 기억·메모에만 존재합니다. 전역·전보 시 100% 손실되며, 같은 주파수를 여러 체계가 각자 재학습하는 비효율이 반복됩니다.</p>
+                                <div class="ppt-pain-metrics">
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="100" data-suffix="%">100%</span>
+                                        <span class="kpi-label">인수인계 시 암묵지 손실</span>
+                                    </div>
+                                    <div class="ppt-pain-metric">
+                                        <span class="kpi-num" data-target="0" data-suffix=" 통합 DB">0 DB</span>
+                                        <span class="kpi-label">체계 간 이미터 공유</span>
+                                    </div>
+                                </div>
+                                <div class="ppt-pain-bar" style="--bar:45%;"><div class="ppt-pain-bar-fill"></div></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ══════════════════════════════════════════════
+                         SECTION 5 — 우리 시스템이 할 수 있는 것
+                         ══════════════════════════════════════════════ -->
+
+                    <!-- Slide 8 — BEWE 플랫폼 개요 -->
+                    <section class="ppt-slide" data-title="BEWE 개요">
+                        <div class="ppt-num">08</div>
+                        <h2 class="ppt-h2">BEWE — 분산 SIGINT 플랫폼</h2>
+                        <p class="ppt-lead">전방 수집 노드(HOST) · C2 분석관(JOIN) · SIGINT 융합 서버(Central) — 3계층이 하나의 플랫폼으로 작동합니다.</p>
+                        <div class="ppt-solution-row">
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>HOST — 전방 배치 수집 노드 (RPi5 + SDR)</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>JOIN — 분석관 C2 워크스테이션</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>Central — SIGINT 융합 릴레이 (포트 7700)</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>IQ · Audio · HIST 미션 아카이브 자동 기록</div>
+                        </div>
+                        <figure class="ppt-figure">
+                            <img src="assets/Main_Page.png" alt="BEWE C2 main page">
+                            <figcaption>JOIN 분석관 화면 — 전방 HOST의 라이브 스펙트럼을 다수 분석관이 동시에 관제</figcaption>
+                        </figure>
+                    </section>
+
+                    <!-- Slide 9 — 무인기(UAS) RF 탐지 -->
+                    <section class="ppt-slide" data-title="무인기 탐지">
+                        <div class="ppt-num">09</div>
+                        <h2 class="ppt-h2">무인기 RF 탐지 · 위치 추정</h2>
+                        <p class="ppt-lead">레이더가 놓치는 저고도 소형 무인기 — RF 제어링크와 FPV 다운링크가 유일한 탐지 단서입니다.</p>
+                        <div class="ppt-split">
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>2.4 / 5.8 GHz 제어링크 자동 분류</b><p>상용 무인기 제어 프로토콜(DJI Ocusync·FPV·FHSS)을 PRI·변조 분석으로 기종별 핑거프린트 식별. 알 수 없는 패턴은 자동으로 분석 대기열에 추가.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>다거점 TDOA 위치 추정</b><p>3개 이상의 전방 노드가 동일 신호를 수신한 시간 차이로 발신원 위치를 삼각측량. 레이더 없이 저고도 무인기의 좌표를 산출합니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>burst 신호 IQ 자동 저장</b><p>수 초짜리 단발 제어 신호도 롤링 IQ 버퍼에 포착. 사후 재분석과 증거 보전이 가능합니다.</p></div></div>
+                                <figure class="ppt-context-photo">
+                                    <img src="assets/news_shahed_display.jpg" alt="Shahed-136 display">
+                                    <figcaption>이란 Shahed-136 — 우크라이나 전선에서 RF 탐지로 요격한 사례 (CC BY-SA 4.0)</figcaption>
+                                </figure>
+                            </div>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/max_decay.png" alt="UAS RF spectrum">
+                                <figcaption>Max Hold 스펙트럼 — 이탈 후에도 제어링크 피크가 화면에 남는다</figcaption>
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 10 — 통신 감청 (COMINT) -->
+                    <section class="ppt-slide" data-title="통신 감청">
+                        <div class="ppt-num">10</div>
+                        <h2 class="ppt-h2">전술 통신 감청 (COMINT)</h2>
+                        <p class="ppt-lead">HF · VHF · UHF 10채널 동시 복조 — 적성 통신이 어느 주파수로 이동해도 Holding List가 추적을 유지합니다.</p>
+                        <div class="ppt-split">
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>10채널 동시 복조</b><p>AM · FM · USB · LSB · CW 복조 채널 10개를 병렬 운용. 분석관이 다른 채널로 이동해도 Holding List가 스켈치 타이머를 유지하다가 재활성 시 자동 복귀합니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>전술 밴드플랜 실시간 동기화</b><p>북한군 주파수 할당·무인기 제어 대역·위성 다운링크 대역을 카테고리·색상으로 정의해 두면, 모든 JOIN 분석관 화면에 즉시 동기화됩니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>주파수 도약(FH) 신호 포착</b><p>60초 롤링 IQ 버퍼 덕분에 FH로 순식간에 이동한 신호도 사후에 재생·분석이 가능합니다. 기존 스캔 방식의 구조적 공백을 해소합니다.</p></div></div>
+                            </div>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/band_plan.png" alt="Tactical band plan">
+                                <figcaption>전술 밴드플랜 — 운용자가 정의한 적성 주파수 대역이 워터폴 위에 표시</figcaption>
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 11 — 전자정보 (ELINT) -->
+                    <section class="ppt-slide" data-title="전자정보 수집">
+                        <div class="ppt-num">11</div>
+                        <h2 class="ppt-h2">전자정보 수집 · 미사일 신호 분석 (ELINT)</h2>
+                        <p class="ppt-lead">레이더·미사일 탐색기·텔레메트리 신호 — 9개 분석 도메인으로 파라미터를 자동 산출합니다.</p>
+                        <div class="ppt-domains">
+                            <div class="ppt-chip">Spectrogram</div>
+                            <div class="ppt-chip">Amp</div>
+                            <div class="ppt-chip">Freq / PRI</div>
+                            <div class="ppt-chip">Phase</div>
+                            <div class="ppt-chip">I/Q</div>
+                            <div class="ppt-chip">Constellation</div>
+                            <div class="ppt-chip">Audio</div>
+                            <div class="ppt-chip">Power</div>
+                            <div class="ppt-chip">Bits</div>
+                        </div>
+                        <div class="ppt-split">
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/analyzer_freq_pri.png" alt="Freq PRI analysis">
+                                <figcaption>Freq 도메인 — 프리앰블 자동 검출, PRI · PRF · Pulse Duration · Baud Rate 자동 산출 (레이더·데이터링크 ELINT)</figcaption>
+                            </figure>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/analyzer_bits.png" alt="Bit map">
+                                <figcaption>Bits 비트맵 — 프레임 동기·스크램블러·주기성을 한눈에 파악 (디지털 통신 역분석)</figcaption>
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 12 — GPS 교란 탐지 -->
+                    <section class="ppt-slide" data-title="GPS 교란 탐지">
+                        <div class="ppt-num">12</div>
+                        <h2 class="ppt-h2">GPS 교란 발원 탐지 · 영향권 실시간 매핑</h2>
+                        <p class="ppt-lead">단일 수신 지점으로는 교란 범위를 가늠할 수 없습니다. 분산 노드만이 실시간 삼각측량을 가능하게 합니다.</p>
+                        <div class="ppt-split">
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>광대역 GNSS 대역 상시 모니터링</b><p>GPS L1/L2(1.2·1.5 GHz), GLONASS, BeiDou, Galileo 대역을 상시 수신. 교란 신호 등장 즉시 경보 발령.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>다거점 TDOA로 발원지 추정</b><p>3개 이상 노드가 교란 신호를 수신한 시각 차이로 북한 교란 송신기 위치를 삼각측량. 기존 단일 감청소로는 불가능한 기능입니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>교란 이벤트 IQ 자동 보존</b><p>교란 신호를 IQ 파일로 자동 저장. 사후 신호 특성 분석과 국제 기구 신고용 증거 자료로 활용합니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>3D Globe 영향권 시각화</b><p>노드별 수신 강도를 Globe에 표시해 교란 영향권을 지도 위에 실시간으로 가시화합니다.</p></div></div>
+                            </div>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/globe_sat_soi.png" alt="GPS jamming globe view">
+                                <figcaption>3D Globe C2 — 전방 노드 위치와 교란 영향권을 동시에 표시</figcaption>
+                            </figure>
+                        </div>
+                    </section>
+
+                    <!-- Slide 13 — 위성 다운링크 감시 -->
+                    <section class="ppt-slide" data-title="위성 신호 감시">
+                        <div class="ppt-num">13</div>
+                        <h2 class="ppt-h2">적성 위성 다운링크 감시</h2>
+                        <p class="ppt-lead">중국·러시아·북한 ISR 위성이 한반도 상공을 지나는 매 순간 — 자동으로 신호를 포착하고 기록합니다.</p>
+                        <div class="ppt-split">
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/globe_sat_soi.png" alt="Satellite orbit tracking">
+                                <figcaption>LEO/MEO/GEO 4계층 TLE 카탈로그 — 적성 위성 궤도와 전방 노드 위치를 겹쳐 패스 예측</figcaption>
+                            </figure>
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>TLE 자동 갱신 · 패스 예측</b><p>Celestrak TLE 카탈로그 자동 동기화. 중국·러시아 ISR 위성과 북한 만리경의 한반도 통과 시간을 사전 예측해 수집 일정을 자동 편성합니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>패스별 자동 IQ 녹화</b><p>미션 코드 기반으로 위성 패스마다 IQ 파일을 자동 생성·저장. 수집된 신호는 도플러 보정 후 변조 분석이 가능합니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>분산 스테이션 도플러 핑거프린트</b><p>복수 지점에서 수신한 도플러 곡선을 비교해 위성 용도(통신·ISR·GNSS 재밍)를 식별합니다.</p></div></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ══════════════════════════════════════════════
+                         SECTION 6 — 시스템 운용 장면
+                         ══════════════════════════════════════════════ -->
+
+                    <!-- Slide 14 — 운용 장면 1 : C2 통합 화면 -->
+                    <section class="ppt-slide" data-title="운용 장면 ①">
+                        <div class="ppt-num">14</div>
+                        <h2 class="ppt-h2">운용 장면 — C2 통합 화면</h2>
+                        <p class="ppt-lead">전방 HOST가 송출하는 라이브 스펙트럼을 분석관이 어디서든 실시간으로 관제합니다.</p>
+                        <div class="ppt-solution-row">
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>실시간 워터폴 · 파워 스펙트럼 공유</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>채널 · 녹음 · 채팅 · 파일 전체 동기화</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>단일 포트 7700 — 방화벽 설정 불필요</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>다수 JOIN 동시 접속 (인원 제한 없음)</div>
+                        </div>
+                        <figure class="ppt-figure">
+                            <img src="assets/Main_Page.png" alt="BEWE C2 main screen">
+                            <figcaption>JOIN 분석관 화면 — 상단 워터폴 / 중단 파워 스펙트럼 / 우측 채널 리스트 · 미션 상태</figcaption>
+                        </figure>
+                    </section>
+
+                    <!-- Slide 15 — 운용 장면 2 : ELINT 분석 워크벤치 -->
+                    <section class="ppt-slide" data-title="운용 장면 ②">
                         <div class="ppt-num">15</div>
-                        <h2 class="ppt-h2">CONOPS — 전방 수집에서 후방 C2까지</h2>
-                        <p class="ppt-lead">3계층 아키텍처: 전방 수집 노드 → Central 백홀 릴레이 → 후방 C2 분석관.</p>
-                        <div class="ppt-conops">
-                            <div class="ppt-conops-layer fwd">
-                                <div class="ppt-conops-layer-label">FWD — 전방 수집</div>
-                                <div class="ppt-conops-nodes">
-                                    <div class="ppt-conops-node">
-                                        <b>HOST DGS-1</b>
-                                        <span class="meta">BladeRF · 47 MHz–6 GHz</span>
-                                        <span class="meta">DMZ 접경 거점</span>
-                                    </div>
-                                    <div class="ppt-conops-node">
-                                        <b>HOST DGS-2</b>
-                                        <span class="meta">Pluto · 70 MHz–6 GHz</span>
-                                        <span class="meta">NLL 해안 거점</span>
-                                    </div>
-                                    <div class="ppt-conops-node">
-                                        <b>HOST DGS-3</b>
-                                        <span class="meta">RTL-SDR · HF/VHF/UHF</span>
-                                        <span class="meta">도심 / 기지 내부</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="ppt-conops-arrow"><span>IQ stream · 암호화 Tailscale</span></div>
-                            <div class="ppt-conops-layer hub">
-                                <div class="ppt-conops-layer-label">HUB — Central 릴레이 (port 7700)</div>
-                                <div class="ppt-conops-nodes">
-                                    <div class="ppt-conops-node">
-                                        <b>Central Server</b>
-                                        <span class="meta">미션 아카이브 · 이미터 DB</span>
-                                        <span class="meta">전 스테이션 상태 브로드캐스트</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="ppt-conops-arrow"><span>워터폴 · 채널 · Signal Library 동기화</span></div>
-                            <div class="ppt-conops-layer rear">
-                                <div class="ppt-conops-layer-label">REAR — 후방 C2 분석</div>
-                                <div class="ppt-conops-nodes">
-                                    <div class="ppt-conops-node">
-                                        <b>JOIN 분석관 A</b>
-                                        <span class="meta">ELINT / COMINT 워크벤치</span>
-                                    </div>
-                                    <div class="ppt-conops-node">
-                                        <b>JOIN 분석관 B</b>
-                                        <span class="meta">C-UAS / UAS RF 모니터링</span>
-                                    </div>
-                                    <div class="ppt-conops-node">
-                                        <b>C2 지휘소</b>
-                                        <span class="meta">Globe 작전도 · 전 노드 관제</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <h2 class="ppt-h2">운용 장면 — ELINT 분석 워크벤치</h2>
+                        <p class="ppt-lead">수집된 신호를 9개 도메인으로 즉시 분석 — 변조 식별부터 비트 역분석까지 한 화면에서.</p>
+                        <div class="ppt-split">
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/analyzer_freq_pri.png" alt="Freq domain PRI">
+                                <figcaption>Freq 도메인 — PRI · PRF · Pulse Duration · Baud 자동 측정</figcaption>
+                            </figure>
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/analyzer_bits.png" alt="Bits bitmap">
+                                <figcaption>Bits 비트맵 — 프레임 구조 · 스크램블러 패턴 시각화</figcaption>
+                            </figure>
                         </div>
                     </section>
 
-                    <!-- Slide 16 — Adversary Workflow -->
-                    <section class="ppt-slide" data-title="적 행동 흐름">
+                    <!-- Slide 16 — 운용 장면 3 : Globe C2 -->
+                    <section class="ppt-slide" data-title="운용 장면 ③">
                         <div class="ppt-num">16</div>
-                        <h2 class="ppt-h2">Adversary Workflow — 적 RF 활동 탐지·식별 5단계</h2>
-                        <p class="ppt-lead">이미터 송출부터 지휘 보고까지 — BEWE가 각 단계에서 개입하는 방식.</p>
-                        <div class="ppt-flow-banner">
-                            <img src="assets/news_shahed_display.jpg" alt="Shahed-136 IRGC display">
-                            <div class="ppt-flow-banner-overlay">
-                                <span class="ppt-flow-banner-text">실전 사례 — 이란 Shahed-136 대량 투입 (우크라 전선), 北 FH 데이터링크, GPS jamming: RF 기반 탐지·식별의 현실 (IRGC, CC BY-SA 4.0)</span>
-                            </div>
-                        </div>
-                        <div class="ppt-flow">
-                            <div class="ppt-flow-step">
-                                <div class="step-num">01</div>
-                                <div class="step-title">이미터 송출</div>
-                                <div class="step-sub">Adversary RF Activity</div>
-                                <ul class="step-bullets">
-                                    <li>北 FH/CDMA 통신</li>
-                                    <li>UAS 제어링크 burst</li>
-                                    <li>적성 위성 다운링크</li>
-                                    <li>GPS jamming 신호</li>
-                                </ul>
-                            </div>
-                            <div class="ppt-flow-step">
-                                <div class="step-num">02</div>
-                                <div class="step-title">전방 수집</div>
-                                <div class="step-sub">FWD NODE Intercept</div>
-                                <ul class="step-bullets">
-                                    <li>HOST 광대역 IQ 수집</li>
-                                    <li>60sec 롤링 버퍼 저장</li>
-                                    <li>Max Hold 피크 누적</li>
-                                    <li>미션 아카이브 자동 기록</li>
-                                </ul>
-                            </div>
-                            <div class="ppt-flow-step">
-                                <div class="step-num">03</div>
-                                <div class="step-title">Central 전달</div>
-                                <div class="step-sub">Relay &amp; Fusion</div>
-                                <ul class="step-bullets">
-                                    <li>암호화 Tailscale 백홀</li>
-                                    <li>다중 노드 스트림 병합</li>
-                                    <li>IQ / HIST Central 집중</li>
-                                    <li>이미터 DB 자동 매칭</li>
-                                </ul>
-                            </div>
-                            <div class="ppt-flow-step">
-                                <div class="step-num">04</div>
-                                <div class="step-title">분석 · 식별</div>
-                                <div class="step-sub">Analyst Workbench</div>
-                                <ul class="step-bullets">
-                                    <li>ELINT 9도메인 분석</li>
-                                    <li>PRI/PRF/변조 자동 산출</li>
-                                    <li>Bits 역분석 · 핑거프린트</li>
-                                    <li>TDOA 위치 추정</li>
-                                </ul>
-                            </div>
-                            <div class="ppt-flow-step">
-                                <div class="step-num">05</div>
-                                <div class="step-title">지휘 보고</div>
-                                <div class="step-sub">C2 Reporting</div>
-                                <ul class="step-bullets">
-                                    <li>Signal Library 갱신</li>
-                                    <li>ESM 위협 라이브러리 추가</li>
-                                    <li>지휘소 경보 발령</li>
-                                    <li>EW 대응 지원</li>
-                                </ul>
+                        <h2 class="ppt-h2">운용 장면 — 3D Globe 작전 지도</h2>
+                        <p class="ppt-lead">전방 노드 위치와 적성 위성 궤도를 한 화면에 — 분석관 한 명이 전 구역을 동시에 관제합니다.</p>
+                        <div class="ppt-split">
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/globe_sat_soi.png" alt="3D Globe operational view">
+                                <figcaption>3D Globe — 전방 HOST 마커 · Starlink / SOI / LEO · MEO · GEO 4계층 위성 궤도 실시간 표시</figcaption>
+                            </figure>
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>전방 노드 실시간 상태 표시</b><p>각 HOST가 위·경도와 운용 상태를 Central로 송출 → Globe 마커 자동 갱신. 클릭 한 번으로 해당 스테이션 스펙트럼에 즉시 접속.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>적성 위성 궤적 오버레이</b><p>TLE 자동 갱신으로 중국·러시아·북한 ISR 위성의 한반도 통과 예정 경로를 전방 노드 위치와 함께 표시.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>다중 스테이션 동시 관제</b><p>Globe를 작전 지도로 두고, 각 전방 노드를 별도 창으로 분리해 DMZ·NLL·해안 전 구역을 1인이 동시에 감시.</p></div></div>
                             </div>
                         </div>
                     </section>
 
-                    <!-- Slide 17 — Comparison Table -->
-                    <section class="ppt-slide" data-title="경쟁 비교">
+                    <!-- Slide 17 — SIGINT 아카이브 -->
+                    <section class="ppt-slide" data-title="SIGINT 아카이브">
                         <div class="ppt-num">17</div>
-                        <h2 class="ppt-h2">BEWE vs 기존 전용 SIGINT 체계</h2>
-                        <p class="ppt-lead">단가·배치 속도·협업·아카이브 — 4개 축에서 구조적 우위.</p>
+                        <h2 class="ppt-h2">SIGINT 아카이브 — 수집한 모든 신호를 영구 보존</h2>
+                        <p class="ppt-lead">한 분석관의 발견이 전 체계의 자산이 됩니다 — 이미터 식별 DB가 미션마다 쌓여갑니다.</p>
+                        <div class="ppt-split">
+                            <figure class="ppt-figure ppt-figure-side">
+                                <img src="assets/history.png" alt="HIST long waterfall archive">
+                                <figcaption>HIST 장기 워터폴 — 미션 코드별로 시간축을 압축해 수일치 신호 활동을 한눈에 조망</figcaption>
+                            </figure>
+                            <div class="ppt-split-text">
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>미션 단위 자동 분류</b><p>미션 코드(예: A03 = 1월 3일) 기반으로 IQ · Audio · HIST 파일을 Central에 자동 집중 관리. 임무 단위 사후 재분석이 가능합니다.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>이미터 DB 자동 누적</b><p>주파수·Tags(MMSI·Callsign·단위 식별자)로 이미터를 자동 매칭. 새로운 미식별 신호는 분석관 확인 대기열에 추가.</p></div></div>
+                                <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>전역·전보 없이 지식 이전</b><p>first_seen · last_seen · 기여 스테이션 · 분석관 메모가 하나의 레코드에 누적. 인수인계 없이도 지식이 조직에 남습니다.</p></div></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 18 — 전방 배치 하드웨어 -->
+                    <section class="ppt-slide" data-title="하드웨어">
+                        <div class="ppt-num">18</div>
+                        <h2 class="ppt-h2">전방 배치형 COTS 수집 노드</h2>
+                        <p class="ppt-lead">RPi5 + 상용 SDR — 수백만 원으로 전방 기지 어디에나 즉시 배치할 수 있는 무인 SIGINT 노드.</p>
+                        <table class="ppt-table">
+                            <thead>
+                                <tr><th>SDR</th><th>수신 주파수</th><th>게인</th><th>주요 운용 용도</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>BladeRF xA4/xA9</b></td><td>47 MHz – 6 GHz</td><td>0 – 60 dB</td><td>광대역 수집 · 무인기 · 위성 다운링크</td></tr>
+                                <tr><td><b>ADALM-Pluto</b></td><td>70 MHz – 6 GHz</td><td>0 – 71 dB</td><td>VHF/UHF 전술 통신 · C-UAS</td></tr>
+                                <tr><td><b>RTL-SDR v4</b></td><td>500 kHz – 1.766 GHz</td><td>0 – 49.6 dB</td><td>HF 감청 · GPS 대역 모니터링</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="ppt-deploy">
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>수신기 자동 감지 (BladeRF → Pluto → RTL-SDR 순서)</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>RPi5 헤드리스 CLI — 전원만 연결하면 자동 시작</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>런타임 수신기 교체 (재부팅 불필요)</div>
+                            <div class="ppt-pill"><span class="ppt-pill-dot"></span>Tailscale 메시 VPN — 단일 포트 7700으로 Central 연결</div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 19 — BEWE vs 기존 체계 비교 -->
+                    <section class="ppt-slide" data-title="경쟁 비교">
+                        <div class="ppt-num">19</div>
+                        <h2 class="ppt-h2">BEWE vs 기존 전용 SIGINT 체계 비교</h2>
+                        <p class="ppt-lead">단가·배치 속도·협업·아카이브 — 네 가지 핵심 축에서 구조적 우위.</p>
                         <div class="ppt-comp">
                             <table>
                                 <thead>
@@ -791,7 +717,7 @@
                                         <th>비교 항목</th>
                                         <th class="col-bewe">BEWE (COTS)</th>
                                         <th>L3Harris / BAE</th>
-                                        <th>Raytheon / 전용체계</th>
+                                        <th>전용 지상 체계</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -802,153 +728,56 @@
                                         <td>수십억 ~ 수백억 원</td>
                                     </tr>
                                     <tr>
-                                        <td>배치 시간</td>
-                                        <td class="col-bewe"><b>수 시간 내</b><br>전방 즉시 배치</td>
+                                        <td>전방 배치 소요 시간</td>
+                                        <td class="col-bewe"><b>수 시간 이내</b></td>
                                         <td>수 주 ~ 수 개월</td>
                                         <td>수 개월 ~ 수 년</td>
                                     </tr>
                                     <tr>
-                                        <td>실시간 다중 분석관 협업</td>
+                                        <td>다수 분석관 실시간 협업</td>
                                         <td class="col-bewe"><b>기본 내장</b><br>JOIN 무제한</td>
                                         <td>별도 C2 시스템 필요</td>
-                                        <td>미지원 (단독 운용)</td>
+                                        <td>미지원</td>
                                     </tr>
                                     <tr>
                                         <td>IQ 영구 아카이브</td>
-                                        <td class="col-bewe"><b>미션 단위 자동</b><br>Central 집중 관리</td>
+                                        <td class="col-bewe"><b>미션 단위 자동</b></td>
                                         <td>옵션 (추가 비용)</td>
-                                        <td>제한적 / 별도 구축</td>
+                                        <td>제한적</td>
                                     </tr>
                                     <tr>
-                                        <td>오픈 프로토콜 / 확장성</td>
+                                        <td>수신기 확장성</td>
                                         <td class="col-bewe"><b>완전 개방</b><br>SDR 자유 교체</td>
-                                        <td>독점 하드웨어 Lock-in</td>
-                                        <td>독점 플랫폼 Lock-in</td>
+                                        <td>독점 하드웨어</td>
+                                        <td>독점 플랫폼</td>
                                     </tr>
                                     <tr>
-                                        <td>운용 인력 요구</td>
-                                        <td class="col-bewe"><b>1인 관제 가능</b><br>GUI 자동화</td>
-                                        <td>전담 운용팀 필요</td>
-                                        <td>전담 운용팀 필요</td>
+                                        <td>최소 운용 인원</td>
+                                        <td class="col-bewe"><b>1인 관제 가능</b></td>
+                                        <td>전담팀 필요</td>
+                                        <td>전담팀 필요</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </section>
 
-                    <!-- Slide 18 — Roadmap -->
-                    <section class="ppt-slide" data-title="로드맵">
-                        <div class="ppt-num">18</div>
-                        <h2 class="ppt-h2">개발 로드맵 — Phase 1 / 2 / 3</h2>
-                        <p class="ppt-lead">접경 전방 노드 운용부터 국가 SIGINT 네트워크 통합까지 3단계.</p>
-                        <div class="ppt-roadmap">
-                            <div class="ppt-phase">
-                                <div class="ppt-phase-marker"></div>
-                                <div class="ppt-phase-num">Phase 1</div>
-                                <div class="ppt-phase-year">현재 ~ 2026</div>
-                                <div class="ppt-phase-title">전방 노드 배치 + 核 기능</div>
-                                <ul class="ppt-phase-bullets">
-                                    <li>HOST/JOIN/Central 3-tier 운용</li>
-                                    <li>IQ / Audio / HIST 미션 아카이브</li>
-                                    <li>ELINT 9도메인 분석 워크벤치</li>
-                                    <li>3D Globe 전방 노드 관제</li>
-                                    <li>Signal Library 이미터 DB 초기 구축</li>
-                                </ul>
-                                <div class="ppt-phase-stamp">운용 중</div>
-                            </div>
-                            <div class="ppt-phase">
-                                <div class="ppt-phase-marker"></div>
-                                <div class="ppt-phase-num">Phase 2</div>
-                                <div class="ppt-phase-year">2026 ~ 2027</div>
-                                <div class="ppt-phase-title">AI/ML 자동 분류 + TDOA</div>
-                                <ul class="ppt-phase-bullets">
-                                    <li>딥러닝 변조 자동 분류 (AMC)</li>
-                                    <li>다중 노드 TDOA 발신 위치 추정</li>
-                                    <li>이미터 자동 경보 (재활성 탐지)</li>
-                                    <li>위성 패스 자동 IQ 스케줄 수집</li>
-                                    <li>ESM 위협 라이브러리 통합 API</li>
-                                </ul>
-                                <div class="ppt-phase-stamp">개발 중</div>
-                            </div>
-                            <div class="ppt-phase p3">
-                                <div class="ppt-phase-marker"></div>
-                                <div class="ppt-phase-num">Phase 3</div>
-                                <div class="ppt-phase-year">2027 ~</div>
-                                <div class="ppt-phase-title">국가 SIGINT 네트워크 통합</div>
-                                <ul class="ppt-phase-bullets">
-                                    <li>합참 · 정보사 · 777 연동 인터페이스</li>
-                                    <li>전국 전방 노드 100+ 확장</li>
-                                    <li>위성 다운링크 분산 수신망 구축</li>
-                                    <li>동맹국 SIGINT 교환 프로토콜</li>
-                                    <li>국가 RF 위협 지도 실시간 운용</li>
-                                </ul>
-                                <div class="ppt-phase-stamp">계획</div>
-                            </div>
-                        </div>
-                    </section>
+                    <!-- ══════════════════════════════════════════════
+                         SECTION 7 — 마무리
+                         ══════════════════════════════════════════════ -->
 
-                    <!-- Slide 19 — Security / OPSEC -->
-                    <section class="ppt-slide" data-title="보안 · OPSEC">
-                        <div class="ppt-num">19</div>
-                        <h2 class="ppt-h2">보안 · OPSEC 설계</h2>
-                        <p class="ppt-lead">수집 데이터 · 분석관 접근 · 네트워크 트래픽 — 3개 층위에서 보안을 설계한다.</p>
-                        <div class="ppt-security">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>보안 항목</th>
-                                        <th>현재 구현</th>
-                                        <th class="roadmap">Phase 2 로드맵</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>네트워크 암호화</td>
-                                        <td class="now">Tailscale WireGuard 메시 (E2E)</td>
-                                        <td class="roadmap">mTLS 노드 인증 추가</td>
-                                    </tr>
-                                    <tr>
-                                        <td>접근 통제</td>
-                                        <td class="now">Tier 기반 권한 (Tier 0~2), 비밀번호 인증</td>
-                                        <td class="roadmap">PKI 인증서 + MFA</td>
-                                    </tr>
-                                    <tr>
-                                        <td>IQ 아카이브 보안</td>
-                                        <td class="now">Central 로컬 스토리지 (격리 환경)</td>
-                                        <td class="roadmap">AES-256 암호화 저장 + 접근 감사 로그</td>
-                                    </tr>
-                                    <tr>
-                                        <td>OPSEC — 노드 위치</td>
-                                        <td class="now">Tailscale 100.x.x.x 내부망, 공개 IP 미노출</td>
-                                        <td class="roadmap">노드 위치 암호화 브로드캐스트</td>
-                                    </tr>
-                                    <tr>
-                                        <td>소프트웨어 무결성</td>
-                                        <td class="now">git 서명 커밋 + 빌드 검증</td>
-                                        <td class="roadmap">바이너리 서명 + TPM 부트 검증</td>
-                                    </tr>
-                                    <tr>
-                                        <td>신호 데이터 분류</td>
-                                        <td class="now">미션 코드 기반 격리 저장</td>
-                                        <td class="roadmap">보안 등급 레이블 + 자동 분류 정책</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <!-- Slide 20 — Vision / Closing -->
-                    <section class="ppt-slide ppt-closing" data-title="비전">
+                    <!-- Slide 20 — 마무리 -->
+                    <section class="ppt-slide ppt-closing" data-title="마무리">
                         <div class="ppt-cover-bg" style="background-image:url('assets/globe_sat_soi.png');"></div>
                         <div class="ppt-cover-overlay"></div>
                         <div class="ppt-cover-content">
-                            <div class="ppt-eyebrow">VISION 2027+</div>
-                            <h2 class="ppt-closing-title">한국형 분산 SIGINT 엔터프라이즈<br>— 모든 무선 신호를 듣는다</h2>
+                            <div class="ppt-eyebrow">BEWE · 한국형 분산 SIGINT 플랫폼</div>
+                            <h2 class="ppt-closing-title">모든 무선 신호를 듣는다<br>— 사전에, 분산으로, 영구히</h2>
                             <div class="ppt-applications">
-                                <div class="ppt-app">접경 · 해안 · 도심 24/7 전방 노드</div>
-                                <div class="ppt-app">C-UAS · 對北 COMINT · Space SIGINT</div>
-                                <div class="ppt-app">국가 이미터 식별 DB · ESM 위협 라이브러리</div>
-                                <div class="ppt-app">동맹국 SIGINT 교환 프로토콜</div>
+                                <div class="ppt-app">GPS 교란 · 무인기 · 미사일 RF 사전 탐지</div>
+                                <div class="ppt-app">전술 통신 감청 · 전자정보 분석</div>
+                                <div class="ppt-app">적성 위성 다운링크 감시</div>
+                                <div class="ppt-app">국가 이미터 식별 DB 영구 구축</div>
                             </div>
                             <p class="ppt-closing-cta">방위사업 도입 문의 — bewe.co.kr</p>
                             <div class="ppt-cover-meta">
@@ -960,6 +789,7 @@
                             </div>
                         </div>
                     </section>
+
 
                 </div>
             </div>

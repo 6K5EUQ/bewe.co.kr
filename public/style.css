@@ -1505,3 +1505,521 @@ body {
     .hero-desc { font-size: 14px; }
     .btn-primary { padding: 14px 36px; font-size: 14px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PPT — NEW SLIDES (Korean SIGINT)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Slide 4: Korean SIGINT Asset Map ──────────────────────────────────── */
+.ppt-asset-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 18px;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+}
+.ppt-asset-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+.ppt-asset-col-head {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(96,165,250,0.75);
+    padding-bottom: 4px;
+}
+.ppt-asset-col.bewe .ppt-asset-col-head { color: rgba(110,231,183,0.85); }
+.ppt-asset-card {
+    position: relative;
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    flex: 1;
+    min-height: 0;
+}
+.ppt-asset-col.bewe .ppt-asset-card {
+    border-color: rgba(110,231,183,0.25);
+    background: linear-gradient(180deg, rgba(110,231,183,0.06) 0%, rgba(110,231,183,0.02) 100%);
+}
+.ppt-asset-card h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+}
+.ppt-asset-card .bullets {
+    font-size: 12px;
+    color: rgba(180,200,225,0.85);
+    line-height: 1.55;
+    list-style: none;
+    padding: 0;
+}
+.ppt-asset-card .bullets li {
+    padding-left: 12px;
+    position: relative;
+    margin-bottom: 3px;
+}
+.ppt-asset-card .bullets li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: rgba(96,165,250,0.6);
+}
+.ppt-asset-col.bewe .ppt-asset-card .bullets li::before { color: rgba(110,231,183,0.7); }
+.ppt-asset-arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    color: rgba(96,165,250,0.5);
+    font-size: 22px;
+    padding: 0 4px;
+}
+.ppt-asset-arrows span {
+    display: block;
+    line-height: 1;
+}
+.ppt-asset-conclusion {
+    margin-top: 14px;
+    padding: 12px 22px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, rgba(110,231,183,0.10), rgba(59,130,246,0.10));
+    border: 1px solid rgba(110,231,183,0.2);
+    text-align: center;
+    font-size: 14px;
+    color: rgba(220,235,250,0.95);
+    font-weight: 500;
+}
+.ppt-asset-conclusion b { color: #6ee7b7; }
+
+/* ── Slide 8: CONOPS Diagram ───────────────────────────────────────────── */
+.ppt-conops {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+}
+.ppt-conops-layer {
+    position: relative;
+    padding: 14px 20px 14px 22px;
+    border-radius: 12px;
+    border: 1px solid rgba(96,165,250,0.18);
+    background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.005) 100%);
+}
+.ppt-conops-layer.fwd  { border-color: rgba(251,146,60,0.30); background: linear-gradient(180deg, rgba(251,146,60,0.06) 0%, rgba(251,146,60,0.01) 100%); }
+.ppt-conops-layer.hub  { border-color: rgba(96,165,250,0.40); background: linear-gradient(180deg, rgba(59,130,246,0.10) 0%, rgba(59,130,246,0.02) 100%); }
+.ppt-conops-layer.rear { border-color: rgba(110,231,183,0.30); background: linear-gradient(180deg, rgba(110,231,183,0.06) 0%, rgba(110,231,183,0.01) 100%); }
+.ppt-conops-layer-label {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(180,200,225,0.65);
+    margin-bottom: 8px;
+}
+.ppt-conops-layer.fwd  .ppt-conops-layer-label { color: rgba(251,146,60,0.85); }
+.ppt-conops-layer.hub  .ppt-conops-layer-label { color: rgba(96,165,250,0.85); }
+.ppt-conops-layer.rear .ppt-conops-layer-label { color: rgba(110,231,183,0.85); }
+.ppt-conops-nodes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+}
+.ppt-conops-node {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px;
+    color: rgba(210,225,245,0.92);
+}
+.ppt-conops-node b {
+    display: block;
+    font-size: 12.5px;
+    color: #fff;
+    margin-bottom: 2px;
+}
+.ppt-conops-node .meta {
+    font-size: 10.5px;
+    color: rgba(160,185,215,0.7);
+    margin-top: 2px;
+    font-family: 'Consolas', monospace;
+}
+.ppt-conops-arrow {
+    text-align: center;
+    color: rgba(96,165,250,0.55);
+    font-size: 14px;
+    line-height: 1;
+    height: 18px;
+    position: relative;
+}
+.ppt-conops-arrow::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 18px;
+    background: linear-gradient(180deg, rgba(96,165,250,0.6), rgba(96,165,250,0.15));
+}
+.ppt-conops-arrow span {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(160deg, #060a18 0%, #0a1024 40%, #060a18 100%);
+    padding: 0 8px;
+    font-size: 10px;
+    color: rgba(180,210,255,0.8);
+    letter-spacing: 0.5px;
+}
+
+/* ── Slide 13: Adversary Workflow (horizontal flow) ───────────────────── */
+.ppt-flow {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+.ppt-flow-step {
+    position: relative;
+    padding: 14px 14px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(96,165,250,0.22);
+    background: linear-gradient(180deg, rgba(59,130,246,0.06) 0%, rgba(59,130,246,0.01) 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ppt-flow-step::after {
+    content: '▶';
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(96,165,250,0.55);
+    font-size: 14px;
+    z-index: 3;
+    background: linear-gradient(160deg, #060a18 0%, #0a1024 40%, #060a18 100%);
+    width: 18px;
+    text-align: center;
+}
+.ppt-flow-step:last-child::after { display: none; }
+.ppt-flow-step .step-num {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba(96,165,250,0.7);
+}
+.ppt-flow-step .step-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+.ppt-flow-step .step-sub {
+    font-size: 10.5px;
+    color: rgba(150,170,200,0.7);
+    font-style: italic;
+    margin-bottom: 4px;
+}
+.ppt-flow-step .step-bullets {
+    list-style: none;
+    padding: 0;
+    font-size: 11.5px;
+    color: rgba(190,210,235,0.82);
+    line-height: 1.45;
+}
+.ppt-flow-step .step-bullets li {
+    padding-left: 10px;
+    position: relative;
+    margin-bottom: 2px;
+}
+.ppt-flow-step .step-bullets li::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+    color: rgba(96,165,250,0.6);
+    font-weight: 900;
+}
+
+/* ── Slide 16: Comparison Table ────────────────────────────────────────── */
+.ppt-comp {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(96,165,250,0.20);
+}
+.ppt-comp table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    background: rgba(255,255,255,0.02);
+}
+.ppt-comp th, .ppt-comp td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+.ppt-comp tr:last-child td { border-bottom: none; }
+.ppt-comp th:last-child, .ppt-comp td:last-child { border-right: none; }
+.ppt-comp thead th {
+    background: rgba(59,130,246,0.18);
+    color: #cde2fb;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+    border-bottom: 1px solid rgba(96,165,250,0.35);
+}
+.ppt-comp th.col-bewe, .ppt-comp td.col-bewe {
+    background: rgba(110,231,183,0.10);
+    border-left: 2px solid rgba(110,231,183,0.5);
+    border-right: 2px solid rgba(110,231,183,0.5);
+}
+.ppt-comp thead th.col-bewe {
+    background: rgba(110,231,183,0.22);
+    color: #6ee7b7;
+}
+.ppt-comp td:first-child {
+    color: rgba(180,200,225,0.85);
+    font-weight: 600;
+    background: rgba(255,255,255,0.025);
+}
+.ppt-comp td.col-bewe b { color: #6ee7b7; }
+.ppt-comp td b { color: #cde2fb; }
+
+/* ── Slide 18: Roadmap (horizontal phases) ──────────────────────────────── */
+.ppt-roadmap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    margin-top: 8px;
+}
+.ppt-roadmap::before {
+    content: '';
+    position: absolute;
+    top: 26px;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(96,165,250,0.6), rgba(110,231,183,0.6));
+    z-index: 0;
+}
+.ppt-phase {
+    position: relative;
+    padding: 18px 18px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(96,165,250,0.25);
+    background: linear-gradient(180deg, rgba(59,130,246,0.08) 0%, rgba(59,130,246,0.02) 100%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ppt-phase-marker {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #60a5fa 30%, transparent 70%);
+    box-shadow: 0 0 14px rgba(96,165,250,0.7);
+}
+.ppt-phase.p3 .ppt-phase-marker {
+    background: radial-gradient(circle, #6ee7b7 30%, transparent 70%);
+    box-shadow: 0 0 14px rgba(110,231,183,0.7);
+}
+.ppt-phase-num {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    color: rgba(96,165,250,0.85);
+}
+.ppt-phase.p3 .ppt-phase-num { color: rgba(110,231,183,0.85); }
+.ppt-phase-year {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+.ppt-phase-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #cde2fb;
+    margin-bottom: 4px;
+}
+.ppt-phase-bullets {
+    list-style: none;
+    padding: 0;
+    font-size: 12px;
+    color: rgba(180,200,225,0.85);
+    line-height: 1.55;
+}
+.ppt-phase-bullets li {
+    padding-left: 12px;
+    position: relative;
+    margin-bottom: 3px;
+}
+.ppt-phase-bullets li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: rgba(96,165,250,0.65);
+    font-size: 10px;
+}
+.ppt-phase.p3 .ppt-phase-bullets li::before { color: rgba(110,231,183,0.7); }
+.ppt-phase-stamp {
+    margin-top: 8px;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(150,170,200,0.7);
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ── Slide 19: Security / OPSEC ─────────────────────────────────────────── */
+.ppt-security {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(96,165,250,0.20);
+}
+.ppt-security table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    background: rgba(255,255,255,0.02);
+}
+.ppt-security th, .ppt-security td {
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    vertical-align: top;
+}
+.ppt-security tr:last-child td { border-bottom: none; }
+.ppt-security thead th {
+    background: rgba(59,130,246,0.18);
+    color: #cde2fb;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+    border-bottom: 1px solid rgba(96,165,250,0.35);
+}
+.ppt-security td:first-child {
+    color: #cde2fb;
+    font-weight: 700;
+    font-size: 13px;
+    background: rgba(255,255,255,0.025);
+    width: 22%;
+}
+.ppt-security td.now {
+    color: rgba(180,200,225,0.85);
+}
+.ppt-security td.roadmap {
+    color: rgba(110,231,183,0.85);
+    font-weight: 500;
+}
+
+/* Compact cover slides for new long-content slides */
+.ppt-slide-compact { gap: clamp(10px, 1.4vh, 18px); }
+.ppt-slide-compact .ppt-lead { font-size: clamp(14px, 1.3vw, 18px); margin-bottom: 4px; }
+
+/* ── News evidence inside pain cards ─────────────────────────── */
+.ppt-pain-cite {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 2px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.ppt-pain-cite img {
+    width: 64px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 4px;
+    opacity: 0.80;
+    flex-shrink: 0;
+}
+.ppt-pain-cite .cite-text {
+    font-size: 10.5px;
+    color: rgba(140,160,190,0.72);
+    font-style: italic;
+    line-height: 1.35;
+}
+
+/* ── Context photo in split-layout slides ─────────────────────── */
+.ppt-context-photo {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.ppt-context-photo img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    display: block;
+    opacity: 0.80;
+}
+.ppt-context-photo figcaption {
+    font-size: 9.5px;
+    color: rgba(140,160,190,0.50);
+    padding: 3px 6px 4px;
+    text-align: center;
+    font-style: italic;
+    background: rgba(0,0,0,0.25);
+}
+
+/* ── Adversary workflow photo banner ─────────────────────────── */
+.ppt-flow-banner {
+    width: 100%;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+    position: relative;
+}
+.ppt-flow-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.60;
+}
+.ppt-flow-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.30) 60%, rgba(0,0,0,0.55) 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.ppt-flow-banner-text {
+    font-size: 10.5px;
+    color: rgba(253,186,116,0.92);
+    font-style: italic;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
+}

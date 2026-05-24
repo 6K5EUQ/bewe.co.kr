@@ -179,6 +179,8 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
                 if (slides[cur].contains(v)) v.play().catch(()=>{});
                 else { v.pause(); try { v.currentTime = 0; } catch(e) {} }
             });
+            if (slides[cur].classList.contains('ppt-splash')) window.__splash?.start();
+            else window.__splash?.stop();
         }, 350);
     }
     function go(n) { cur = Math.max(0, Math.min(slides.length - 1, n)); render(); }
@@ -194,6 +196,7 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
         if (!ovEl.classList.contains('hidden')) { closeOverview(); return; }
         if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
         stopLive();
+        window.__splash?.stop();
         modal.classList.add('hidden');
         if (location.hash) history.replaceState(null, '', location.pathname + location.search);
     }
@@ -729,3 +732,348 @@ function animate() {
     renderer.render(scene, camera);
 }
 animate();
+
+// ── Splash Scene (slide 1: live globe + satellites + aircraft + missiles) ────
+window.__splash = (function setupSplashScene() {
+    const cvs = document.getElementById('splash-canvas');
+    if (!cvs || typeof THREE === 'undefined') return { start(){}, stop(){} };
+
+    let initialized = false;
+    let renderer, scene, camera, globe, atmos, animating = false, frameId = null, lastTime = 0;
+    const satellites = [];
+    const aircraft = [];
+    const missiles = [];
+    let missileTimer = null;
+    let glowTex = null;
+
+    const PYONGYANG = { lat: 39.0392, lon: 125.7625 };
+    const DAEGU     = { lat: 35.8714, lon: 128.6014 };
+
+    function ll2v(lat, lon, r) {
+        const phi = (90 - lat) * Math.PI / 180;
+        const theta = (lon + 180) * Math.PI / 180;
+        return new THREE.Vector3(
+            -r * Math.sin(phi) * Math.cos(theta),
+             r * Math.cos(phi),
+             r * Math.sin(phi) * Math.sin(theta)
+        );
+    }
+
+    function makeGlow(r, g, b) {
+        const sz = 64;
+        const c = document.createElement('canvas');
+        c.width = sz; c.height = sz;
+        const ctx = c.getContext('2d');
+        const grad = ctx.createRadialGradient(sz/2, sz/2, 0, sz/2, sz/2, sz/2);
+        grad.addColorStop(0,   `rgba(${r},${g},${b},1)`);
+        grad.addColorStop(0.3, `rgba(${r},${g},${b},0.5)`);
+        grad.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, sz, sz);
+        return new THREE.CanvasTexture(c);
+    }
+
+    function resize() {
+        if (!renderer || !camera) return;
+        const w = cvs.clientWidth || 1, h = cvs.clientHeight || 1;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+    }
+
+    function init() {
+        if (initialized) return;
+        initialized = true;
+
+        renderer = new THREE.WebGLRenderer({ canvas: cvs, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+        camera.position.set(0, 0, 4.6);
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Stars
+        (function() {
+            const geo = new THREE.BufferGeometry();
+            const n = 2200;
+            const pos = new Float32Array(n * 3);
+            for (let i = 0; i < n; i++) {
+                const th = Math.random() * Math.PI * 2;
+                const ph = Math.acos(2 * Math.random() - 1);
+                const r = 28 + Math.random() * 18;
+                pos[i*3]   = r * Math.sin(ph) * Math.cos(th);
+                pos[i*3+1] = r * Math.sin(ph) * Math.sin(th);
+                pos[i*3+2] = r * Math.cos(ph);
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.045, sizeAttenuation: true })));
+        })();
+
+        // Globe with rim lighting
+        const R = 1.0;
+        const globeMat = new THREE.ShaderMaterial({
+            uniforms: { uTex: { value: null }, uHas: { value: 0.0 } },
+            vertexShader: `varying vec2 vUv; varying vec3 vN; varying vec3 vP;
+                void main(){ vUv=uv; vN=normalize(normalMatrix*normal);
+                vP=(modelViewMatrix*vec4(position,1.0)).xyz;
+                gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+            fragmentShader: `uniform sampler2D uTex; uniform float uHas;
+                varying vec2 vUv; varying vec3 vN; varying vec3 vP;
+                void main(){
+                    vec3 vd=normalize(-vP);
+                    float rim=pow(1.0-max(dot(vd,vN),0.0),2.6);
+                    vec3 base = uHas>0.5 ? texture2D(uTex,vUv).rgb*0.78 : vec3(0.04,0.10,0.28);
+                    gl_FragColor=vec4(base + vec3(0.30,0.55,0.95)*rim*0.55, 1.0);
+                }`
+        });
+        globe = new THREE.Mesh(new THREE.SphereGeometry(R, 64, 48), globeMat);
+        scene.add(globe);
+        new THREE.TextureLoader().load('assets/earth.jpg', tex => {
+            tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            globeMat.uniforms.uTex.value = tex;
+            globeMat.uniforms.uHas.value = 1.0;
+        });
+
+        // Atmosphere glow
+        atmos = new THREE.Mesh(
+            new THREE.SphereGeometry(R * 1.045, 64, 48),
+            new THREE.ShaderMaterial({
+                vertexShader: `varying vec3 vN; varying vec3 vP;
+                    void main(){ vN=normalize(normalMatrix*normal);
+                    vP=(modelViewMatrix*vec4(position,1.0)).xyz;
+                    gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+                fragmentShader: `varying vec3 vN; varying vec3 vP;
+                    void main(){ vec3 vd=normalize(-vP);
+                    float i=pow(1.0-max(dot(vd,vN),0.0),3.2);
+                    gl_FragColor=vec4(0.35,0.55,1.0,i*0.5); }`,
+                transparent: true, side: THREE.BackSide, depthWrite: false
+            })
+        );
+        scene.add(atmos);
+
+        // Initial orientation: show Korea facing camera
+        globe.rotation.y = -2.30;
+        atmos.rotation.y = -2.30;
+
+        // Satellites — 4 orbital layers
+        const layers = [
+            { alt: 1.13, inc:  52, count: 6, speed: 0.55, color: 0x60a5fa, ring: true  },
+            { alt: 1.28, inc:  86, count: 4, speed: 0.40, color: 0xa5b4fc, ring: true  },
+            { alt: 1.55, inc:  20, count: 3, speed: 0.25, color: 0xfbbf24, ring: true  },
+            { alt: 1.95, inc:   8, count: 2, speed: 0.12, color: 0xf472b6, ring: false },
+        ];
+        layers.forEach(L => {
+            const inc = L.inc * Math.PI / 180;
+            const node = Math.random() * Math.PI * 2;
+            // Orbital ring (one per layer, in shared orbital plane)
+            if (L.ring) {
+                const ringGeo = new THREE.RingGeometry(L.alt - 0.0025, L.alt + 0.0025, 96);
+                const ringMat = new THREE.MeshBasicMaterial({ color: L.color, transparent: true, opacity: 0.18, side: THREE.DoubleSide });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / 2 - inc;
+                ring.rotation.z = node;
+                scene.add(ring);
+            }
+            for (let i = 0; i < L.count; i++) {
+                const sat = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.014, 10, 10),
+                    new THREE.MeshBasicMaterial({ color: L.color })
+                );
+                sat.userData = {
+                    r: L.alt, inc, node, speed: L.speed,
+                    phase: (i / L.count) * Math.PI * 2 + Math.random() * 0.4
+                };
+                // Glow halo
+                const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+                    map: makeGlow((L.color>>16)&255, (L.color>>8)&255, L.color&255),
+                    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+                }));
+                halo.scale.set(0.07, 0.07, 1);
+                sat.add(halo);
+                satellites.push(sat);
+                scene.add(sat);
+            }
+        });
+
+        // Aircraft routes around Korea (lat0, lon0, lat1, lon1)
+        const routes = [
+            [35.18, 129.07, 37.46, 126.44], // Busan → Incheon
+            [37.46, 126.44, 33.51, 126.49], // Incheon → Jeju
+            [35.87, 128.60, 38.20, 128.59], // Daegu → Gangneung
+            [36.95, 123.50, 37.20, 130.50], // West offshore → East offshore
+            [33.51, 126.49, 35.18, 129.07], // Jeju → Busan
+            [38.50, 124.50, 35.00, 130.50], // NW → SE diagonal patrol
+        ];
+        const acTex = makeGlow(255, 200, 100);
+        routes.forEach(rt => {
+            const ac = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: acTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+            }));
+            ac.scale.set(0.045, 0.045, 1);
+            ac.userData = {
+                a: { lat: rt[0], lon: rt[1] },
+                b: { lat: rt[2], lon: rt[3] },
+                progress: Math.random(),
+                speed: 0.04 + Math.random() * 0.025,
+                alt: 1.013,
+            };
+            aircraft.push(ac);
+            scene.add(ac);
+        });
+
+        // Missile launch infrastructure
+        glowTex = makeGlow(255, 80, 70);
+
+        // Schedule periodic missile launches
+        missileTimer = setInterval(() => { if (animating) launchMissile(); }, 5500);
+        // First launch slight delay
+        setTimeout(() => { if (animating) launchMissile(); }, 1500);
+    }
+
+    function launchMissile() {
+        const s = ll2v(PYONGYANG.lat, PYONGYANG.lon, 1.0);
+        const e = ll2v(DAEGU.lat, DAEGU.lon, 1.0);
+        const mid = s.clone().add(e).normalize().multiplyScalar(1.32);
+        const curve = new THREE.QuadraticBezierCurve3(s, mid, e);
+        // Trajectory line (revealed as missile travels)
+        const pts = curve.getPoints(60);
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xff4544, transparent: true, opacity: 0.0 });
+        const line = new THREE.Line(lineGeo, lineMat);
+        scene.add(line);
+        // Missile dot
+        const dot = new THREE.Mesh(
+            new THREE.SphereGeometry(0.020, 10, 10),
+            new THREE.MeshBasicMaterial({ color: 0xff3030 })
+        );
+        scene.add(dot);
+        // Glow halo
+        const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: glowTex, transparent: true, blending: THREE.AdditiveBlending,
+            color: 0xff4040, depthWrite: false
+        }));
+        halo.scale.set(0.10, 0.10, 1);
+        scene.add(halo);
+        // Launch marker (pulse at Pyongyang)
+        const launchMk = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: glowTex, transparent: true, blending: THREE.AdditiveBlending,
+            color: 0xff5050, depthWrite: false
+        }));
+        launchMk.scale.set(0.12, 0.12, 1);
+        launchMk.position.copy(s);
+        scene.add(launchMk);
+
+        missiles.push({
+            curve, line, lineMat, dot, halo, launchMk,
+            progress: 0, speed: 0.32,
+            phase: 'flying', impactT: 0, startT: performance.now()
+        });
+    }
+
+    function animate(now) {
+        if (!animating) return;
+        frameId = requestAnimationFrame(animate);
+        const t = now / 1000;
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        // Globe slow rotation
+        globe.rotation.y += dt * 0.025;
+        atmos.rotation.y = globe.rotation.y;
+
+        // Satellites
+        satellites.forEach(sat => {
+            const u = sat.userData;
+            const a = u.phase + t * u.speed;
+            // Position in orbital plane (XZ), then rotate by inclination and ascending node
+            const ox = Math.cos(a) * u.r;
+            const oz = Math.sin(a) * u.r;
+            // Apply inclination (rotate around X)
+            const ix = ox;
+            const iy = -oz * Math.sin(u.inc);
+            const iz =  oz * Math.cos(u.inc);
+            // Apply ascending node (rotate around Y)
+            const cn = Math.cos(u.node), sn = Math.sin(u.node);
+            sat.position.set(ix * cn + iz * sn, iy, -ix * sn + iz * cn);
+        });
+
+        // Aircraft
+        aircraft.forEach(ac => {
+            const u = ac.userData;
+            u.progress += dt * u.speed;
+            if (u.progress > 1) u.progress -= 1;
+            const va = ll2v(u.a.lat, u.a.lon, 1.0);
+            const vb = ll2v(u.b.lat, u.b.lon, 1.0);
+            // SLERP-like (lerp then normalize)
+            const p = va.clone().lerp(vb, u.progress).normalize().multiplyScalar(u.alt);
+            // Apply globe rotation so aircraft moves with the earth
+            p.applyEuler(new THREE.Euler(0, globe.rotation.y, 0));
+            ac.position.copy(p);
+        });
+
+        // Missiles
+        for (let i = missiles.length - 1; i >= 0; i--) {
+            const m = missiles[i];
+            // Launch marker pulse (visible only during launch window)
+            const launchAge = (now - m.startT) / 1000;
+            m.launchMk.material.opacity = Math.max(0, 0.85 - launchAge * 0.5);
+            m.launchMk.scale.setScalar(0.10 + launchAge * 0.06);
+            if (m.phase === 'flying') {
+                m.progress += dt * m.speed;
+                if (m.progress >= 1) {
+                    m.phase = 'impact';
+                    m.impactT = now;
+                    m.progress = 1;
+                }
+                const pos = m.curve.getPoint(m.progress);
+                // Apply globe rotation so missile follows the spinning earth
+                const rotatedPos = pos.clone().applyEuler(new THREE.Euler(0, globe.rotation.y, 0));
+                m.dot.position.copy(rotatedPos);
+                m.halo.position.copy(rotatedPos);
+                m.lineMat.opacity = Math.min(0.55, m.progress * 1.4);
+                // Apply globe rotation to line as well
+                m.line.rotation.y = globe.rotation.y;
+                m.launchMk.position.copy(ll2v(PYONGYANG.lat, PYONGYANG.lon, 1.0).applyEuler(new THREE.Euler(0, globe.rotation.y, 0)));
+            } else {
+                // Impact pulse + fade
+                const elapsed = (now - m.impactT) / 1000;
+                const fadeDur = 1.8;
+                if (elapsed > fadeDur) {
+                    scene.remove(m.line); scene.remove(m.dot); scene.remove(m.halo); scene.remove(m.launchMk);
+                    m.line.geometry.dispose(); m.lineMat.dispose();
+                    m.dot.geometry.dispose(); m.dot.material.dispose();
+                    m.halo.material.dispose(); m.launchMk.material.dispose();
+                    missiles.splice(i, 1);
+                    continue;
+                }
+                const k = elapsed / fadeDur;
+                m.lineMat.opacity = 0.55 * (1 - k);
+                m.dot.visible = false;
+                m.halo.scale.setScalar(0.10 + k * 0.55);
+                m.halo.material.opacity = (1 - k);
+                m.line.rotation.y = globe.rotation.y;
+                m.halo.position.copy(ll2v(DAEGU.lat, DAEGU.lon, 1.0).applyEuler(new THREE.Euler(0, globe.rotation.y, 0)));
+            }
+        }
+
+        renderer.render(scene, camera);
+    }
+
+    function start() {
+        init();
+        if (animating) return;
+        animating = true;
+        lastTime = performance.now();
+        resize();
+        frameId = requestAnimationFrame(animate);
+    }
+    function stop() {
+        animating = false;
+        if (frameId) cancelAnimationFrame(frameId);
+        frameId = null;
+    }
+    return { start, stop };
+})();

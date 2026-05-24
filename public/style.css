@@ -2253,27 +2253,39 @@ body {
     top: 0; left: 0;
     display: flex; align-items: baseline;
     line-height: 1;
-    font-size: clamp(64px, 11vw, 150px);
-    font-weight: 200;
-    letter-spacing: 0.04em;
-    color: #fff;
+    font-size: clamp(72px, 12vw, 170px);
     white-space: nowrap;
-    text-shadow: 0 0 30px rgba(120,180,255,0.35), 0 0 80px rgba(96,165,250,0.18);
     animation: splashMove 12s cubic-bezier(0.7, 0, 0.3, 1) infinite;
     will-change: transform;
 }
-.splash-row[data-i="0"] { --x1: -1.85em; --y1: -0.50em; --x2: -2.20em; --y2: -2.00em; }
-.splash-row[data-i="1"] { --x1: -0.95em; --y1: -0.50em; --x2: -2.20em; --y2: -1.00em; }
-.splash-row[data-i="2"] { --x1:  0.00em; --y1: -0.50em; --x2: -2.20em; --y2:  0.00em; }
-.splash-row[data-i="3"] { --x1:  1.05em; --y1: -0.50em; --x2: -2.20em; --y2:  1.00em; }
-.splash-row .letter { display: inline-block; }
+.splash-row[data-i="0"] { --x1: -1.95em; --y1: -0.50em; --x2: -2.40em; --y2: -2.00em; }
+.splash-row[data-i="1"] { --x1: -1.00em; --y1: -0.50em; --x2: -2.40em; --y2: -1.00em; }
+.splash-row[data-i="2"] { --x1: -0.05em; --y1: -0.50em; --x2: -2.40em; --y2:  0.00em; }
+.splash-row[data-i="3"] { --x1:  1.10em; --y1: -0.50em; --x2: -2.40em; --y2:  1.00em; }
+.splash-row .letter {
+    display: inline-block;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(180,200,255,0.65) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 60px rgba(96,165,250,0.40);
+}
 .splash-row .rest {
     display: inline-block;
     overflow: hidden;
     max-width: 0;
     opacity: 0;
     white-space: nowrap;
-    text-shadow: inherit;
+    font-size: 0.20em;
+    font-weight: 300;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(180,200,235,0.75);
+    margin-left: 0.7em;
+    padding-right: 0.1em;
 }
 .splash-row[data-i="0"] .rest { animation: splashReveal0 12s cubic-bezier(0.7, 0, 0.3, 1) infinite; }
 .splash-row[data-i="1"] .rest { animation: splashReveal1 12s cubic-bezier(0.7, 0, 0.3, 1) infinite; }

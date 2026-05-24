@@ -1443,16 +1443,6 @@ body {
     to   { width: 64px; opacity: 1; }
 }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-    .ppt-slide,
-    .ppt-slide.active *,
-    .ppt-progress-fill,
-    .ppt-cover-bg {
-        animation: none !important;
-        transition: opacity 0.2s linear !important;
-    }
-}
 
 /* Fullscreen tweaks */
 .about-modal:fullscreen,

@@ -2329,8 +2329,3 @@ body {
     0%, 100% { opacity: 0.92; }
     50%      { opacity: 0.78; }
 }
-@media (prefers-reduced-motion: reduce) {
-    .ppt-splash-bg, .ppt-splash-overlay, .splash-pivot, .splash-row, .splash-row .rest { animation: none; }
-    .splash-row { transform: translate(var(--x2), var(--y2)); }
-    .splash-row .rest { max-width: 14em; opacity: 1; }
-}

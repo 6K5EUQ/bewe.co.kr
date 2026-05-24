@@ -403,7 +403,7 @@
 
 <!-- Stations -->
 <div class="section-title">
-    <span>Forward Collection Nodes</span>
+    <span>Station List</span>
     <span class="count" id="stations-count">–</span>
 </div>
 <div class="stations" id="stations"></div>
@@ -528,7 +528,7 @@ function renderStations(data) {
                 <div>
                     <div class="station-id">
                         <span class="status-led ${led}"></span>
-                        <span class="station-name">${escapeHtml(STATION_DISPLAY[s.station_id] || s.name || s.station_id)}</span>
+                        <span class="station-name">${escapeHtml(STATION_DISPLAY[s.name] || STATION_DISPLAY[s.station_id] || s.name || s.station_id)}</span>
                         ${s.hist_recording ? `<span class="station-rec"><span class="dot"></span>REC</span>` : ''}
                     </div>
                     <div class="station-meta">${tierLabel}${s.operator_login ? ' · operated by ' + escapeHtml(s.operator_login) : ''}</div>

@@ -497,6 +497,11 @@ function renderKpis(data) {
 }
 
 function renderStations(data) {
+    // Don't rebuild station cards while a note is being edited — wipes focus / input.
+    const active = document.activeElement;
+    if (active && active.classList && active.classList.contains('note-input')) {
+        return;
+    }
     const stations = data.stations || [];
     document.getElementById('stations-count').textContent = stations.length + ' site(s)';
 

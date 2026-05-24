@@ -182,6 +182,10 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
             animateCounters(slides[cur]);
             if (slides[cur].querySelector('.ppt-live-badge')) startLive(); else stopLive();
             if (slides[cur].querySelector('#ppt-tdoa')) initTDOA();
+            slidesEl.querySelectorAll('video').forEach(v => {
+                if (slides[cur].contains(v)) v.play().catch(()=>{});
+                else { v.pause(); try { v.currentTime = 0; } catch(e) {} }
+            });
         }, 350);
         updateHash();
     }

@@ -914,7 +914,8 @@ body {
     align-self: center;
     flex: 0 0 auto;
 }
-.ppt-figure img {
+.ppt-figure img,
+.ppt-figure video {
     width: 100%;
     height: auto;
     aspect-ratio: 16 / 9;

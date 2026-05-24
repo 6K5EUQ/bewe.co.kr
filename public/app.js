@@ -161,13 +161,6 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
         else closeOverview();
     }
 
-    // ── URL hash sync
-    function updateHash() { history.replaceState(null, '', '#slide/' + (cur + 1)); }
-    window.addEventListener('hashchange', () => {
-        const m = location.hash.match(/#slide\/(\d+)/);
-        if (m && !modal.classList.contains('hidden')) go(parseInt(m[1]) - 1);
-    });
-
     // ── Render
     function render() {
         slides.forEach((s, i) => {
@@ -187,15 +180,13 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
                 else { v.pause(); try { v.currentTime = 0; } catch(e) {} }
             });
         }, 350);
-        updateHash();
     }
     function go(n) { cur = Math.max(0, Math.min(slides.length - 1, n)); render(); }
     function nextSlide() { go(cur + 1); }
     function prevSlide() { go(cur - 1); }
 
     function openModal() {
-        const m = location.hash.match(/#slide\/(\d+)/);
-        cur = m ? Math.max(0, Math.min(slides.length - 1, parseInt(m[1]) - 1)) : 0;
+        cur = 0;
         modal.classList.remove('hidden');
         render();
     }
@@ -204,6 +195,7 @@ document.getElementById('btn-back').addEventListener('click', showLanding);
         if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
         stopLive();
         modal.classList.add('hidden');
+        if (location.hash) history.replaceState(null, '', location.pathname + location.search);
     }
     function toggleFullscreen() {
         if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});

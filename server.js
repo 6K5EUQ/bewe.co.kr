@@ -460,8 +460,44 @@ async function fetchTle(group) {
     return sats;
 }
 
+// ── Station notes (persisted across restarts) ──────────────────────────────
+const fs = require('fs');
+const NOTES_FILE = path.join(__dirname, 'data', 'station_notes.json');
+let stationNotes = {};   // { station_id: { text, updatedAt } }
+try {
+    fs.mkdirSync(path.dirname(NOTES_FILE), { recursive: true });
+    if (fs.existsSync(NOTES_FILE)) {
+        stationNotes = JSON.parse(fs.readFileSync(NOTES_FILE, 'utf8'));
+    }
+} catch (e) { console.error('notes load:', e.message); }
+
+let notesSaveTimer = null;
+function saveNotes() {
+    if (notesSaveTimer) clearTimeout(notesSaveTimer);
+    notesSaveTimer = setTimeout(() => {
+        try { fs.writeFileSync(NOTES_FILE, JSON.stringify(stationNotes, null, 2)); }
+        catch (e) { console.error('notes save:', e.message); }
+    }, 250);
+}
+
 // ── Express ─────────────────────────────────────────────────────────────────
+app.use(express.json({ limit: '8kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/api/notes', (req, res) => { res.json(stationNotes); });
+
+app.post('/api/notes/:id', (req, res) => {
+    const id = String(req.params.id || '').slice(0, 64);
+    if (!id) return res.status(400).json({ error: 'missing id' });
+    const text = String((req.body && req.body.text) || '').slice(0, 500);
+    if (text === '') {
+        delete stationNotes[id];
+    } else {
+        stationNotes[id] = { text, updatedAt: Date.now() };
+    }
+    saveNotes();
+    res.json({ ok: true, note: stationNotes[id] || null });
+});
 
 app.get('/api/tle', async (req, res) => {
     const group = req.query.group || 'visual';

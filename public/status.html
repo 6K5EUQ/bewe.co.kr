@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEWE — 작전 현황</title>
+    <title>BEWE — Operations</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
         :root {
@@ -34,7 +34,7 @@
                 radial-gradient(ellipse at 80% 100%, rgba(96,165,250,0.04) 0%, transparent 50%),
                 var(--bg);
             color: var(--text);
-            font-family: 'Inter', 'Noto Sans KR', 'Segoe UI', sans-serif;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             font-weight: 400;
             min-height: 100vh;
             padding: 28px clamp(24px, 4vw, 56px) 48px;
@@ -47,9 +47,7 @@
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 28px;
         }
-        .brand {
-            display: flex; align-items: baseline; gap: 14px;
-        }
+        .brand { display: flex; align-items: baseline; gap: 14px; }
         .brand .name {
             font-size: 22px; font-weight: 900; letter-spacing: 6px; color: #fff;
         }
@@ -73,8 +71,7 @@
         }
         .header-left h1 {
             font-size: clamp(22px, 2.4vw, 30px);
-            font-weight: 700; letter-spacing: 0.3px;
-            color: #fff;
+            font-weight: 700; letter-spacing: 0.3px; color: #fff;
         }
         .header-left .sub {
             font-size: 12px; color: var(--text-faint); letter-spacing: 0.5px;
@@ -102,16 +99,14 @@
         .kpis {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 14px;
-            margin-bottom: 28px;
+            gap: 14px; margin-bottom: 28px;
         }
         .kpi {
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 18px 20px;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
         .kpi::before {
             content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
@@ -147,9 +142,7 @@
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
         }
-        .section-title .count {
-            font-weight: 400; color: var(--text-faint); letter-spacing: 0.5px;
-        }
+        .section-title .count { font-weight: 400; color: var(--text-faint); letter-spacing: 0.5px; }
 
         /* ── Station grid ──────────────────────────────────────────── */
         .stations {
@@ -169,20 +162,17 @@
         .station-head {
             display: flex; align-items: center; justify-content: space-between;
             padding: 16px 18px 12px;
-            cursor: pointer;
-            user-select: none;
+            cursor: pointer; user-select: none;
         }
         .station-head:hover { background: rgba(255,255,255,0.02); }
-        .station-id {
-            display: flex; align-items: center; gap: 10px;
-        }
+        .station-id { display: flex; align-items: center; gap: 10px; }
         .status-led {
             width: 10px; height: 10px; border-radius: 50%;
             box-shadow: 0 0 8px currentColor;
             flex-shrink: 0;
         }
-        .led-on  { background: var(--ok);   color: var(--ok);  animation: dotPulse 2s ease-in-out infinite; }
-        .led-off { background: var(--err);  color: var(--err); }
+        .led-on  { background: var(--ok);  color: var(--ok);  animation: dotPulse 2s ease-in-out infinite; }
+        .led-off { background: var(--err); color: var(--err); }
         .station-name {
             font-size: 16px; font-weight: 700; color: #fff;
             letter-spacing: 0.5px;
@@ -192,12 +182,8 @@
             letter-spacing: 0.8px; text-transform: uppercase;
             margin-top: 2px;
         }
-        .station-summary {
-            font-size: 11px; color: var(--text-dim); text-align: right;
-        }
-        .station-summary .age {
-            font-weight: 600; color: var(--text);
-        }
+        .station-summary { font-size: 11px; color: var(--text-dim); text-align: right; }
+        .station-summary .age { font-weight: 600; color: var(--text); }
         .station-rec {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 2px 8px; border-radius: 4px;
@@ -215,7 +201,7 @@
         }
 
         .station-body {
-            padding: 0 18px 18px;
+            padding: 0 18px 14px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
@@ -239,6 +225,47 @@
             margin-left: 2px;
         }
 
+        /* ── Note field ────────────────────────────────────────────── */
+        .note-wrap {
+            margin: 0 18px 16px;
+            background: rgba(255,255,255,0.018);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .note-wrap:focus-within { border-color: var(--accent); background: rgba(96,165,250,0.04); }
+        .note-label {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px;
+            color: var(--text-faint); text-transform: uppercase;
+        }
+        .note-label .meta {
+            font-weight: 500; letter-spacing: 0.5px; text-transform: none;
+            font-size: 10px;
+        }
+        .note-label .meta.saved   { color: var(--ok); }
+        .note-label .meta.saving  { color: var(--warn); }
+        .note-label .meta.err     { color: var(--err); }
+        .note-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 36px;
+            max-height: 200px;
+            padding: 0;
+            width: 100%;
+        }
+        .note-input::placeholder { color: var(--text-faint); font-style: italic; }
+        .note-input:read-only { cursor: text; }
+
         /* ── Expandable detail ─────────────────────────────────────── */
         .detail {
             border-top: 1px solid var(--border);
@@ -255,9 +282,7 @@
             transition: transform .2s;
             font-size: 12px;
         }
-        .detail-section {
-            margin-bottom: 14px;
-        }
+        .detail-section { margin-bottom: 14px; }
         .detail-section:last-child { margin-bottom: 0; }
         .detail-title {
             font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
@@ -268,9 +293,7 @@
             font-size: 12px; color: var(--text-faint);
             padding: 8px 0;
         }
-        .chlist, .schedlist {
-            display: flex; flex-direction: column; gap: 6px;
-        }
+        .chlist, .schedlist { display: flex; flex-direction: column; gap: 6px; }
         .chrow, .schedrow {
             display: grid;
             grid-template-columns: 30px 1fr auto auto;
@@ -308,9 +331,7 @@
         .schstatus.active{ background: var(--ok-bg); color: var(--ok); }
         .schstatus.done  { background: rgba(255,255,255,0.04); color: var(--text-faint); }
 
-        .joins {
-            display: flex; flex-wrap: wrap; gap: 6px;
-        }
+        .joins { display: flex; flex-wrap: wrap; gap: 6px; }
         .join-pill {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 5px 11px; border-radius: 999px;
@@ -347,9 +368,7 @@
             font-size: 11px; color: var(--text-faint);
             display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
         }
-        .footer .live {
-            display: inline-flex; align-items: center; gap: 6px;
-        }
+        .footer .live { display: inline-flex; align-items: center; gap: 6px; }
 
         .hidden { display: none !important; }
 
@@ -368,15 +387,15 @@
         <div class="name">BEWE</div>
         <div class="tag">Behind Everyone We Hear Everything</div>
     </div>
-    <a href="/">홈으로</a>
+    <a href="/">Home</a>
 </div>
 
 <div class="header">
     <div class="header-left">
-        <h1>전방 신호정보 작전 현황</h1>
-        <div class="sub" id="last-update">데이터 수신 대기 중…</div>
+        <h1>Forward SIGINT Operations</h1>
+        <div class="sub" id="last-update">Awaiting telemetry…</div>
     </div>
-    <div id="central-pill" class="central-pill ok"><span class="pill-dot"></span><span id="central-status">CENTRAL 연결됨</span></div>
+    <div id="central-pill" class="central-pill ok"><span class="pill-dot"></span><span id="central-status">CENTRAL ONLINE</span></div>
 </div>
 
 <!-- KPI strip -->
@@ -384,22 +403,25 @@
 
 <!-- Stations -->
 <div class="section-title">
-    <span>전방 수집 노드</span>
+    <span>Forward Collection Nodes</span>
     <span class="count" id="stations-count">–</span>
 </div>
 <div class="stations" id="stations"></div>
 
 <div class="footer">
-    <span class="live"><span class="pill-dot" style="color:var(--ok);background:var(--ok)"></span> LIVE · 3초마다 자동 갱신</span>
+    <span class="live"><span class="pill-dot" style="color:var(--ok);background:var(--ok)"></span> LIVE · auto-refresh every 3s</span>
     <span>BEWE Operations Console · 2026</span>
 </div>
 
 <script>
 const POLL_MS = 3000;
 const DETAIL_POLL_MS = 5000;
-const expanded = new Set();          // station_id with detail expanded
-const detailCache = new Map();        // station_id → detail JSON
-let detailTimers = new Map();
+const NOTES_POLL_MS = 5000;
+const expanded = new Set();
+const detailCache = new Map();
+const detailTimers = new Map();
+let notes = {};                // station_id -> { text, updatedAt }
+const noteDirty = new Set();   // currently editing — don't overwrite from server
 
 function fmtFreqMHz(hz) {
     if (!hz || hz <= 0) return '—';
@@ -412,30 +434,28 @@ function fmtBwKHz(hz) {
 function fmtAge(ms) {
     if (ms == null) return '—';
     const s = Math.floor(ms / 1000);
-    if (s < 5) return '방금';
-    if (s < 60) return s + '초 전';
+    if (s < 5) return 'just now';
+    if (s < 60) return s + 's ago';
     const m = Math.floor(s / 60);
-    if (m < 60) return m + '분 전';
+    if (m < 60) return m + 'm ago';
     const h = Math.floor(m / 60);
-    return h + '시간 전';
+    return h + 'h ago';
 }
-function fmtClockKST(unixSec) {
+function fmtClock(unixSec) {
     if (!unixSec || unixSec <= 0) return '—';
     const d = new Date(unixSec * 1000);
-    const hh = String(d.getHours()).padStart(2,'0');
-    const mm = String(d.getMinutes()).padStart(2,'0');
-    return hh + ':' + mm;
+    return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
 }
 function fmtDuration(sec) {
     if (!sec || sec <= 0) return '—';
-    if (sec < 60) return Math.round(sec) + '초';
+    if (sec < 60) return Math.round(sec) + 's';
     const m = Math.floor(sec / 60);
-    if (m < 60) return m + '분';
-    return (sec / 3600).toFixed(1) + '시간';
+    if (m < 60) return m + 'm';
+    return (sec / 3600).toFixed(1) + 'h';
 }
 const MODE_NAMES = ['AM','FM','USB','LSB','CW','DIGITAL','—','—','—','—'];
 function modeName(m) { return MODE_NAMES[m] || '—'; }
-const SCHED_STATUS = { 0: ['idle','대기'], 1: ['armed','ARMED'], 2: ['active','녹음 중'], 3: ['done','완료'] };
+const SCHED_STATUS = { 0: ['idle','IDLE'], 1: ['armed','ARMED'], 2: ['active','RECORDING'], 3: ['done','DONE'] };
 function schedStatus(s) { return SCHED_STATUS[s] || ['idle','—']; }
 
 function renderKpis(data) {
@@ -448,17 +468,17 @@ function renderKpis(data) {
 
     const kpis = [
         { cls: online.length === stations.length && stations.length > 0 ? 'ok' : (online.length === 0 ? 'err' : 'warn'),
-          lbl: '운용 사이트', val: online.length, sub: '/ ' + stations.length,
-          note: offlineCount > 0 ? offlineCount + '개 사이트 단절' : '전 사이트 정상 운용' },
+          lbl: 'Sites Active', val: online.length, sub: '/ ' + stations.length,
+          note: offlineCount > 0 ? offlineCount + ' site(s) offline' : 'All sites operational' },
         { cls: totalAnalysts > 0 ? 'ok' : '',
-          lbl: '근무 분석관', val: totalAnalysts,
-          note: totalAnalysts > 0 ? '실시간 관제 중' : '분석관 미접속' },
+          lbl: 'Analysts On Duty', val: totalAnalysts,
+          note: totalAnalysts > 0 ? 'Live monitoring' : 'No analysts connected' },
         { cls: totalChannels > 0 ? 'ok' : '',
-          lbl: '활성 감청 채널', val: totalChannels,
-          note: '동시 복조 중' },
+          lbl: 'Active Channels', val: totalChannels,
+          note: 'Concurrent demodulation' },
         { cls: recCount > 0 ? 'ok' : '',
-          lbl: '임무 녹음', val: recCount,
-          note: recCount > 0 ? '신호 영구 아카이브 중' : '대기' },
+          lbl: 'Mission Recording', val: recCount,
+          note: recCount > 0 ? 'Permanent archive active' : 'Standby' },
     ];
 
     document.getElementById('kpis').innerHTML = kpis.map(k => `
@@ -472,12 +492,12 @@ function renderKpis(data) {
 
 function renderStations(data) {
     const stations = data.stations || [];
-    document.getElementById('stations-count').textContent = stations.length + '개';
+    document.getElementById('stations-count').textContent = stations.length + ' site(s)';
 
     if (stations.length === 0) {
         document.getElementById('stations').innerHTML = `
             <div style="grid-column:1/-1;background:var(--panel);border:1px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--text-faint);font-size:13px;">
-                현재 등록된 전방 노드가 없습니다.
+                No forward nodes registered.
             </div>`;
         return;
     }
@@ -487,17 +507,20 @@ function renderStations(data) {
         const cls = (s.online ? '' : 'offline') + (isExp ? ' expanded' : '');
         const led = s.online ? 'led-on' : 'led-off';
         const tierLabel = s.tier ? `Tier ${s.tier}` : '';
-        const ageStr = s.online ? '실시간' : fmtAge(s.ageMs);
+        const ageStr = s.online ? 'LIVE' : fmtAge(s.ageMs);
+        const noteText = (notes[s.station_id]?.text) || '';
+        const noteMeta = notes[s.station_id]?.updatedAt
+            ? `Updated ${fmtAge(Date.now() - notes[s.station_id].updatedAt)}` : '';
         return `
         <div class="station ${cls}" data-id="${s.station_id}">
-            <div class="station-head" onclick="toggleStation('${s.station_id}')">
+            <div class="station-head" onclick="toggleStation('${s.station_id}', event)">
                 <div>
                     <div class="station-id">
                         <span class="status-led ${led}"></span>
                         <span class="station-name">${escapeHtml(s.name || s.station_id)}</span>
                         ${s.hist_recording ? `<span class="station-rec"><span class="dot"></span>REC</span>` : ''}
                     </div>
-                    <div class="station-meta">${tierLabel}${s.operator_login ? ' · ' + escapeHtml(s.operator_login) + ' 운용' : ''}</div>
+                    <div class="station-meta">${tierLabel}${s.operator_login ? ' · operated by ' + escapeHtml(s.operator_login) : ''}</div>
                 </div>
                 <div class="station-summary">
                     <div class="age">${ageStr}</div>
@@ -506,44 +529,67 @@ function renderStations(data) {
             </div>
             <div class="station-body">
                 <div class="stat">
-                    <div class="stat-label">분석관</div>
-                    <div class="stat-value">${s.users || 0}<span class="u">명</span></div>
+                    <div class="stat-label">Analysts</div>
+                    <div class="stat-value">${s.users || 0}</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-label">감청 채널</div>
-                    <div class="stat-value">${s.channel_count || 0}<span class="u">개</span></div>
+                    <div class="stat-label">Channels</div>
+                    <div class="stat-value">${s.channel_count || 0}</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-label">중심 주파수</div>
+                    <div class="stat-label">Center Freq</div>
                     <div class="stat-value" style="font-size:14px;">${fmtFreqMHz(s.center_freq_hz)}</div>
                 </div>
             </div>
-            <div class="detail" id="detail-${s.station_id}">
+            <div class="note-wrap" onclick="event.stopPropagation()">
+                <div class="note-label">
+                    <span>Operator Note</span>
+                    <span class="meta" id="note-meta-${cssId(s.station_id)}">${escapeHtml(noteMeta)}</span>
+                </div>
+                <textarea class="note-input" id="note-${cssId(s.station_id)}"
+                    data-id="${s.station_id}"
+                    rows="1"
+                    maxlength="500"
+                    placeholder="Add a shared note for this site (auto-saves)…"
+                    oninput="onNoteInput(event)"
+                    onblur="onNoteBlur(event)"
+                    onkeydown="onNoteKey(event)"
+                >${escapeHtml(noteText)}</textarea>
+            </div>
+            <div class="detail" id="detail-${cssId(s.station_id)}">
                 ${renderDetail(s.station_id)}
             </div>
         </div>`;
     }).join('');
+
+    // Auto-size textareas
+    document.querySelectorAll('.note-input').forEach(autoResize);
+}
+
+function cssId(s) { return String(s).replace(/[^a-zA-Z0-9_-]/g, '_'); }
+function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(200, el.scrollHeight) + 'px';
 }
 
 function renderDetail(id) {
     const d = detailCache.get(id);
-    if (!d) return `<div class="detail-empty">상세 정보 로딩 중…</div>`;
+    if (!d) return `<div class="detail-empty">Loading details…</div>`;
 
     let html = '';
 
-    // Active channels
     html += `<div class="detail-section">
-        <div class="detail-title">활성 감청 채널 (${d.channels.length})</div>`;
+        <div class="detail-title">Active Channels (${d.channels.length})</div>`;
     if (d.channels.length === 0) {
-        html += `<div class="detail-empty">현재 활성 채널 없음</div>`;
+        html += `<div class="detail-empty">No active channels</div>`;
     } else {
         html += `<div class="chlist">`;
         for (const c of d.channels) {
             const center = ((c.s_mhz + c.e_mhz) / 2);
             const bw_kHz = ((c.e_mhz - c.s_mhz) * 1000);
-            let rec = `<span class="chrec none">대기</span>`;
-            if (c.iq_rec_on)      rec = `<span class="chrec iq">IQ 녹음</span>`;
-            else if (c.audio_rec_on) rec = `<span class="chrec audio">AUDIO 녹음</span>`;
+            let rec = `<span class="chrec none">standby</span>`;
+            if (c.iq_rec_on)          rec = `<span class="chrec iq">IQ REC</span>`;
+            else if (c.audio_rec_on)  rec = `<span class="chrec audio">AUDIO REC</span>`;
             const owner = c.owner ? ` · ${escapeHtml(c.owner)}` : '';
             html += `<div class="chrow">
                 <span class="chnum">${String(c.index + 1).padStart(2,'0')}</span>
@@ -556,11 +602,10 @@ function renderDetail(id) {
     }
     html += `</div>`;
 
-    // Joins (connected analysts)
     html += `<div class="detail-section">
-        <div class="detail-title">접속 분석관 (${d.joins.length})</div>`;
+        <div class="detail-title">Connected Analysts (${d.joins.length})</div>`;
     if (d.joins.length === 0) {
-        html += `<div class="detail-empty">접속 중인 분석관 없음</div>`;
+        html += `<div class="detail-empty">No analysts connected</div>`;
     } else {
         html += `<div class="joins">`;
         for (const j of d.joins) {
@@ -570,12 +615,11 @@ function renderDetail(id) {
     }
     html += `</div>`;
 
-    // Schedules
     const armed = d.scheds.filter(s => s.valid);
     html += `<div class="detail-section">
-        <div class="detail-title">사전 임무 (${armed.length})</div>`;
+        <div class="detail-title">Scheduled Missions (${armed.length})</div>`;
     if (armed.length === 0) {
-        html += `<div class="detail-empty">예정된 임무 없음</div>`;
+        html += `<div class="detail-empty">No scheduled missions</div>`;
     } else {
         html += `<div class="schedlist">`;
         for (const s of armed) {
@@ -584,7 +628,7 @@ function renderDetail(id) {
             html += `<div class="schedrow">
                 <span class="schnum">#${(s.op_index || 0) + 1}</span>
                 <span><span class="schfreq">${s.freq_mhz.toFixed(3)} MHz</span>${tgt}</span>
-                <span style="color:var(--text-faint);font-size:11px;">${fmtClockKST(s.start_time)} · ${fmtDuration(s.duration_sec)}</span>
+                <span style="color:var(--text-faint);font-size:11px;">${fmtClock(s.start_time)} · ${fmtDuration(s.duration_sec)}</span>
                 <span class="schstatus ${cls}">${lbl}</span>
             </div>`;
         }
@@ -592,16 +636,15 @@ function renderDetail(id) {
     }
     html += `</div>`;
 
-    // HIST (mission archive)
     if (d.hist) {
         const elapsed = (Math.floor(Date.now() / 1000) - d.hist.start_utc_unix);
         html += `<div class="detail-section">
-            <div class="detail-title">임무 아카이브 (HIST)</div>
+            <div class="detail-title">Mission Archive (HIST)</div>
             <div class="hist-info">
-                <div class="hist-item"><div class="lbl">시작</div><div class="val">${fmtClockKST(d.hist.start_utc_unix)}</div></div>
-                <div class="hist-item"><div class="lbl">경과</div><div class="val">${fmtDuration(elapsed)}</div></div>
-                <div class="hist-item"><div class="lbl">중심 주파수</div><div class="val">${fmtFreqMHz(d.hist.center_freq_hz)}</div></div>
-                <div class="hist-item"><div class="lbl">대역폭</div><div class="val">${fmtBwKHz(d.hist.sample_rate_hz)}</div></div>
+                <div class="hist-item"><div class="lbl">Started</div><div class="val">${fmtClock(d.hist.start_utc_unix)}</div></div>
+                <div class="hist-item"><div class="lbl">Elapsed</div><div class="val">${fmtDuration(elapsed)}</div></div>
+                <div class="hist-item"><div class="lbl">Center Freq</div><div class="val">${fmtFreqMHz(d.hist.center_freq_hz)}</div></div>
+                <div class="hist-item"><div class="lbl">Bandwidth</div><div class="val">${fmtBwKHz(d.hist.sample_rate_hz)}</div></div>
             </div>
         </div>`;
     }
@@ -612,17 +655,16 @@ function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 }
 
-window.toggleStation = function(id) {
+window.toggleStation = function(id, ev) {
+    if (ev && (ev.target.tagName === 'TEXTAREA' || ev.target.closest('.note-wrap'))) return;
     if (expanded.has(id)) {
         expanded.delete(id);
         if (detailTimers.has(id)) { clearInterval(detailTimers.get(id)); detailTimers.delete(id); }
     } else {
         expanded.add(id);
         fetchDetail(id);
-        const t = setInterval(() => fetchDetail(id), DETAIL_POLL_MS);
-        detailTimers.set(id, t);
+        detailTimers.set(id, setInterval(() => fetchDetail(id), DETAIL_POLL_MS));
     }
-    // Re-render only affected card
     const card = document.querySelector(`.station[data-id="${id}"]`);
     if (card) {
         card.classList.toggle('expanded', expanded.has(id));
@@ -637,7 +679,6 @@ async function fetchDetail(id) {
         if (!r.ok) return;
         const d = await r.json();
         detailCache.set(id, d);
-        // Update only this card's detail content (no full re-render)
         const card = document.querySelector(`.station[data-id="${id}"]`);
         if (card && card.classList.contains('expanded')) {
             const detail = card.querySelector('.detail');
@@ -646,39 +687,111 @@ async function fetchDetail(id) {
     } catch (e) { /* silent */ }
 }
 
+// ── Notes ──────────────────────────────────────────────────────────
+const noteSaveTimers = new Map();
+window.onNoteInput = function(e) {
+    const id = e.target.dataset.id;
+    noteDirty.add(id);
+    autoResize(e.target);
+    setMeta(id, 'editing…', '');
+    if (noteSaveTimers.has(id)) clearTimeout(noteSaveTimers.get(id));
+    noteSaveTimers.set(id, setTimeout(() => saveNote(id), 800));
+};
+window.onNoteBlur = function(e) {
+    const id = e.target.dataset.id;
+    if (noteSaveTimers.has(id)) {
+        clearTimeout(noteSaveTimers.get(id));
+        noteSaveTimers.delete(id);
+    }
+    saveNote(id);
+};
+window.onNoteKey = function(e) {
+    if (e.key === 'Escape') e.target.blur();
+};
+function setMeta(id, text, cls) {
+    const el = document.getElementById('note-meta-' + cssId(id));
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'meta' + (cls ? ' ' + cls : '');
+}
+async function saveNote(id) {
+    const ta = document.getElementById('note-' + cssId(id));
+    if (!ta) return;
+    const text = ta.value;
+    setMeta(id, 'saving…', 'saving');
+    try {
+        const r = await fetch('/api/notes/' + encodeURIComponent(id), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text })
+        });
+        if (!r.ok) throw new Error('save failed');
+        const j = await r.json();
+        if (j.note) notes[id] = j.note; else delete notes[id];
+        noteDirty.delete(id);
+        setMeta(id, 'saved · just now', 'saved');
+    } catch (e) {
+        setMeta(id, 'save failed', 'err');
+    }
+}
+
+async function fetchNotes() {
+    try {
+        const r = await fetch('/api/notes');
+        if (!r.ok) return;
+        const fresh = await r.json();
+        notes = fresh;
+        // Update any non-dirty textareas with fresh server text
+        document.querySelectorAll('.note-input').forEach(ta => {
+            const id = ta.dataset.id;
+            if (noteDirty.has(id)) return;
+            const remoteText = (notes[id]?.text) || '';
+            if (ta.value !== remoteText) {
+                ta.value = remoteText;
+                autoResize(ta);
+            }
+            const meta = notes[id]?.updatedAt
+                ? `Updated ${fmtAge(Date.now() - notes[id].updatedAt)}` : '';
+            setMeta(id, meta, '');
+        });
+    } catch (e) { /* silent */ }
+}
+
 async function poll() {
     try {
         const r = await fetch('/api/status');
         if (!r.ok) throw new Error('status unreachable');
         const data = await r.json();
-
-        // Central pill
         const pill = document.getElementById('central-pill');
         const ptxt = document.getElementById('central-status');
         if (data.central?.reachable) {
             pill.className = 'central-pill ok';
-            ptxt.textContent = 'CENTRAL 연결됨';
+            ptxt.textContent = 'CENTRAL ONLINE';
         } else {
             pill.className = 'central-pill err';
-            ptxt.textContent = 'CENTRAL 단절';
+            ptxt.textContent = 'CENTRAL OFFLINE';
         }
-
         renderKpis(data);
         renderStations(data);
-
         const now = new Date();
-        const hh = String(now.getHours()).padStart(2,'0');
-        const mm = String(now.getMinutes()).padStart(2,'0');
-        const ss = String(now.getSeconds()).padStart(2,'0');
-        document.getElementById('last-update').textContent = `최종 갱신: ${hh}:${mm}:${ss}`;
+        document.getElementById('last-update').textContent =
+            'Last update: ' + String(now.getHours()).padStart(2,'0') + ':' +
+            String(now.getMinutes()).padStart(2,'0') + ':' +
+            String(now.getSeconds()).padStart(2,'0');
     } catch (e) {
         const pill = document.getElementById('central-pill');
         pill.className = 'central-pill err';
-        document.getElementById('central-status').textContent = '서버 응답 없음';
+        document.getElementById('central-status').textContent = 'NO RESPONSE';
     }
 }
-poll();
-setInterval(poll, POLL_MS);
+
+// Initial load: fetch notes first so render has them, then poll status
+(async function init() {
+    await fetchNotes();
+    await poll();
+    setInterval(poll, POLL_MS);
+    setInterval(fetchNotes, NOTES_POLL_MS);
+})();
 </script>
 </body>
 </html>

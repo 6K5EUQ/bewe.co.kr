@@ -392,7 +392,7 @@
 
 <div class="header">
     <div class="header-left">
-        <h1>Forward SIGINT Operations</h1>
+        <h1>SIGINT Operations Dashboard</h1>
         <div class="sub" id="last-update">Awaiting telemetry…</div>
     </div>
     <div id="central-pill" class="central-pill ok"><span class="pill-dot"></span><span id="central-status">CENTRAL ONLINE</span></div>
@@ -416,12 +416,18 @@
 <script>
 const POLL_MS = 3000;
 const DETAIL_POLL_MS = 5000;
-const NOTES_POLL_MS = 5000;
 const expanded = new Set();
 const detailCache = new Map();
 const detailTimers = new Map();
 let notes = {};                // station_id -> { text, updatedAt }
-const noteDirty = new Set();   // currently editing — don't overwrite from server
+const noteDirty = new Set();   // currently being edited — don't overwrite from server
+
+// Static station display-name overrides (id → display name)
+const STATION_DISPLAY = {
+    'DGS-1': 'DGS-1 (Masan)',
+    'DGS-2': 'DGS-2 (Changwon)',
+    'DGS-3': 'DGS-3 (Daegu)',
+};
 
 function fmtFreqMHz(hz) {
     if (!hz || hz <= 0) return '—';
@@ -517,7 +523,7 @@ function renderStations(data) {
                 <div>
                     <div class="station-id">
                         <span class="status-led ${led}"></span>
-                        <span class="station-name">${escapeHtml(s.name || s.station_id)}</span>
+                        <span class="station-name">${escapeHtml(STATION_DISPLAY[s.station_id] || s.name || s.station_id)}</span>
                         ${s.hist_recording ? `<span class="station-rec"><span class="dot"></span>REC</span>` : ''}
                     </div>
                     <div class="station-meta">${tierLabel}${s.operator_login ? ' · operated by ' + escapeHtml(s.operator_login) : ''}</div>
@@ -550,9 +556,7 @@ function renderStations(data) {
                     data-id="${s.station_id}"
                     rows="1"
                     maxlength="500"
-                    placeholder="Add a shared note for this site (auto-saves)…"
                     oninput="onNoteInput(event)"
-                    onblur="onNoteBlur(event)"
                     onkeydown="onNoteKey(event)"
                 >${escapeHtml(noteText)}</textarea>
             </div>
@@ -688,25 +692,36 @@ async function fetchDetail(id) {
 }
 
 // ── Notes ──────────────────────────────────────────────────────────
-const noteSaveTimers = new Map();
 window.onNoteInput = function(e) {
     const id = e.target.dataset.id;
-    noteDirty.add(id);
-    autoResize(e.target);
-    setMeta(id, 'editing…', '');
-    if (noteSaveTimers.has(id)) clearTimeout(noteSaveTimers.get(id));
-    noteSaveTimers.set(id, setTimeout(() => saveNote(id), 800));
-};
-window.onNoteBlur = function(e) {
-    const id = e.target.dataset.id;
-    if (noteSaveTimers.has(id)) {
-        clearTimeout(noteSaveTimers.get(id));
-        noteSaveTimers.delete(id);
+    const saved = (notes[id]?.text) || '';
+    if (e.target.value !== saved) {
+        noteDirty.add(id);
+        setMeta(id, 'unsaved · press Enter to save', '');
+    } else {
+        noteDirty.delete(id);
+        const meta = notes[id]?.updatedAt
+            ? `Updated ${fmtAge(Date.now() - notes[id].updatedAt)}` : '';
+        setMeta(id, meta, '');
     }
-    saveNote(id);
+    autoResize(e.target);
 };
 window.onNoteKey = function(e) {
-    if (e.key === 'Escape') e.target.blur();
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        saveNote(e.target.dataset.id);
+        e.target.blur();
+    } else if (e.key === 'Escape') {
+        // Revert to saved value, cancel edit
+        const id = e.target.dataset.id;
+        e.target.value = (notes[id]?.text) || '';
+        noteDirty.delete(id);
+        autoResize(e.target);
+        const meta = notes[id]?.updatedAt
+            ? `Updated ${fmtAge(Date.now() - notes[id].updatedAt)}` : '';
+        setMeta(id, meta, '');
+        e.target.blur();
+    }
 };
 function setMeta(id, text, cls) {
     const el = document.getElementById('note-meta-' + cssId(id));
@@ -785,12 +800,12 @@ async function poll() {
     }
 }
 
-// Initial load: fetch notes first so render has them, then poll status
+// Initial load: fetch notes once (no polling — refresh page to see others' edits),
+// then poll status only.
 (async function init() {
     await fetchNotes();
     await poll();
     setInterval(poll, POLL_MS);
-    setInterval(fetchNotes, NOTES_POLL_MS);
 })();
 </script>
 </body>

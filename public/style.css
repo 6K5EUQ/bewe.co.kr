@@ -2226,3 +2226,61 @@ body {
 .ppt-opsec-icon { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: rgba(96,165,250,0.75); }
 .ppt-opsec-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.88); }
 .ppt-opsec-body { font-size: 11px; line-height: 1.55; color: rgba(255,255,255,0.60); }
+
+/* ── Splash (pre-presentation) page ──────────────────────────────── */
+.ppt-splash-bg {
+    animation: splashBreath 14s ease-in-out infinite;
+    transform-origin: center center;
+    filter: brightness(0.92) saturate(1.05);
+}
+.ppt-splash-overlay {
+    background: radial-gradient(ellipse at center, rgba(2,6,23,0.25) 0%, rgba(2,6,23,0.55) 55%, rgba(2,6,23,0.88) 100%);
+    animation: splashVignette 9s ease-in-out infinite;
+}
+.ppt-splash-content {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: clamp(14px, 2.5vh, 28px);
+    text-align: center;
+}
+.ppt-splash-title {
+    font-size: clamp(96px, 17vw, 230px);
+    font-weight: 200;
+    letter-spacing: 0.20em;
+    margin: 0;
+    color: #fff;
+    animation: splashGlow 6.5s ease-in-out infinite;
+}
+.ppt-splash-tagline {
+    font-size: clamp(13px, 1.5vw, 22px);
+    font-weight: 300;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    margin: 0;
+    color: rgba(220,235,255,0.78);
+    animation: splashFloat 6.5s ease-in-out infinite;
+}
+@keyframes splashBreath {
+    0%, 100% { transform: scale(1.00); }
+    50%      { transform: scale(1.07); }
+}
+@keyframes splashVignette {
+    0%, 100% { opacity: 0.92; }
+    50%      { opacity: 0.78; }
+}
+@keyframes splashGlow {
+    0%, 100% {
+        text-shadow: 0 0 28px rgba(120,180,255,0.32), 0 0 80px rgba(96,165,250,0.16);
+        opacity: 0.95;
+    }
+    50% {
+        text-shadow: 0 0 55px rgba(140,195,255,0.65), 0 0 140px rgba(96,165,250,0.32);
+        opacity: 1;
+    }
+}
+@keyframes splashFloat {
+    0%, 100% { transform: translateY(0px);  opacity: 0.70; }
+    50%      { transform: translateY(-4px); opacity: 1.00; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ppt-splash-bg, .ppt-splash-overlay, .ppt-splash-title, .ppt-splash-tagline { animation: none; }
+}

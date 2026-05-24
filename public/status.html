@@ -1,985 +1,684 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEWE — Status</title>
+    <title>BEWE — 작전 현황</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
+        :root {
+            --bg: #03060f;
+            --panel: rgba(255,255,255,0.035);
+            --panel-strong: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.08);
+            --border-strong: rgba(255,255,255,0.16);
+            --text: #e8edf5;
+            --text-dim: rgba(232,237,245,0.55);
+            --text-faint: rgba(232,237,245,0.35);
+            --accent: #60a5fa;
+            --accent-dim: rgba(96,165,250,0.18);
+            --ok: #4ade80;
+            --ok-bg: rgba(74,222,128,0.10);
+            --warn: #fbbf24;
+            --warn-bg: rgba(251,191,36,0.10);
+            --err: #f87171;
+            --err-bg: rgba(248,113,113,0.10);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #000;
-            color: #e0e0e0;
-            font-family: 'Inter', 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(96,165,250,0.04) 0%, transparent 50%),
+                var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Noto Sans KR', 'Segoe UI', sans-serif;
+            font-weight: 400;
             min-height: 100vh;
-            padding: 32px 48px;
+            padding: 28px clamp(24px, 4vw, 56px) 48px;
+            line-height: 1.45;
+            -webkit-font-smoothing: antialiased;
         }
-        .top-nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 32px;
-        }
-        .top-nav .logo {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 5px;
-            color: #fff;
-        }
-        .top-nav .right {
-            display: flex;
-            gap: 24px;
-            align-items: center;
-            font-size: 13px;
-            color: rgba(255,255,255,0.55);
-        }
-        .top-nav a {
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            transition: color 0.2s;
-        }
-        .top-nav a:hover { color: #fff; }
 
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        .page-sub {
-            font-size: 13px;
-            color: rgba(255,255,255,0.45);
+        /* ── Top bar ────────────────────────────────────────────────── */
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 28px;
         }
+        .brand {
+            display: flex; align-items: baseline; gap: 14px;
+        }
+        .brand .name {
+            font-size: 22px; font-weight: 900; letter-spacing: 6px; color: #fff;
+        }
+        .brand .tag {
+            font-size: 10px; font-weight: 600; letter-spacing: 3px; color: var(--text-faint);
+            text-transform: uppercase;
+        }
+        .topbar a {
+            color: var(--text-dim); text-decoration: none;
+            font-size: 12px; font-weight: 600; letter-spacing: 1px;
+            padding: 8px 14px; border-radius: 6px;
+            transition: color .15s, background .15s;
+            text-transform: uppercase;
+        }
+        .topbar a:hover { color: #fff; background: var(--panel); }
 
-        /* Central card */
-        .central-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 32px;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 24px;
-            align-items: center;
+        /* ── Header ─────────────────────────────────────────────────── */
+        .header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            gap: 20px; margin-bottom: 22px; flex-wrap: wrap;
         }
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .badge.online {
-            background: rgba(80, 220, 120, 0.12);
-            color: #6ee089;
-            border: 1px solid rgba(80, 220, 120, 0.4);
-        }
-        .badge.offline {
-            background: rgba(255, 80, 80, 0.12);
-            color: #ff7777;
-            border: 1px solid rgba(255, 80, 80, 0.4);
-        }
-        .badge .dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: currentColor;
-            box-shadow: 0 0 8px currentColor;
-        }
-        .central-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 16px;
-            font-size: 13px;
-        }
-        .meta-item .label {
-            display: block;
-            font-size: 11px;
-            color: rgba(255,255,255,0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 4px;
-        }
-        .meta-item .value {
+        .header-left h1 {
+            font-size: clamp(22px, 2.4vw, 30px);
+            font-weight: 700; letter-spacing: 0.3px;
             color: #fff;
-            font-weight: 500;
-            font-variant-numeric: tabular-nums;
         }
-        .refresh-info {
-            font-size: 11px;
-            color: rgba(255,255,255,0.4);
-            text-align: right;
-            font-variant-numeric: tabular-nums;
+        .header-left .sub {
+            font-size: 12px; color: var(--text-faint); letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        .central-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 999px;
+            font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+        .central-pill.ok  { background: var(--ok-bg);  color: var(--ok);  border: 1px solid rgba(74,222,128,0.30); }
+        .central-pill.err { background: var(--err-bg); color: var(--err); border: 1px solid rgba(248,113,113,0.30); }
+        .pill-dot {
+            width: 7px; height: 7px; border-radius: 50%; background: currentColor;
+            box-shadow: 0 0 6px currentColor;
+            animation: dotPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%,100% { opacity: 1; }
+            50%     { opacity: 0.35; }
         }
 
-        /* Stations table */
-        .section-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        /* ── KPI strip ──────────────────────────────────────────────── */
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
         }
-        .section-title .count {
-            font-size: 12px;
-            color: rgba(255,255,255,0.4);
-            font-weight: 400;
-        }
-        .stations-wrap {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
+        .kpi {
+            background: var(--panel);
+            border: 1px solid var(--border);
             border-radius: 12px;
+            padding: 18px 20px;
+            position: relative;
             overflow: hidden;
         }
-        table.stations {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+        .kpi::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            background: var(--accent); opacity: 0.7;
         }
-        table.stations th {
-            text-align: left;
-            padding: 12px 16px;
-            color: rgba(255,255,255,0.5);
-            font-weight: 500;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        table.stations td {
-            padding: 14px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            font-variant-numeric: tabular-nums;
-        }
-        table.stations tr:last-child td { border-bottom: none; }
-        table.stations tr.station-row.online td:first-child {
-            box-shadow: inset 3px 0 0 0 rgba(110,224,137,0.8);
-        }
-        table.stations tr.station-row.offline td {
-            color: rgba(255,255,255,0.45);
-        }
-        table.stations tr.station-row.offline .station-name {
-            color: rgba(255,255,255,0.65);
-        }
-        .status-dot {
-            display: inline-block;
-            width: 10px; height: 10px; border-radius: 50%;
-            position: relative;
-        }
-        .status-dot.online {
-            background: #6ee089;
-            box-shadow: 0 0 8px rgba(110, 224, 137, 0.6);
-        }
-        .status-dot.online::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 1px solid rgba(110, 224, 137, 0.7);
-            animation: pulse 1.8s ease-out infinite;
-        }
-        @keyframes pulse {
-            0%   { transform: scale(0.6); opacity: 0.9; }
-            100% { transform: scale(1.8); opacity: 0; }
-        }
-        .status-dot.offline {
-            background: #ff7777;
-            box-shadow: 0 0 8px rgba(255, 119, 119, 0.5);
-        }
-        .station-name { color: #fff; font-weight: 500; }
-        .station-id { color: rgba(255,255,255,0.5); font-size: 12px; font-family: 'SF Mono', Menlo, monospace; }
-        .tier { font-size: 11px; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-        .tier-1 { background: rgba(255,80,80,0.15); color: #ff7777; }
-        .tier-2 { background: rgba(255,180,80,0.15); color: #ffb866; }
-        .tier-3 { background: rgba(110,224,137,0.15); color: #6ee089; }
-
-        .empty {
-            padding: 48px;
-            text-align: center;
-            color: rgba(255,255,255,0.4);
-            font-size: 13px;
-        }
-        table.stations tr.station-row { cursor: pointer; transition: background 0.1s; }
-        table.stations tr.station-row:hover td { background: rgba(255,255,255,0.04); }
-        .freq-cell, .sr-cell, .coord-cell, .op-cell {
-            font-size: 12px;
-            color: rgba(255,255,255,0.75);
-            font-family: 'SF Mono', Menlo, monospace;
-        }
-        .rec-flag {
-            display: inline-block;
-            font-size: 10px;
-            padding: 1px 6px;
-            border-radius: 3px;
-            background: rgba(255,80,80,0.15);
-            color: #ff7777;
-            border: 1px solid rgba(255,80,80,0.3);
-            margin-left: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .ch-count {
-            display: inline-block;
-            font-size: 10px;
-            padding: 1px 6px;
-            border-radius: 3px;
-            background: rgba(110,224,137,0.12);
-            color: #6ee089;
-            border: 1px solid rgba(110,224,137,0.3);
-            margin-left: 6px;
-        }
-        /* Stats bar */
-        .stats-bar {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        .stat-chip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 13px;
-        }
-        .stat-chip .sv {
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-            font-variant-numeric: tabular-nums;
-        }
-        .stat-chip .sl {
-            font-size: 11px;
-            color: rgba(255,255,255,0.45);
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-        .stat-chip .dot-g { width:8px; height:8px; border-radius:50%; background:#6ee089; box-shadow:0 0 6px rgba(110,224,137,0.5); flex-shrink:0; }
-        .stat-chip .dot-b { width:8px; height:8px; border-radius:50%; background:#7eb8ff; box-shadow:0 0 6px rgba(126,184,255,0.5); flex-shrink:0; }
-        .stat-chip .dot-r { width:8px; height:8px; border-radius:50%; background:#ff7777; box-shadow:0 0 6px rgba(255,119,119,0.4); flex-shrink:0; }
-        .stat-chip .dot-y { width:8px; height:8px; border-radius:50%; background:#ffb866; box-shadow:0 0 6px rgba(255,184,102,0.4); flex-shrink:0; }
-
-        /* Filter */
-        .filter-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        .filter-input {
-            flex: 1;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 7px;
-            padding: 8px 14px;
-            font-size: 13px;
-            color: #e0e0e0;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-        .filter-input::placeholder { color: rgba(255,255,255,0.25); }
-        .filter-input:focus { border-color: rgba(100,160,255,0.5); }
-
-        /* Offline row dim */
-        table.stations tr.station-row.offline-row td { color: rgba(255,255,255,0.45); }
-        table.stations tr.station-row.offline-row .station-name { color: rgba(255,255,255,0.5); }
-
-        /* Modal */
-        .modal-bg {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.65);
-            display: none;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 60px 24px;
-            z-index: 100;
-            backdrop-filter: blur(2px);
-        }
-        .modal-bg.open { display: flex; }
-        .modal-card {
-            background: #14181f;
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            width: min(820px, 100%);
-            max-height: calc(100vh - 120px);
-            overflow-y: auto;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-        }
-        .modal-head {
-            padding: 22px 26px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            display: flex; align-items: center; gap: 14px;
-        }
-        .modal-head .name { font-size: 18px; font-weight: 700; color: #fff; }
-        .modal-head .id   { font-size: 12px; color: rgba(255,255,255,0.45); font-family: 'SF Mono', Menlo, monospace; }
-        .modal-head .close-btn {
-            margin-left: auto;
-            background: none; border: none;
-            color: rgba(255,255,255,0.5);
-            font-size: 22px; line-height: 1;
-            cursor: pointer; padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .modal-head .close-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
-        .modal-section {
-            padding: 18px 26px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .modal-section:last-child { border-bottom: none; }
-        .modal-section h3 {
-            font-size: 11px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.45);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .kpi.ok::before   { background: var(--ok);   }
+        .kpi.warn::before { background: var(--warn); }
+        .kpi.err::before  { background: var(--err);  }
+        .kpi-label {
+            font-size: 10.5px; font-weight: 700; letter-spacing: 1.3px;
+            color: var(--text-dim); text-transform: uppercase;
             margin-bottom: 10px;
         }
-        .kv-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 14px;
-            font-size: 13px;
-        }
-        .kv-grid .k {
-            font-size: 10px;
-            color: rgba(255,255,255,0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            margin-bottom: 3px;
-            display: block;
-        }
-        .kv-grid .v { color: #fff; font-variant-numeric: tabular-nums; font-family: 'SF Mono', Menlo, monospace; }
-        table.channels {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
+        .kpi-value {
+            font-size: 32px; font-weight: 800; color: #fff;
+            line-height: 1; letter-spacing: -0.5px;
             font-variant-numeric: tabular-nums;
         }
-        table.channels th {
-            padding: 6px 10px;
-            text-align: left;
-            color: rgba(255,255,255,0.45);
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            font-weight: 500;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+        .kpi-value .sub {
+            font-size: 14px; font-weight: 500; color: var(--text-dim);
+            margin-left: 4px;
         }
-        table.channels td {
-            padding: 8px 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            font-family: 'SF Mono', Menlo, monospace;
-            color: rgba(255,255,255,0.85);
+        .kpi-note {
+            font-size: 11px; color: var(--text-faint); margin-top: 6px;
         }
-        .pill {
-            display: inline-block;
-            padding: 1px 7px;
-            border-radius: 3px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+
+        /* ── Section header ────────────────────────────────────────── */
+        .section-title {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 14px; font-weight: 700; letter-spacing: 1.5px;
+            color: var(--text-dim); text-transform: uppercase;
+            margin: 10px 0 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
         }
-        .pill.on  { background: rgba(110,224,137,0.15); color: #6ee089; border: 1px solid rgba(110,224,137,0.3); }
-        .pill.off { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.06); }
-        /* Joined-users grid in detail modal */
-        .joins-grid {
+        .section-title .count {
+            font-weight: 400; color: var(--text-faint); letter-spacing: 0.5px;
+        }
+
+        /* ── Station grid ──────────────────────────────────────────── */
+        .stations {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 14px;
         }
-        .join-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .station {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color .2s, background .2s;
         }
-        .join-card .avatar {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: linear-gradient(135deg, #4a5568, #2d3748);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px;
-            color: #fff;
+        .station:hover { border-color: var(--border-strong); }
+        .station.offline { opacity: 0.55; }
+        .station-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 18px 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .station-head:hover { background: rgba(255,255,255,0.02); }
+        .station-id {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .status-led {
+            width: 10px; height: 10px; border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
             flex-shrink: 0;
         }
-        .join-card .who {
-            display: flex; flex-direction: column; gap: 3px;
-            min-width: 0;
+        .led-on  { background: var(--ok);   color: var(--ok);  animation: dotPulse 2s ease-in-out infinite; }
+        .led-off { background: var(--err);  color: var(--err); }
+        .station-name {
+            font-size: 16px; font-weight: 700; color: #fff;
+            letter-spacing: 0.5px;
         }
-        .join-card .who .name {
-            font-size: 13px; color: #fff; font-weight: 500;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        .station-meta {
+            font-size: 10.5px; color: var(--text-faint);
+            letter-spacing: 0.8px; text-transform: uppercase;
+            margin-top: 2px;
         }
-        .join-card .who .meta {
-            font-size: 10px; color: rgba(255,255,255,0.45);
-            display: flex; gap: 6px; align-items: center;
+        .station-summary {
+            font-size: 11px; color: var(--text-dim); text-align: right;
         }
-        .pill.tier-1 { background: rgba(255,80,80,0.15);   color: #ff7777; border: 1px solid rgba(255,80,80,0.3); }
-        .pill.tier-2 { background: rgba(255,180,80,0.15);  color: #ffb866; border: 1px solid rgba(255,180,80,0.3); }
-        .pill.tier-3 { background: rgba(110,224,137,0.12); color: #6ee089; border: 1px solid rgba(110,224,137,0.3); }
-        .pill.guest  { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.08); }
-        .error-banner {
-            background: rgba(255,80,80,0.08);
-            border: 1px solid rgba(255,80,80,0.3);
+        .station-summary .age {
+            font-weight: 600; color: var(--text);
+        }
+        .station-rec {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+            background: var(--err-bg); color: var(--err);
+            margin-left: 6px;
+        }
+        .station-rec .dot {
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+            animation: recBlink 1.2s ease-in-out infinite;
+        }
+        @keyframes recBlink {
+            0%,49%   { opacity: 1; }
+            50%,100% { opacity: 0.25; }
+        }
+
+        .station-body {
+            padding: 0 18px 18px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .stat {
+            background: rgba(255,255,255,0.025);
             border-radius: 8px;
-            padding: 10px 14px;
+            padding: 10px 12px;
+        }
+        .stat-label {
+            font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+            color: var(--text-faint); text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 17px; font-weight: 700; color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-value .u {
+            font-size: 10px; font-weight: 500; color: var(--text-dim);
+            margin-left: 2px;
+        }
+
+        /* ── Expandable detail ─────────────────────────────────────── */
+        .detail {
+            border-top: 1px solid var(--border);
+            padding: 14px 18px 16px;
+            display: none;
+        }
+        .station.expanded .detail { display: block; }
+        .station.expanded .station-head .chevron { transform: rotate(180deg); }
+        .chevron {
+            width: 18px; height: 18px;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-left: 8px;
+            color: var(--text-faint);
+            transition: transform .2s;
             font-size: 12px;
-            color: #ff9999;
-            margin-top: 12px;
-            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .detail-section {
+            margin-bottom: 14px;
+        }
+        .detail-section:last-child { margin-bottom: 0; }
+        .detail-title {
+            font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+            color: var(--accent); text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .detail-empty {
+            font-size: 12px; color: var(--text-faint);
+            padding: 8px 0;
+        }
+        .chlist, .schedlist {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .chrow, .schedrow {
+            display: grid;
+            grid-template-columns: 30px 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            font-size: 12px;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.025);
+            border-radius: 6px;
+        }
+        .chrow .chnum, .schedrow .schnum {
+            font-weight: 700; color: var(--accent);
+            font-variant-numeric: tabular-nums; font-size: 11px;
+        }
+        .chrow .chmode {
+            display: inline-block;
+            font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px;
+            padding: 2px 6px; border-radius: 3px;
+            background: var(--accent-dim); color: var(--accent);
+            text-transform: uppercase;
+            margin-right: 8px;
+        }
+        .chrow .chfreq, .schedrow .schfreq {
+            color: #fff; font-weight: 600; font-variant-numeric: tabular-nums;
+        }
+        .chrow .chrec, .schedrow .schstatus {
+            font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+            padding: 2px 7px; border-radius: 4px;
+        }
+        .chrec.iq    { background: rgba(248,113,113,0.15); color: var(--err); }
+        .chrec.audio { background: rgba(251,191,36,0.15); color: var(--warn); }
+        .chrec.none  { background: rgba(255,255,255,0.04); color: var(--text-faint); }
+        .schstatus.idle  { background: rgba(255,255,255,0.04); color: var(--text-faint); }
+        .schstatus.armed { background: var(--warn-bg); color: var(--warn); }
+        .schstatus.active{ background: var(--ok-bg); color: var(--ok); }
+        .schstatus.done  { background: rgba(255,255,255,0.04); color: var(--text-faint); }
+
+        .joins {
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .join-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 11px; border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            font-size: 11.5px; color: var(--text);
+        }
+        .join-pill .tier {
+            font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+            padding: 1px 5px; border-radius: 3px;
+            background: var(--accent-dim); color: var(--accent);
+        }
+
+        .hist-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+        }
+        .hist-item .lbl {
+            font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+            color: var(--text-faint); text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+        .hist-item .val {
+            font-size: 13px; color: #fff; font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Footer ────────────────────────────────────────────────── */
+        .footer {
+            margin-top: 38px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--text-faint);
+            display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+        }
+        .footer .live {
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 640px) {
+            body { padding: 18px 16px 30px; }
+            .station-body { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .stat-value { font-size: 15px; }
+            .stations { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="top-nav">
-        <div class="logo">BEWE</div>
-        <div class="right">
-            <span id="refresh-info" class="refresh-info">—</span>
-            <a href="/">← Back to Globe</a>
+
+<div class="topbar">
+    <div class="brand">
+        <div class="name">BEWE</div>
+        <div class="tag">Behind Everyone We Hear Everything</div>
+    </div>
+    <a href="/">홈으로</a>
+</div>
+
+<div class="header">
+    <div class="header-left">
+        <h1>전방 신호정보 작전 현황</h1>
+        <div class="sub" id="last-update">데이터 수신 대기 중…</div>
+    </div>
+    <div id="central-pill" class="central-pill ok"><span class="pill-dot"></span><span id="central-status">CENTRAL 연결됨</span></div>
+</div>
+
+<!-- KPI strip -->
+<div class="kpis" id="kpis"></div>
+
+<!-- Stations -->
+<div class="section-title">
+    <span>전방 수집 노드</span>
+    <span class="count" id="stations-count">–</span>
+</div>
+<div class="stations" id="stations"></div>
+
+<div class="footer">
+    <span class="live"><span class="pill-dot" style="color:var(--ok);background:var(--ok)"></span> LIVE · 3초마다 자동 갱신</span>
+    <span>BEWE Operations Console · 2026</span>
+</div>
+
+<script>
+const POLL_MS = 3000;
+const DETAIL_POLL_MS = 5000;
+const expanded = new Set();          // station_id with detail expanded
+const detailCache = new Map();        // station_id → detail JSON
+let detailTimers = new Map();
+
+function fmtFreqMHz(hz) {
+    if (!hz || hz <= 0) return '—';
+    return (hz / 1e6).toFixed(3) + ' MHz';
+}
+function fmtBwKHz(hz) {
+    if (!hz || hz <= 0) return '—';
+    return (hz / 1e3).toFixed(0) + ' kHz';
+}
+function fmtAge(ms) {
+    if (ms == null) return '—';
+    const s = Math.floor(ms / 1000);
+    if (s < 5) return '방금';
+    if (s < 60) return s + '초 전';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + '분 전';
+    const h = Math.floor(m / 60);
+    return h + '시간 전';
+}
+function fmtClockKST(unixSec) {
+    if (!unixSec || unixSec <= 0) return '—';
+    const d = new Date(unixSec * 1000);
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    return hh + ':' + mm;
+}
+function fmtDuration(sec) {
+    if (!sec || sec <= 0) return '—';
+    if (sec < 60) return Math.round(sec) + '초';
+    const m = Math.floor(sec / 60);
+    if (m < 60) return m + '분';
+    return (sec / 3600).toFixed(1) + '시간';
+}
+const MODE_NAMES = ['AM','FM','USB','LSB','CW','DIGITAL','—','—','—','—'];
+function modeName(m) { return MODE_NAMES[m] || '—'; }
+const SCHED_STATUS = { 0: ['idle','대기'], 1: ['armed','ARMED'], 2: ['active','녹음 중'], 3: ['done','완료'] };
+function schedStatus(s) { return SCHED_STATUS[s] || ['idle','—']; }
+
+function renderKpis(data) {
+    const stations = data.stations || [];
+    const online = stations.filter(s => s.online);
+    const totalAnalysts = online.reduce((a,s) => a + (s.users || 0), 0);
+    const totalChannels = online.reduce((a,s) => a + (s.channel_count || 0), 0);
+    const recCount = online.filter(s => s.hist_recording).length;
+    const offlineCount = stations.length - online.length;
+
+    const kpis = [
+        { cls: online.length === stations.length && stations.length > 0 ? 'ok' : (online.length === 0 ? 'err' : 'warn'),
+          lbl: '운용 사이트', val: online.length, sub: '/ ' + stations.length,
+          note: offlineCount > 0 ? offlineCount + '개 사이트 단절' : '전 사이트 정상 운용' },
+        { cls: totalAnalysts > 0 ? 'ok' : '',
+          lbl: '근무 분석관', val: totalAnalysts,
+          note: totalAnalysts > 0 ? '실시간 관제 중' : '분석관 미접속' },
+        { cls: totalChannels > 0 ? 'ok' : '',
+          lbl: '활성 감청 채널', val: totalChannels,
+          note: '동시 복조 중' },
+        { cls: recCount > 0 ? 'ok' : '',
+          lbl: '임무 녹음', val: recCount,
+          note: recCount > 0 ? '신호 영구 아카이브 중' : '대기' },
+    ];
+
+    document.getElementById('kpis').innerHTML = kpis.map(k => `
+        <div class="kpi ${k.cls}">
+            <div class="kpi-label">${k.lbl}</div>
+            <div class="kpi-value">${k.val}${k.sub ? `<span class="sub">${k.sub}</span>` : ''}</div>
+            <div class="kpi-note">${k.note}</div>
         </div>
-    </div>
+    `).join('');
+}
 
-    <h1 class="page-title">Network Status</h1>
-    <p class="page-sub">Live health of the Central Server and distributed collection sites.</p>
+function renderStations(data) {
+    const stations = data.stations || [];
+    document.getElementById('stations-count').textContent = stations.length + '개';
 
-    <!-- Central -->
-    <div class="central-card">
-        <div>
-            <span id="central-badge" class="badge offline"><span class="dot"></span><span id="central-label">CHECKING</span></span>
-        </div>
-        <div class="central-meta">
-            <div class="meta-item">
-                <span class="label">Endpoint</span>
-                <span class="value" id="central-endpoint">—</span>
-            </div>
-            <div class="meta-item">
-                <span class="label">Last Success</span>
-                <span class="value" id="central-last-success">—</span>
-            </div>
-            <div class="meta-item">
-                <span class="label">Response</span>
-                <span class="value" id="central-response">—</span>
-            </div>
-            <div class="meta-item">
-                <span class="label">Last Attempt</span>
-                <span class="value" id="central-last-attempt">—</span>
-            </div>
-        </div>
-        <div></div>
-        <div id="central-error-wrap" style="grid-column: 1 / -1; display: none;">
-            <div class="error-banner" id="central-error"></div>
-        </div>
-    </div>
+    if (stations.length === 0) {
+        document.getElementById('stations').innerHTML = `
+            <div style="grid-column:1/-1;background:var(--panel);border:1px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--text-faint);font-size:13px;">
+                현재 등록된 전방 노드가 없습니다.
+            </div>`;
+        return;
+    }
 
-    <!-- Stats bar -->
-    <div class="stats-bar" id="stats-bar">
-        <div class="stat-chip"><span class="dot-g"></span><div><div class="sv" id="st-online">—</div><div class="sl">Sites Online</div></div></div>
-        <div class="stat-chip"><span class="dot-b"></span><div><div class="sv" id="st-channels">—</div><div class="sl">Demod Channels</div></div></div>
-        <div class="stat-chip"><span class="dot-r"></span><div><div class="sv" id="st-rec">—</div><div class="sl">Recording</div></div></div>
-        <div class="stat-chip"><span class="dot-y"></span><div><div class="sv" id="st-users">—</div><div class="sl">Analysts</div></div></div>
-    </div>
-
-    <!-- Stations -->
-    <div class="section-title">
-        Collection Sites <span class="count" id="station-count">(0)</span>
-    </div>
-    <div class="filter-row">
-        <input type="text" class="filter-input" id="filter-input" placeholder="Filter by site, operator, or frequency…" oninput="applyFilter()">
-    </div>
-    <div class="stations-wrap">
-        <table class="stations" id="stations-table">
-            <thead>
-                <tr>
-                    <th style="width: 40px;"></th>
-                    <th>Name</th>
-                    <th>Operator</th>
-                    <th style="width: 130px;">Coords</th>
-                    <th style="width: 90px;">Tier</th>
-                    <th style="width: 70px;">Analysts</th>
-                    <th style="width: 140px;">Frequency</th>
-                    <th style="width: 110px;">Sample Rate</th>
-                    <th style="width: 130px;">Last Seen</th>
-                </tr>
-            </thead>
-            <tbody id="stations-body">
-                <tr><td colspan="9" class="empty">Loading…</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Detail modal -->
-    <div class="modal-bg" id="modal-bg" onclick="if(event.target===this) closeModal()">
-        <div class="modal-card" id="modal-card">
-            <div class="modal-head">
+    document.getElementById('stations').innerHTML = stations.map(s => {
+        const isExp = expanded.has(s.station_id);
+        const cls = (s.online ? '' : 'offline') + (isExp ? ' expanded' : '');
+        const led = s.online ? 'led-on' : 'led-off';
+        const tierLabel = s.tier ? `Tier ${s.tier}` : '';
+        const ageStr = s.online ? '실시간' : fmtAge(s.ageMs);
+        return `
+        <div class="station ${cls}" data-id="${s.station_id}">
+            <div class="station-head" onclick="toggleStation('${s.station_id}')">
                 <div>
-                    <div class="name" id="m-name">—</div>
-                    <div class="id" id="m-id">—</div>
+                    <div class="station-id">
+                        <span class="status-led ${led}"></span>
+                        <span class="station-name">${escapeHtml(s.name || s.station_id)}</span>
+                        ${s.hist_recording ? `<span class="station-rec"><span class="dot"></span>REC</span>` : ''}
+                    </div>
+                    <div class="station-meta">${tierLabel}${s.operator_login ? ' · ' + escapeHtml(s.operator_login) + ' 운용' : ''}</div>
                 </div>
-                <button class="close-btn" onclick="closeModal()">×</button>
-            </div>
-            <div class="modal-section">
-                <h3>Receiver</h3>
-                <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px;">
-                    <span id="m-cf" style="font-size:22px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;font-family:'SF Mono',Menlo,monospace;">—</span>
-                    <span id="m-sr" style="font-size:14px;color:rgba(255,255,255,0.5);font-family:'SF Mono',Menlo,monospace;">—</span>
-                    <span id="m-hist">—</span>
-                </div>
-                <div class="kv-grid">
-                    <div><span class="k">Operator</span><span class="v" id="m-operator">—</span></div>
-                    <div><span class="k">Coordinates</span><span class="v" id="m-coords">—</span></div>
-                    <div><span class="k">Active Channels</span><span class="v" id="m-chcount">—</span></div>
+                <div class="station-summary">
+                    <div class="age">${ageStr}</div>
+                    <div class="chevron">&#9662;</div>
                 </div>
             </div>
-            <div class="modal-section">
-                <h3>Joined Analysts <span id="m-joins-count" style="color: rgba(255,255,255,0.35); font-weight: 500; margin-left: 6px;"></span></h3>
-                <div id="m-joins-wrap">
-                    <div class="empty" style="padding:18px 0;">No analysts have joined.</div>
+            <div class="station-body">
+                <div class="stat">
+                    <div class="stat-label">분석관</div>
+                    <div class="stat-value">${s.users || 0}<span class="u">명</span></div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">감청 채널</div>
+                    <div class="stat-value">${s.channel_count || 0}<span class="u">개</span></div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">중심 주파수</div>
+                    <div class="stat-value" style="font-size:14px;">${fmtFreqMHz(s.center_freq_hz)}</div>
                 </div>
             </div>
-            <div class="modal-section">
-                <h3>Waterfall Archive &mdash; Live Segment</h3>
-                <div id="m-hist-wrap">
-                    <div class="empty" style="padding:18px 0;">No active waterfall segment.</div>
-                </div>
+            <div class="detail" id="detail-${s.station_id}">
+                ${renderDetail(s.station_id)}
             </div>
-            <div class="modal-section">
-                <h3>Scheduled Recordings <span id="m-sched-count" style="color: rgba(255,255,255,0.35); font-weight: 500; margin-left: 6px;"></span></h3>
-                <div id="m-sched-wrap">
-                    <div class="empty" style="padding:18px 0;">No schedules.</div>
-                </div>
+        </div>`;
+    }).join('');
+}
+
+function renderDetail(id) {
+    const d = detailCache.get(id);
+    if (!d) return `<div class="detail-empty">상세 정보 로딩 중…</div>`;
+
+    let html = '';
+
+    // Active channels
+    html += `<div class="detail-section">
+        <div class="detail-title">활성 감청 채널 (${d.channels.length})</div>`;
+    if (d.channels.length === 0) {
+        html += `<div class="detail-empty">현재 활성 채널 없음</div>`;
+    } else {
+        html += `<div class="chlist">`;
+        for (const c of d.channels) {
+            const center = ((c.s_mhz + c.e_mhz) / 2);
+            const bw_kHz = ((c.e_mhz - c.s_mhz) * 1000);
+            let rec = `<span class="chrec none">대기</span>`;
+            if (c.iq_rec_on)      rec = `<span class="chrec iq">IQ 녹음</span>`;
+            else if (c.audio_rec_on) rec = `<span class="chrec audio">AUDIO 녹음</span>`;
+            const owner = c.owner ? ` · ${escapeHtml(c.owner)}` : '';
+            html += `<div class="chrow">
+                <span class="chnum">${String(c.index + 1).padStart(2,'0')}</span>
+                <span><span class="chmode">${modeName(c.mode)}</span><span class="chfreq">${center.toFixed(3)} MHz</span>${owner}</span>
+                <span style="color:var(--text-faint);font-size:11px;">${bw_kHz.toFixed(0)} kHz</span>
+                ${rec}
+            </div>`;
+        }
+        html += `</div>`;
+    }
+    html += `</div>`;
+
+    // Joins (connected analysts)
+    html += `<div class="detail-section">
+        <div class="detail-title">접속 분석관 (${d.joins.length})</div>`;
+    if (d.joins.length === 0) {
+        html += `<div class="detail-empty">접속 중인 분석관 없음</div>`;
+    } else {
+        html += `<div class="joins">`;
+        for (const j of d.joins) {
+            html += `<span class="join-pill"><span class="tier">T${j.tier}</span>${escapeHtml(j.name)}</span>`;
+        }
+        html += `</div>`;
+    }
+    html += `</div>`;
+
+    // Schedules
+    const armed = d.scheds.filter(s => s.valid);
+    html += `<div class="detail-section">
+        <div class="detail-title">사전 임무 (${armed.length})</div>`;
+    if (armed.length === 0) {
+        html += `<div class="detail-empty">예정된 임무 없음</div>`;
+    } else {
+        html += `<div class="schedlist">`;
+        for (const s of armed) {
+            const [cls, lbl] = schedStatus(s.status);
+            const tgt = s.target ? ` → ${escapeHtml(s.target)}` : '';
+            html += `<div class="schedrow">
+                <span class="schnum">#${(s.op_index || 0) + 1}</span>
+                <span><span class="schfreq">${s.freq_mhz.toFixed(3)} MHz</span>${tgt}</span>
+                <span style="color:var(--text-faint);font-size:11px;">${fmtClockKST(s.start_time)} · ${fmtDuration(s.duration_sec)}</span>
+                <span class="schstatus ${cls}">${lbl}</span>
+            </div>`;
+        }
+        html += `</div>`;
+    }
+    html += `</div>`;
+
+    // HIST (mission archive)
+    if (d.hist) {
+        const elapsed = (Math.floor(Date.now() / 1000) - d.hist.start_utc_unix);
+        html += `<div class="detail-section">
+            <div class="detail-title">임무 아카이브 (HIST)</div>
+            <div class="hist-info">
+                <div class="hist-item"><div class="lbl">시작</div><div class="val">${fmtClockKST(d.hist.start_utc_unix)}</div></div>
+                <div class="hist-item"><div class="lbl">경과</div><div class="val">${fmtDuration(elapsed)}</div></div>
+                <div class="hist-item"><div class="lbl">중심 주파수</div><div class="val">${fmtFreqMHz(d.hist.center_freq_hz)}</div></div>
+                <div class="hist-item"><div class="lbl">대역폭</div><div class="val">${fmtBwKHz(d.hist.sample_rate_hz)}</div></div>
             </div>
-            <div class="modal-section">
-                <h3>Demodulator Channels</h3>
-                <div id="m-channels-wrap">
-                    <div class="empty" style="padding:18px 0;">No active demodulator channels.</div>
-                </div>
-            </div>
-        </div>
-    </div>
+        </div>`;
+    }
+    return html;
+}
 
-    <script>
-        const REFRESH_MS = 2000;
-        let lastFetchAt = 0;
-        let lastStations = [];   // latest /api/status snapshot — used by modal summary
-        let lastServerTime = 0;  // for client-side age tick
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
 
-        function fmtAge(ms) {
-            if (ms == null) return '—';
-            if (ms < 1000) return 'just now';
-            const s = Math.floor(ms / 1000);
-            if (s < 60) return s + 's ago';
-            const m = Math.floor(s / 60);
-            if (m < 60) return m + 'm ' + (s % 60) + 's ago';
-            const h = Math.floor(m / 60);
-            return h + 'h ' + (m % 60) + 'm ago';
+window.toggleStation = function(id) {
+    if (expanded.has(id)) {
+        expanded.delete(id);
+        if (detailTimers.has(id)) { clearInterval(detailTimers.get(id)); detailTimers.delete(id); }
+    } else {
+        expanded.add(id);
+        fetchDetail(id);
+        const t = setInterval(() => fetchDetail(id), DETAIL_POLL_MS);
+        detailTimers.set(id, t);
+    }
+    // Re-render only affected card
+    const card = document.querySelector(`.station[data-id="${id}"]`);
+    if (card) {
+        card.classList.toggle('expanded', expanded.has(id));
+        const detail = card.querySelector('.detail');
+        if (detail) detail.innerHTML = renderDetail(id);
+    }
+};
+
+async function fetchDetail(id) {
+    try {
+        const r = await fetch('/api/station/' + encodeURIComponent(id) + '/detail');
+        if (!r.ok) return;
+        const d = await r.json();
+        detailCache.set(id, d);
+        // Update only this card's detail content (no full re-render)
+        const card = document.querySelector(`.station[data-id="${id}"]`);
+        if (card && card.classList.contains('expanded')) {
+            const detail = card.querySelector('.detail');
+            if (detail) detail.innerHTML = renderDetail(id);
+        }
+    } catch (e) { /* silent */ }
+}
+
+async function poll() {
+    try {
+        const r = await fetch('/api/status');
+        if (!r.ok) throw new Error('status unreachable');
+        const data = await r.json();
+
+        // Central pill
+        const pill = document.getElementById('central-pill');
+        const ptxt = document.getElementById('central-status');
+        if (data.central?.reachable) {
+            pill.className = 'central-pill ok';
+            ptxt.textContent = 'CENTRAL 연결됨';
+        } else {
+            pill.className = 'central-pill err';
+            ptxt.textContent = 'CENTRAL 단절';
         }
 
-        function fmtTime(ts) {
-            if (!ts) return '—';
-            const d = new Date(ts);
-            return d.toLocaleTimeString();
-        }
+        renderKpis(data);
+        renderStations(data);
 
-        function tierLabel(t) {
-            if (t === 1) return { cls: 'tier-1', name: 'Tier 1' };
-            if (t === 2) return { cls: 'tier-2', name: 'Tier 2' };
-            return { cls: 'tier-3', name: 'Tier 3' };
-        }
-
-        function fmtFreqHz(hz) {
-            if (!hz) return '—';
-            if (hz >= 1e9) return (hz / 1e9).toFixed(3) + ' GHz';
-            if (hz >= 1e6) return (hz / 1e6).toFixed(3) + ' MHz';
-            if (hz >= 1e3) return (hz / 1e3).toFixed(1) + ' kHz';
-            return hz + ' Hz';
-        }
-        function fmtSrHz(hz) {
-            if (!hz) return '—';
-            if (hz >= 1e6) return (hz / 1e6).toFixed(2) + ' MS/s';
-            return (hz / 1e3).toFixed(1) + ' kS/s';
-        }
-        function fmtCoords(lat, lon) {
-            if (lat == null || lon == null || (lat === 0 && lon === 0)) return '—';
-            const ns = lat >= 0 ? 'N' : 'S';
-            const ew = lon >= 0 ? 'E' : 'W';
-            return Math.abs(lat).toFixed(2) + '°' + ns + ' ' +
-                   Math.abs(lon).toFixed(2) + '°' + ew;
-        }
-        const DEMOD_MODE = ['—', 'AM', 'FM', 'MAGIC'];
-        const DIGITAL_MODE = ['—', 'AIS', 'ADS-B', 'DEMOD', 'AUTO-ID'];
-        // Colors for demod types — matching BE_WE sat_view color philosophy
-        const DEMOD_COLOR = { AM: '#7eb8ff', FM: '#6ee089', MAGIC: '#c084fc', AIS: '#ffb866', 'ADS-B': '#fde047' };
-        function demodName(m){ return DEMOD_MODE[m] || ('mode' + m); }
-        function digitalName(m){ return DIGITAL_MODE[m] || ('digi' + m); }
-        function demodBadge(demod, digital) {
-            const d = demodName(demod);
-            const dg = digital ? digitalName(digital) : null;
-            const label = (dg && dg !== '—') ? dg : d;
-            const col = DEMOD_COLOR[label] || 'rgba(255,255,255,0.6)';
-            return `<span style="color:${col};font-weight:600;">${escapeHtml(label)}</span>`;
-        }
-
-        function applyFilter() {
-            const q = (document.getElementById('filter-input').value || '').toLowerCase();
-            document.querySelectorAll('#stations-body tr.station-row').forEach(tr => {
-                const name  = (tr.dataset.name  || '').toLowerCase();
-                const op    = (tr.dataset.op    || '').toLowerCase();
-                const freq  = (tr.dataset.freq  || '').toLowerCase();
-                tr.style.display = (!q || name.includes(q) || op.includes(q) || freq.includes(q)) ? '' : 'none';
-            });
-        }
-
-        function render(data) {
-            lastStations = data.stations || [];
-            lastServerTime = data.serverTime;
-            const now = data.serverTime;
-
-            // Central
-            const c = data.central;
-            const badge = document.getElementById('central-badge');
-            const label = document.getElementById('central-label');
-            badge.classList.toggle('online', c.reachable);
-            badge.classList.toggle('offline', !c.reachable);
-            label.textContent = c.reachable ? 'ONLINE' : 'OFFLINE';
-
-            document.getElementById('central-endpoint').textContent = c.host + ':' + c.port;
-            document.getElementById('central-last-success').textContent = c.lastSuccessAt
-                ? fmtTime(c.lastSuccessAt) + ' (' + fmtAge(c.ageMs) + ')'
-                : 'never';
-            document.getElementById('central-response').textContent = c.responseMs != null
-                ? c.responseMs + ' ms'
-                : '—';
-            document.getElementById('central-last-attempt').textContent = c.lastAttemptAt
-                ? fmtTime(c.lastAttemptAt)
-                : '—';
-
-            const errWrap = document.getElementById('central-error-wrap');
-            const errEl = document.getElementById('central-error');
-            if (!c.reachable && c.lastError) {
-                errWrap.style.display = 'block';
-                errEl.textContent = 'Last error: ' + c.lastError;
-            } else {
-                errWrap.style.display = 'none';
-            }
-
-            // Stats bar
-            const online = data.stations.filter(s => s.online);
-            document.getElementById('st-online').textContent   = online.length + ' / ' + data.stations.length;
-            document.getElementById('st-channels').textContent = data.stations.reduce((a, s) => a + (s.channel_count || 0), 0);
-            document.getElementById('st-rec').textContent      = data.stations.filter(s => s.hist_recording).length;
-            document.getElementById('st-users').textContent    = data.stations.reduce((a, s) => a + (s.users || 0), 0);
-
-            // Stations — sort: online first, then by name
-            const tbody = document.getElementById('stations-body');
-            document.getElementById('station-count').textContent = '(' + data.stations.length + ')';
-
-            if (data.stations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty">No collection sites observed yet.</td></tr>';
-                return;
-            }
-
-            const sorted = [...data.stations].sort((a, b) => {
-                if (a.online !== b.online) return a.online ? -1 : 1;
-                return (a.name || '').localeCompare(b.name || '');
-            });
-
-            tbody.innerHTML = sorted.map(s => {
-                const tier = tierLabel(s.tier);
-                const dotCls = s.online ? 'online' : 'offline';
-                const offCls = s.online ? '' : ' offline-row';
-                const op = s.operator_login || '—';
-                const histTag  = s.hist_recording ? '<span class="rec-flag">REC</span>' : '';
-                const chTag    = s.channel_count ? `<span class="ch-count">${s.channel_count}ch</span>` : '';
-                const usersCell = s.users > 0
-                    ? `<span style="color:#ffb866;font-weight:600;">${s.users}</span>`
-                    : s.users;
-                return `<tr class="station-row ${dotCls}" data-id="${escapeHtml(s.station_id)}"
-                            data-name="${escapeHtml(s.name || '')}"
-                            data-op="${escapeHtml(op)}"
-                            data-freq="${escapeHtml(fmtFreqHz(s.center_freq_hz) || '')}"
-                            data-seen="${s.lastSeenAt || 0}">
-                    <td><span class="status-dot ${dotCls}"></span></td>
-                    <td>
-                        <span class="station-name">${escapeHtml(s.name || '(unnamed)')}</span>
-                        ${histTag}${chTag}
-                        <div class="station-id">${escapeHtml(s.station_id)}</div>
-                    </td>
-                    <td><span class="op-cell">${escapeHtml(op)}</span></td>
-                    <td><span class="coord-cell">${fmtCoords(s.lat, s.lon)}</span></td>
-                    <td><span class="tier ${tier.cls}">${tier.name}</span></td>
-                    <td>${usersCell}</td>
-                    <td><span class="freq-cell">${fmtFreqHz(s.center_freq_hz)}</span></td>
-                    <td><span class="sr-cell">${fmtSrHz(s.sample_rate_hz)}</span></td>
-                    <td class="age-cell">${fmtAge(s.ageMs)}</td>
-                </tr>`;
-            }).join('');
-
-            // Wire row clicks → detail modal
-            tbody.querySelectorAll('tr.station-row').forEach(tr => {
-                tr.addEventListener('click', () => openModal(tr.dataset.id));
-            });
-
-            // Re-apply current filter
-            applyFilter();
-        }
-
-        // ── Detail modal ────────────────────────────────────────────────
-        let lastModalStation = null;
-
-        async function openModal(stationId) {
-            lastModalStation = stationId;
-            const bg = document.getElementById('modal-bg');
-            // Initial paint with summary from latest /api/status snapshot
-            const summary = lastStations.find(s => s.station_id === stationId);
-            if (summary) paintModalSummary(summary);
-            document.getElementById('m-channels-wrap').innerHTML =
-                '<div class="empty" style="padding:18px 0;">Loading…</div>';
-            document.getElementById('m-joins-wrap').innerHTML =
-                '<div class="empty" style="padding:18px 0;">Loading…</div>';
-            document.getElementById('m-joins-count').textContent = '';
-            document.getElementById('m-hist-wrap').innerHTML =
-                '<div class="empty" style="padding:18px 0;">Loading…</div>';
-            document.getElementById('m-sched-wrap').innerHTML =
-                '<div class="empty" style="padding:18px 0;">Loading…</div>';
-            document.getElementById('m-sched-count').textContent = '';
-            bg.classList.add('open');
-            // Fetch detailed channel state
-            try {
-                const r = await fetch('/api/station/' + encodeURIComponent(stationId) + '/detail',
-                                      { cache: 'no-store' });
-                if (!r.ok) {
-                    document.getElementById('m-channels-wrap').innerHTML =
-                        '<div class="empty" style="padding:18px 0;">Detail unavailable.</div>';
-                    return;
-                }
-                const det = await r.json();
-                paintModalDetail(det);
-            } catch (e) {
-                document.getElementById('m-channels-wrap').innerHTML =
-                    '<div class="empty" style="padding:18px 0;">Fetch error: ' + escapeHtml(e.message) + '</div>';
-            }
-        }
-
-        function paintModalSummary(s){
-            document.getElementById('m-name').textContent     = s.name || '(unnamed)';
-            document.getElementById('m-id').textContent       = s.station_id;
-            document.getElementById('m-operator').textContent = s.operator_login || '—';
-            document.getElementById('m-cf').textContent       = fmtFreqHz(s.center_freq_hz);
-            document.getElementById('m-sr').textContent       = fmtSrHz(s.sample_rate_hz);
-            document.getElementById('m-coords').textContent   = fmtCoords(s.lat, s.lon);
-            document.getElementById('m-hist').innerHTML       = s.hist_recording
-                ? '<span class="pill on">RECORDING</span>'
-                : '<span class="pill off">idle</span>';
-            document.getElementById('m-chcount').textContent  = (s.channel_count || 0);
-        }
-
-        function tierPill(t){
-            const cls = (t === 1) ? 'tier-1' : (t === 2) ? 'tier-2' : (t === 3) ? 'tier-3' : 'guest';
-            const lbl = (t >= 1 && t <= 3) ? ('T' + t) : '—';
-            return `<span class="pill ${cls}">${lbl}</span>`;
-        }
-        function fmtAbsTime(ms){
-            if (!ms || ms < 1) return '—';
-            const d = new Date(ms);
-            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
-        }
-        function fmtDuration(sec){
-            if (sec == null || sec < 0) return '—';
-            const s = Math.floor(sec);
-            const h = Math.floor(s / 3600);
-            const m = Math.floor((s % 3600) / 60);
-            const r = s % 60;
-            if (h) return h + 'h ' + String(m).padStart(2,'0') + 'm ' + String(r).padStart(2,'0') + 's';
-            if (m) return m + 'm ' + String(r).padStart(2,'0') + 's';
-            return s + 's';
-        }
-        // SchedEntry::Status — fft_viewer.hpp: WAITING=0, ARMED=1, RECORDING=2, DONE=3, FAILED=4
-        const SCHED_STATUS = ['Waiting', 'Armed', 'Recording', 'Done', 'Failed'];
-        function schedStatusPill(st){
-            const lbl = SCHED_STATUS[st] || ('#' + st);
-            let cls = 'off';
-            if (st === 1) cls = 'tier-2';   // Armed (orange)
-            else if (st === 2) cls = 'on';  // Recording (green)
-            else if (st === 3) cls = 'guest'; // Done (grey)
-            else if (st === 4) cls = 'tier-1'; // Failed (red)
-            return `<span class="pill ${cls}">${escapeHtml(lbl)}</span>`;
-        }
-        function avatarInitial(name){
-            const s = (name || '').trim();
-            return s ? s[0].toUpperCase() : '?';
-        }
-
-        function paintModalDetail(det){
-            // Override summary with fresher detail values
-            document.getElementById('m-operator').textContent = det.operator_login || '—';
-            document.getElementById('m-cf').textContent       = fmtFreqHz(det.center_freq_hz);
-            document.getElementById('m-sr').textContent       = fmtSrHz(det.sample_rate_hz);
-            document.getElementById('m-hist').innerHTML       = det.hist_recording
-                ? '<span class="pill on">RECORDING</span>'
-                : '<span class="pill off">idle</span>';
-            document.getElementById('m-chcount').textContent  = det.channels.length;
-
-            // HIST live recording
-            const hwrap = document.getElementById('m-hist-wrap');
-            if (det.hist) {
-                const h = det.hist;
-                const startMs = h.start_utc_unix * 1000;
-                const durSec  = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
-                hwrap.innerHTML = `<div class="kv-grid">
-                    <div><span class="k">Status</span><span class="v"><span class="pill on">RECORDING</span></span></div>
-                    <div><span class="k">File</span><span class="v">${escapeHtml(h.filename || '—')}</span></div>
-                    <div><span class="k">Started</span><span class="v">${escapeHtml(fmtAbsTime(startMs))}</span></div>
-                    <div><span class="k">Elapsed</span><span class="v">${escapeHtml(fmtDuration(durSec))}</span></div>
-                    <div><span class="k">Center Freq</span><span class="v">${fmtFreqHz(h.center_freq_hz)}</span></div>
-                    <div><span class="k">Sample Rate</span><span class="v">${fmtSrHz(h.sample_rate_hz)}</span></div>
-                    <div><span class="k">Row Rate</span><span class="v">${h.row_rate_hz.toFixed(2)} Hz</span></div>
-                    <div><span class="k">FFT Size</span><span class="v">${h.fft_size}</span></div>
-                </div>`;
-            } else {
-                hwrap.innerHTML = '<div class="empty" style="padding:18px 0;">No active waterfall segment.</div>';
-            }
-
-            // Scheduled recordings
-            const scheds = det.scheds || [];
-            const scount = document.getElementById('m-sched-count');
-            const swrap  = document.getElementById('m-sched-wrap');
-            scount.textContent = scheds.length ? '(' + scheds.length + ')' : '';
-            if (!scheds.length) {
-                swrap.innerHTML = '<div class="empty" style="padding:18px 0;">No schedules.</div>';
-            } else {
-                swrap.innerHTML = `<table class="channels"><thead><tr>
-                    <th>Status</th>
-                    <th>Start</th>
-                    <th>Duration</th>
-                    <th>Frequency</th>
-                    <th>Bandwidth</th>
-                    <th>Operator</th>
-                    <th>Target</th>
-                </tr></thead><tbody>` + scheds.map(s => `<tr>
-                    <td>${schedStatusPill(s.status)}</td>
-                    <td>${escapeHtml(fmtAbsTime(s.start_time * 1000))}</td>
-                    <td>${escapeHtml(fmtDuration(s.duration_sec))}</td>
-                    <td>${s.freq_mhz.toFixed(3)} MHz</td>
-                    <td>${s.bw_khz.toFixed(1)} kHz</td>
-                    <td>${escapeHtml(s.operator_name || '—')}</td>
-                    <td>${escapeHtml(s.target || '—')}</td>
-                </tr>`).join('') + '</tbody></table>';
-            }
-
-            // Joined users
-            const joins = det.joins || [];
-            const jcount = document.getElementById('m-joins-count');
-            const jwrap  = document.getElementById('m-joins-wrap');
-            jcount.textContent = joins.length ? '(' + joins.length + ')' : '';
-            if (!joins.length) {
-                jwrap.innerHTML = '<div class="empty" style="padding:18px 0;">No analysts have joined.</div>';
-            } else {
-                jwrap.innerHTML = '<div class="joins-grid">' + joins.map(j => {
-                    const display = j.authed && j.name ? j.name : '(guest)';
-                    return `<div class="join-card">
-                        <div class="avatar">${escapeHtml(avatarInitial(display))}</div>
-                        <div class="who">
-                            <span class="name">${escapeHtml(display)}</span>
-                            <span class="meta">${tierPill(j.tier)}<span>conn ${j.conn_id}</span></span>
-                        </div>
-                    </div>`;
-                }).join('') + '</div>';
-            }
-
-            const wrap = document.getElementById('m-channels-wrap');
-            if (!det.channels.length) {
-                wrap.innerHTML = '<div class="empty" style="padding:18px 0;">No active demodulator channels.</div>';
-                return;
-            }
-            wrap.innerHTML = `<table class="channels"><thead><tr>
-                <th style="width:40px;">#</th>
-                <th>Range (MHz)</th>
-                <th>Mode</th>
-                <th>IQ Rec</th>
-                <th>Audio Rec</th>
-                <th>Demod Run</th>
-                <th>Owner</th>
-            </tr></thead><tbody>` +
-                det.channels.map(c => `<tr>
-                    <td>${c.index}</td>
-                    <td>${c.s_mhz.toFixed(3)} – ${c.e_mhz.toFixed(3)}</td>
-                    <td>${demodBadge(c.mode, c.digital_mode)}</td>
-                    <td>${c.iq_rec_on    ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
-                    <td>${c.audio_rec_on ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
-                    <td>${c.dem_run      ? '<span class="pill on">ON</span>' : '<span class="pill off">off</span>'}</td>
-                    <td>${escapeHtml(c.owner || '—')}</td>
-                </tr>`).join('') + '</tbody></table>';
-        }
-
-        function closeModal(){
-            document.getElementById('modal-bg').classList.remove('open');
-            lastModalStation = null;
-        }
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        function escapeHtml(s) {
-            return String(s).replace(/[&<>"']/g, c => ({
-                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-            }[c]));
-        }
-
-        async function refresh() {
-            try {
-                const r = await fetch('/api/status', { cache: 'no-store' });
-                const data = await r.json();
-                lastFetchAt = Date.now();
-                render(data);
-            } catch (e) {
-                document.getElementById('central-label').textContent = 'WEB ERROR';
-                document.getElementById('central-error-wrap').style.display = 'block';
-                document.getElementById('central-error').textContent = 'Fetch failed: ' + e.message;
-            }
-        }
-
-        function tickCountdown() {
-            if (!lastFetchAt) {
-                document.getElementById('refresh-info').textContent = 'refreshing…';
-                return;
-            }
-            const remain = Math.max(0, REFRESH_MS - (Date.now() - lastFetchAt));
-            document.getElementById('refresh-info').textContent =
-                'next refresh in ' + (remain / 1000).toFixed(1) + 's';
-        }
-
-        // Client-side per-second age tick (no extra fetch needed)
-        function tickAgeCells() {
-            const now = Date.now();
-            document.querySelectorAll('#stations-body tr.station-row').forEach(tr => {
-                const seenAt = parseInt(tr.dataset.seen, 10);
-                if (!seenAt) return;
-                const ageCell = tr.querySelector('.age-cell');
-                if (ageCell) ageCell.textContent = fmtAge(now - seenAt);
-            });
-        }
-
-        refresh();
-        setInterval(refresh, REFRESH_MS);
-        setInterval(tickCountdown, 100);
-        setInterval(tickAgeCells, 1000);
-    </script>
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2,'0');
+        const mm = String(now.getMinutes()).padStart(2,'0');
+        const ss = String(now.getSeconds()).padStart(2,'0');
+        document.getElementById('last-update').textContent = `최종 갱신: ${hh}:${mm}:${ss}`;
+    } catch (e) {
+        const pill = document.getElementById('central-pill');
+        pill.className = 'central-pill err';
+        document.getElementById('central-status').textContent = '서버 응답 없음';
+    }
+}
+poll();
+setInterval(poll, POLL_MS);
+</script>
 </body>
 </html>

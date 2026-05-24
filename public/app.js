@@ -760,17 +760,21 @@ window.__splash = (function setupSplashScene() {
     }
 
     function makeGlow(r, g, b) {
-        const sz = 64;
+        const sz = 128;
         const c = document.createElement('canvas');
         c.width = sz; c.height = sz;
         const ctx = c.getContext('2d');
         const grad = ctx.createRadialGradient(sz/2, sz/2, 0, sz/2, sz/2, sz/2);
-        grad.addColorStop(0,   `rgba(${r},${g},${b},1)`);
-        grad.addColorStop(0.3, `rgba(${r},${g},${b},0.5)`);
-        grad.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+        grad.addColorStop(0.00, `rgba(${r},${g},${b},1.00)`);
+        grad.addColorStop(0.12, `rgba(${r},${g},${b},0.78)`);
+        grad.addColorStop(0.30, `rgba(${r},${g},${b},0.34)`);
+        grad.addColorStop(0.55, `rgba(${r},${g},${b},0.10)`);
+        grad.addColorStop(1.00, `rgba(${r},${g},${b},0.00)`);
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, sz, sz);
-        return new THREE.CanvasTexture(c);
+        const tex = new THREE.CanvasTexture(c);
+        tex.minFilter = THREE.LinearFilter;
+        return tex;
     }
 
     let _prevW = 0, _prevH = 0;
@@ -800,49 +804,71 @@ window.__splash = (function setupSplashScene() {
         window.addEventListener('resize', resize);
         if ('ResizeObserver' in window) new ResizeObserver(resize).observe(cvs);
 
-        // Stars
-        (function() {
-            const geo = new THREE.BufferGeometry();
-            const n = 2200;
-            const pos = new Float32Array(n * 3);
-            for (let i = 0; i < n; i++) {
-                const th = Math.random() * Math.PI * 2;
-                const ph = Math.acos(2 * Math.random() - 1);
-                const r = 28 + Math.random() * 18;
-                pos[i*3]   = r * Math.sin(ph) * Math.cos(th);
-                pos[i*3+1] = r * Math.sin(ph) * Math.sin(th);
-                pos[i*3+2] = r * Math.cos(ph);
-            }
-            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.045, sizeAttenuation: true })));
-        })();
+        // ── Skybox (ported from BE_WE SKY_FRAG: galactic plane + procedural stars)
+        const sky = new THREE.Mesh(
+            new THREE.SphereGeometry(60, 48, 32),
+            new THREE.ShaderMaterial({
+                vertexShader: `varying vec3 vDir;
+                    void main(){ vDir = position;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+                fragmentShader: `varying vec3 vDir;
+                    float hash3(vec3 p){
+                        p = fract(p * vec3(0.3183099, 0.36700, 0.27300) + 0.1);
+                        p *= 17.0;
+                        return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+                    }
+                    void main(){
+                        vec3 d = normalize(vDir);
+                        vec3 gN = normalize(vec3(0.45, 0.78, 0.43));
+                        float ang  = abs(dot(d, gN));
+                        float band = smoothstep(0.55, 0.0, ang);
+                        vec3 base = vec3(0.025, 0.035, 0.075);
+                        vec3 mw   = base + band * vec3(0.06, 0.05, 0.10);
+                        float cn = hash3(floor(d * 14.0));
+                        mw += band * vec3(0.04, 0.03, 0.06) * (cn - 0.4);
+                        vec3 cell = floor(d * 280.0);
+                        float s1 = hash3(cell);
+                        float thr = mix(0.998, 0.991, band);
+                        float star = 0.0;
+                        if (s1 > thr) {
+                            float s2 = hash3(cell + 7.13);
+                            star = (s1 - thr) / (1.0 - thr) * (0.5 + 0.5 * s2);
+                        }
+                        gl_FragColor = vec4(mw + vec3(star) * 0.7, 1.0);
+                    }`,
+                side: THREE.BackSide, depthWrite: false
+            })
+        );
+        sky.renderOrder = -10;
+        scene.add(sky);
 
-        // Globe with rim lighting + directional shading (sun)
+        // ── Globe (ported from BE_WE GLOBE_FRAG: texture + rim atmosphere)
         const R = 1.0;
         const globeMat = new THREE.ShaderMaterial({
             uniforms: { uTex: { value: null }, uHas: { value: 0.0 } },
-            vertexShader: `varying vec2 vUv; varying vec3 vN; varying vec3 vP; varying vec3 vWN;
-                void main(){ vUv=uv;
-                    vN=normalize(normalMatrix*normal);
-                    vWN=normalize(mat3(modelMatrix)*normal);
-                    vP=(modelViewMatrix*vec4(position,1.0)).xyz;
-                    gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-            fragmentShader: `uniform sampler2D uTex; uniform float uHas;
-                varying vec2 vUv; varying vec3 vN; varying vec3 vP; varying vec3 vWN;
+            vertexShader: `varying vec2 vUv; varying vec3 vN;
                 void main(){
-                    vec3 vd=normalize(-vP);
-                    float rim=pow(1.0-max(dot(vd,vN),0.0),2.8);
-                    vec3 sun=normalize(vec3(0.55,0.35,0.75));
-                    float lambert=clamp(dot(vWN,sun),0.0,1.0);
-                    float amb=0.32;
-                    float lit=amb+lambert*0.85;
-                    vec3 base = uHas>0.5 ? texture2D(uTex,vUv).rgb : vec3(0.05,0.12,0.30);
-                    base*=lit;
-                    vec3 rimColor=vec3(0.25,0.50,0.95);
-                    gl_FragColor=vec4(base + rimColor*rim*0.35, 1.0);
+                    vUv = uv;
+                    vN  = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }`,
+            fragmentShader: `uniform sampler2D uTex; uniform float uHas;
+                varying vec2 vUv; varying vec3 vN;
+                void main(){
+                    vec3 N = normalize(vN);
+                    vec3 V = vec3(0.0, 0.0, 1.0);
+                    if (uHas > 0.5) {
+                        vec3 tex = texture2D(uTex, vUv).rgb;
+                        float rim  = 1.0 - abs(dot(N, V));
+                        float atmo = pow(rim, 4.0) * 0.4;
+                        vec3 col   = tex + vec3(0.3, 0.5, 1.0) * atmo;
+                        gl_FragColor = vec4(col, 1.0);
+                    } else {
+                        gl_FragColor = vec4(0.04, 0.10, 0.28, 1.0);
+                    }
                 }`
         });
-        globe = new THREE.Mesh(new THREE.SphereGeometry(R, 96, 72), globeMat);
+        globe = new THREE.Mesh(new THREE.SphereGeometry(R, 128, 96), globeMat);
         scene.add(globe);
         new THREE.TextureLoader().load('assets/earth.jpg', tex => {
             tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -851,34 +877,17 @@ window.__splash = (function setupSplashScene() {
             globeMat.uniforms.uTex.value = tex;
             globeMat.uniforms.uHas.value = 1.0;
         });
-
-        // Atmosphere glow (subtle)
-        atmos = new THREE.Mesh(
-            new THREE.SphereGeometry(R * 1.055, 96, 72),
-            new THREE.ShaderMaterial({
-                vertexShader: `varying vec3 vN; varying vec3 vP;
-                    void main(){ vN=normalize(normalMatrix*normal);
-                    vP=(modelViewMatrix*vec4(position,1.0)).xyz;
-                    gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-                fragmentShader: `varying vec3 vN; varying vec3 vP;
-                    void main(){ vec3 vd=normalize(-vP);
-                    float i=pow(1.0-max(dot(vd,vN),0.0),3.5);
-                    gl_FragColor=vec4(0.30,0.50,0.95,i*0.32); }`,
-                transparent: true, side: THREE.BackSide, depthWrite: false
-            })
-        );
-        scene.add(atmos);
+        atmos = globe; // alias for rotation sync (single-mesh design)
 
         // Initial orientation: Korea (lat 37, lon 127) facing camera
         globe.rotation.y = 2.50;
-        atmos.rotation.y = 2.50;
 
-        // Satellites — 4 orbital layers
+        // Satellites — BE_WE band coloring (LEO red / MEO yellow / GEO blue)
         const layers = [
-            { alt: 1.13, inc:  52, count: 6, speed: 0.55, color: 0x60a5fa, ring: true  },
-            { alt: 1.28, inc:  86, count: 4, speed: 0.40, color: 0xa5b4fc, ring: true  },
-            { alt: 1.55, inc:  20, count: 3, speed: 0.25, color: 0xfbbf24, ring: true  },
-            { alt: 1.95, inc:   8, count: 2, speed: 0.12, color: 0xf472b6, ring: false },
+            { alt: 1.13, inc:  52, count: 8, speed: 0.55, color: 0xff5a5a, ring: true  }, // LEO red
+            { alt: 1.28, inc:  86, count: 6, speed: 0.40, color: 0xff8080, ring: true  }, // SSO pink-red
+            { alt: 1.55, inc:  20, count: 4, speed: 0.25, color: 0xffdc3c, ring: true  }, // MEO yellow
+            { alt: 1.95, inc:   8, count: 3, speed: 0.12, color: 0x78c8ff, ring: false }, // GEO blue
         ];
         layers.forEach(L => {
             const inc = L.inc * Math.PI / 180;

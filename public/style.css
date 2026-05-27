@@ -648,6 +648,8 @@ body {
     font-size: clamp(80px, 14vw, 200px);
     font-weight: 900;
     letter-spacing: clamp(12px, 1.8vw, 28px);
+    font-kerning: none;              /* disable Inter's per-pair kerning so the WE gap matches BE/EW */
+    font-feature-settings: "kern" 0; /* fallback for browsers ignoring font-kerning */
     line-height: 1;
     color: #fff;
     background: linear-gradient(180deg, #ffffff 0%, rgba(180,200,255,0.65) 100%);

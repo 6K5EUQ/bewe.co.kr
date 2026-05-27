@@ -648,8 +648,6 @@ body {
     font-size: clamp(80px, 14vw, 200px);
     font-weight: 900;
     letter-spacing: clamp(12px, 1.8vw, 28px);
-    font-kerning: none;              /* disable Inter's per-pair kerning so the WE gap matches BE/EW */
-    font-feature-settings: "kern" 0; /* fallback for browsers ignoring font-kerning */
     line-height: 1;
     color: #fff;
     background: linear-gradient(180deg, #ffffff 0%, rgba(180,200,255,0.65) 100%);
@@ -2250,10 +2248,12 @@ body {
     animation: splashMove 12s cubic-bezier(0.7, 0, 0.3, 1) infinite;
     will-change: transform;
 }
-.splash-row[data-i="0"] { --x1: -1.95em; --y1: -0.50em; --x2: -2.40em; --y2: -2.00em; }
-.splash-row[data-i="1"] { --x1: -1.00em; --y1: -0.50em; --x2: -2.40em; --y2: -1.00em; }
-.splash-row[data-i="2"] { --x1: -0.05em; --y1: -0.50em; --x2: -2.40em; --y2:  0.00em; }
-.splash-row[data-i="3"] { --x1:  1.10em; --y1: -0.50em; --x2: -2.40em; --y2:  1.00em; }
+/* --x1 = assembled "BEWE" x-offsets, measured for equal letter gaps (~0.31em);
+   W is the widest glyph (1.08em) so its slot is spaced accordingly. --x2/--y2 = expanded list state. */
+.splash-row[data-i="0"] { --x1: -2.071em; --y1: -0.50em; --x2: -2.40em; --y2: -2.00em; }
+.splash-row[data-i="1"] { --x1: -1.093em; --y1: -0.50em; --x2: -2.40em; --y2: -1.00em; }
+.splash-row[data-i="2"] { --x1: -0.171em; --y1: -0.50em; --x2: -2.40em; --y2:  0.00em; }
+.splash-row[data-i="3"] { --x1:  1.221em; --y1: -0.50em; --x2: -2.40em; --y2:  1.00em; }
 .splash-row .letter {
     display: inline-block;
     font-weight: 900;

@@ -263,6 +263,140 @@ body {
     background: rgba(255,255,255,0.1);
 }
 
+/* ── News Section ────────────────────────────────────────────────────────── */
+.news-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 56px 24px 48px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.news-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+.news-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(96,165,250,0.7);
+    margin-bottom: 10px;
+}
+.news-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.3px;
+}
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+@media (max-width: 860px) {
+    .news-grid { grid-template-columns: 1fr; }
+}
+.news-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.25s, background 0.25s;
+}
+.news-card:hover {
+    border-color: rgba(96,165,250,0.25);
+    background: rgba(255,255,255,0.05);
+}
+.news-card-img {
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(255,255,255,0.04);
+}
+.news-card-body {
+    padding: 18px 20px 20px;
+}
+.news-card-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin-bottom: 8px;
+}
+.news-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.45;
+    margin-bottom: 8px;
+}
+.news-card-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(148,163,184,0.7);
+    margin-bottom: 12px;
+}
+.news-card-src {
+    font-size: 11px;
+    color: rgba(148,163,184,0.4);
+    letter-spacing: 0.3px;
+}
+
+/* ── Contact Section ─────────────────────────────────────────────────────── */
+.contact-section {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 56px 24px 64px;
+    text-align: center;
+}
+.contact-inner {
+    max-width: 480px;
+    margin: 0 auto;
+}
+.contact-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 0.3px;
+}
+.contact-desc {
+    font-size: 14px;
+    color: rgba(148,163,184,0.65);
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+.contact-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: rgba(59,130,246,0.18);
+    border: 1px solid rgba(59,130,246,0.45);
+    border-radius: 8px;
+    color: #93c5fd;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+.contact-btn:hover {
+    background: rgba(59,130,246,0.32);
+    border-color: rgba(59,130,246,0.7);
+    color: #bfdbfe;
+}
+.contact-ops {
+    margin-top: 20px;
+}
+.contact-ops-link {
+    font-size: 13px;
+    color: rgba(148,163,184,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.contact-ops-link:hover {
+    color: rgba(148,163,184,0.85);
+}
+
 /* ── Landing Footer ──────────────────────────────────────────────────────── */
 .landing-footer {
     padding: 20px 48px;

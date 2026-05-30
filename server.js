@@ -460,6 +460,97 @@ async function fetchTle(group) {
     return sats;
 }
 
+// ── Radiosonde (auto_rx on DGS-2) ───────────────────────────────────────────
+// auto_rx runs on DGS-2's RTL-SDR and exposes a JSON API on :5000. We poll it
+// over Tailscale and re-serve a compact status for the dashboard.
+const SONDE_URL      = (process.env.SONDE_URL || 'http://100.126.69.82:5000').replace(/\/+$/, '');
+const SONDE_POLL_MS  = 6000;
+const SONDE_STALE_MS = 120000;   // drop sondes not updated within this window (landed/lost)
+
+let cachedSonde = {
+    reachable: false, version: null, sdr_type: null,
+    scan_min_mhz: null, scan_max_mhz: null,
+    scanning: false, decoding: false, sondes: [], lastUpdate: null,
+};
+
+function sondeFetch(pathname) {
+    return fetch(SONDE_URL + pathname, { signal: AbortSignal.timeout(5000) })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+
+async function fetchSonde() {
+    const [task, telem, config, version] = await Promise.allSettled([
+        sondeFetch('/get_task_list'),
+        sondeFetch('/get_telemetry_archive'),
+        sondeFetch('/get_config'),
+        sondeFetch('/get_version'),
+    ]);
+
+    // task_list reachability is our liveness signal.
+    if (task.status !== 'fulfilled') {
+        cachedSonde = { ...cachedSonde, reachable: false };
+        return;
+    }
+
+    const taskList = task.value || {};
+    let scanning = false;
+    for (const k of Object.keys(taskList)) {
+        const t = String((taskList[k] && taskList[k].task) || '');
+        if (/scan/i.test(t)) scanning = true;
+    }
+
+    const now = Date.now();
+    const sondes = [];
+    if (telem.status === 'fulfilled' && telem.value) {
+        for (const serial of Object.keys(telem.value)) {
+            const entry = telem.value[serial];
+            const lt = entry && entry.latest_telem;
+            if (!lt) continue;
+            const ageMs = now - (entry.timestamp ? entry.timestamp * 1000 : now);
+            if (ageMs > SONDE_STALE_MS) continue;
+            const num = (v) => typeof v === 'number' && isFinite(v) ? v : null;
+            sondes.push({
+                serial,
+                type:    lt.type || '',
+                subtype: lt.subtype || '',
+                freq:    lt.freq || '',
+                alt:   num(lt.alt),
+                vel_v: num(lt.vel_v),
+                vel_h: num(lt.vel_h),
+                lat:   num(lt.lat),
+                lon:   num(lt.lon),
+                sats:  num(lt.sats),
+                temp:  num(lt.temp),
+                frame: lt.frame ?? null,
+                ageMs,
+            });
+        }
+        sondes.sort((a, b) => a.ageMs - b.ageMs);
+    }
+
+    const cfg = config.status === 'fulfilled' ? config.value : null;
+    cachedSonde = {
+        reachable: true,
+        version:      version.status === 'fulfilled' ? (version.value?.current || null) : cachedSonde.version,
+        sdr_type:     cfg?.sdr_type ?? cachedSonde.sdr_type,
+        scan_min_mhz: cfg?.min_freq ?? cachedSonde.scan_min_mhz,
+        scan_max_mhz: cfg?.max_freq ?? cachedSonde.scan_max_mhz,
+        scanning,
+        decoding: sondes.length > 0,
+        sondes,
+        lastUpdate: now,
+    };
+}
+
+async function sondePollLoop() {
+    while (true) {
+        try { await fetchSonde(); }
+        catch (e) { cachedSonde = { ...cachedSonde, reachable: false }; }
+        await new Promise(r => setTimeout(r, SONDE_POLL_MS));
+    }
+}
+sondePollLoop();
+
 // ── Station notes (persisted across restarts) ──────────────────────────────
 const fs = require('fs');
 const NOTES_FILE = path.join(__dirname, 'data', 'station_notes.json');
@@ -532,6 +623,10 @@ app.get('/api/stations', (req, res) => {
 
 app.get('/api/aircraft', (req, res) => {
     res.json(cachedAircraft);
+});
+
+app.get('/api/sonde', (req, res) => {
+    res.json(cachedSonde);
 });
 
 app.get('/api/status', (req, res) => {

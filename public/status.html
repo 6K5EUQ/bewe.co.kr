@@ -366,6 +366,94 @@
             font-variant-numeric: tabular-nums;
         }
 
+        /* ── Radiosonde ────────────────────────────────────────────── */
+        .sonde-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 14px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+        }
+        .sonde-bar.offline { opacity: 0.6; }
+        .sonde-bar-id { display: flex; align-items: center; gap: 12px; }
+        .sonde-recv-name {
+            font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.4px;
+        }
+        .sonde-recv-meta {
+            font-size: 10.5px; color: var(--text-faint);
+            letter-spacing: 0.6px; text-transform: uppercase; margin-top: 3px;
+        }
+        .sonde-badge {
+            font-size: 10px; font-weight: 700; letter-spacing: 1.3px;
+            text-transform: uppercase; padding: 6px 13px; border-radius: 999px;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .sonde-badge.dec  { background: var(--ok-bg);     color: var(--ok);     border: 1px solid rgba(74,222,128,0.30); }
+        .sonde-badge.scan { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(96,165,250,0.30); }
+        .sonde-badge.idle { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
+        .sonde-badge.off  { background: var(--err-bg);    color: var(--err);    border: 1px solid rgba(248,113,113,0.30); }
+
+        .sonde-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 14px;
+        }
+        .sonde-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 18px;
+            position: relative; overflow: hidden;
+        }
+        .sonde-card::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            background: var(--ok); opacity: 0.7;
+        }
+        .sonde-card-head {
+            display: flex; align-items: baseline; justify-content: space-between;
+            gap: 8px; margin-bottom: 12px;
+        }
+        .sonde-type {
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--accent);
+            background: var(--accent-dim); padding: 3px 8px; border-radius: 4px;
+        }
+        .sonde-serial {
+            font-size: 12px; font-weight: 600; color: var(--text-dim);
+            font-variant-numeric: tabular-nums;
+        }
+        .sonde-alt {
+            font-size: 30px; font-weight: 800; color: #fff; line-height: 1;
+            letter-spacing: -0.5px; font-variant-numeric: tabular-nums;
+            margin-bottom: 14px;
+        }
+        .sonde-alt .u {
+            font-size: 12px; font-weight: 500; color: var(--text-dim);
+            margin-left: 6px; letter-spacing: 0.5px;
+        }
+        .sonde-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; margin-bottom: 12px;
+        }
+        .sonde-stats .sl {
+            font-size: 9px; font-weight: 700; letter-spacing: 1px;
+            color: var(--text-faint); text-transform: uppercase; margin-bottom: 3px;
+        }
+        .sonde-stats .sv {
+            font-size: 14px; font-weight: 700; color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+        .sonde-stats .sv.asc  { color: var(--ok);   }
+        .sonde-stats .sv.desc { color: var(--warn); }
+        .sonde-foot {
+            display: flex; justify-content: space-between; gap: 8px;
+            font-size: 10.5px; color: var(--text-faint);
+            font-variant-numeric: tabular-nums;
+            padding-top: 10px; border-top: 1px solid var(--border);
+        }
+
         /* ── Footer ────────────────────────────────────────────────── */
         .footer {
             margin-top: 38px;
@@ -414,6 +502,13 @@
 </div>
 <div class="stations" id="stations"></div>
 
+<!-- Radiosonde -->
+<div class="section-title">
+    <span>Radiosonde Tracking</span>
+    <span class="count" id="sonde-count">–</span>
+</div>
+<div id="sonde-panel"></div>
+
 <div class="footer">
     <span class="live"><span class="pill-dot" style="color:var(--ok);background:var(--ok)"></span> LIVE · auto-refresh every 3s</span>
     <span>BEWE Operations Console · 2026</span>
@@ -422,6 +517,7 @@
 <script>
 const POLL_MS = 3000;
 const DETAIL_POLL_MS = 5000;
+const SONDE_POLL_MS = 6000;
 const expanded = new Set();
 const detailCache = new Map();
 const detailTimers = new Map();
@@ -790,6 +886,98 @@ async function fetchNotes() {
     } catch (e) { /* silent */ }
 }
 
+// ── Radiosonde ──────────────────────────────────────────────────────
+function renderSonde(d) {
+    const panel = document.getElementById('sonde-panel');
+    const countEl = document.getElementById('sonde-count');
+    if (!panel) return;
+
+    if (!d || !d.reachable) {
+        if (countEl) countEl.textContent = 'receiver offline';
+        panel.innerHTML = `
+            <div class="sonde-bar offline">
+                <div class="sonde-bar-id">
+                    <span class="status-led led-off"></span>
+                    <div>
+                        <span class="sonde-recv-name">DGS-2 Receiver</span>
+                        <div class="sonde-recv-meta">Radiosonde decoder · auto_rx</div>
+                    </div>
+                </div>
+                <span class="sonde-badge off">Offline</span>
+            </div>
+            <div class="detail-empty" style="padding:8px 2px;">auto_rx is unreachable — the sonde receiver on DGS-2 may be down.</div>`;
+        return;
+    }
+
+    const sondes = d.sondes || [];
+    const n = sondes.length;
+    if (countEl) countEl.textContent = n > 0 ? (n + ' in range') : 'standby';
+
+    const range = (d.scan_min_mhz && d.scan_max_mhz)
+        ? (Number(d.scan_min_mhz).toFixed(2) + '–' + Number(d.scan_max_mhz).toFixed(2) + ' MHz')
+        : '400–406 MHz';
+    const sdr = d.sdr_type === 'RTLSDR' ? 'RTL-SDR' : (d.sdr_type || 'RTL-SDR');
+    const ver = d.version ? (' · auto_rx ' + d.version) : '';
+
+    let state, scls;
+    if (n > 0)           { state = 'Decoding'; scls = 'dec'; }
+    else if (d.scanning) { state = 'Scanning'; scls = 'scan'; }
+    else                 { state = 'Idle';     scls = 'idle'; }
+
+    let html = `
+        <div class="sonde-bar">
+            <div class="sonde-bar-id">
+                <span class="status-led led-on"></span>
+                <div>
+                    <span class="sonde-recv-name">DGS-2 Receiver</span>
+                    <div class="sonde-recv-meta">${escapeHtml(sdr)} · scan ${range}${ver}</div>
+                </div>
+            </div>
+            <span class="sonde-badge ${scls}">${state}</span>
+        </div>`;
+
+    if (n === 0) {
+        html += `<div class="detail-empty" style="padding:8px 2px;">No radiosonde in range — scanning the ${range} band for new launches.</div>`;
+    } else {
+        html += '<div class="sonde-grid">' + sondes.map(s => {
+            const climb = s.vel_v;
+            const climbCls = climb == null ? '' : (climb >= 0 ? 'asc' : 'desc');
+            const climbTxt = climb == null ? '—' : ((climb >= 0 ? '+' : '') + climb.toFixed(1) + ' m/s');
+            const altTxt = s.alt == null ? '—' : Math.round(s.alt).toLocaleString('en-US') + ' m';
+            const pos = (s.lat != null && s.lon != null) ? fmtCoord(s.lat, s.lon) : '—';
+            const label = (s.type || 'Sonde') + (s.subtype ? (' ' + s.subtype) : '');
+            return `
+            <div class="sonde-card">
+                <div class="sonde-card-head">
+                    <span class="sonde-type">${escapeHtml(label)}</span>
+                    <span class="sonde-serial">${escapeHtml(s.serial)}</span>
+                </div>
+                <div class="sonde-alt">${altTxt}<span class="u">altitude</span></div>
+                <div class="sonde-stats">
+                    <div><div class="sl">Climb</div><div class="sv ${climbCls}">${climbTxt}</div></div>
+                    <div><div class="sl">Freq</div><div class="sv" style="font-size:12px;">${escapeHtml(s.freq || '—')}</div></div>
+                    <div><div class="sl">Sats</div><div class="sv">${s.sats == null ? '—' : s.sats}</div></div>
+                </div>
+                <div class="sonde-foot">
+                    <span>${pos}</span>
+                    <span>${fmtAge(s.ageMs)}</span>
+                </div>
+            </div>`;
+        }).join('') + '</div>';
+    }
+    panel.innerHTML = html;
+}
+
+async function pollSonde() {
+    try {
+        const r = await fetch('/api/sonde');
+        if (!r.ok) throw new Error('sonde unreachable');
+        renderSonde(await r.json());
+    } catch (e) {
+        renderSonde(null);
+    }
+}
+
 async function poll() {
     try {
         const r = await fetch('/api/status');
@@ -824,6 +1012,8 @@ async function poll() {
     await fetchNotes();
     await poll();
     setInterval(poll, POLL_MS);
+    pollSonde();
+    setInterval(pollSonde, SONDE_POLL_MS);
 })();
 </script>
 </body>

@@ -917,6 +917,21 @@
         <div class="popup-coords" id="popup-coords"></div>
         <div class="popup-info" id="popup-users"></div>
         <div class="popup-tier" id="popup-tier"></div>
+        <div id="popup-v2" class="popup-v2" style="display:none;">
+            <div class="popup-v2-row">
+                <span class="popup-v2-label">Freq</span>
+                <span class="popup-v2-val" id="popup-freq">—</span>
+            </div>
+            <div class="popup-v2-row">
+                <span class="popup-v2-label">SR</span>
+                <span class="popup-v2-val" id="popup-sr">—</span>
+            </div>
+            <div class="popup-v2-row">
+                <span class="popup-v2-label">Ch</span>
+                <span class="popup-v2-val" id="popup-ch">—</span>
+                <span class="popup-rec" id="popup-rec" style="display:none;">REC</span>
+            </div>
+        </div>
         <div class="popup-close" onclick="closePopup()">&times;</div>
     </div>
 
@@ -934,6 +949,14 @@
 
     <!-- Station count -->
     <div class="station-count globe-ui" style="display:none;" id="station-count">0 Stations Online</div>
+
+    <!-- Satellite mode toggle -->
+    <div class="sat-toggle globe-ui" style="display:none;">
+        <span class="sat-toggle-label">SAT</span>
+        <button class="sat-btn" data-mode="off" onclick="setSatMode('off')">OFF</button>
+        <button class="sat-btn active" data-mode="visual" onclick="setSatMode('visual')">VISUAL</button>
+        <button class="sat-btn" data-mode="starlink" onclick="setSatMode('starlink')">STARLINK</button>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="app.js"></script>

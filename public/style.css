@@ -76,6 +76,40 @@ body {
     color: #fff;
 }
 
+/* ── Language toggle (nav) ───────────────────────────────────────────────── */
+.nav-right-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+.lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.lang-btn-main {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.22);
+    padding: 1px 4px;
+    border-radius: 3px;
+    transition: color 0.15s;
+}
+.lang-btn-main.active { color: rgba(255,255,255,0.55); }
+.lang-btn-main:hover  { color: rgba(255,255,255,0.42); }
+.lang-sep-main { color: rgba(255,255,255,0.12); font-size: 10px; }
+
+/* ── i18n visibility ─────────────────────────────────────────────────────── */
+.i18n-kr { display: none; }
+body.lang-kr .i18n-en { display: none; }
+body.lang-kr .i18n-kr { display: revert; }
+
 /* ── Landing scroll container ────────────────────────────────────────────── */
 #landing {
     overflow-y: auto;

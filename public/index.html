@@ -35,27 +35,43 @@
                 <a href="#" class="nav-link" id="nav-about">About</a>
                 <a href="/status.html" class="nav-link" id="nav-status">Operations</a>
                 <a href="/guide.html" class="nav-link">Guide</a>
-                <a href="#" class="nav-link nav-link-accent" id="nav-discover">Discover</a>
+                <div class="nav-right-group">
+                    <a href="#" class="nav-link nav-link-accent" id="nav-discover">Discover</a>
+                    <div class="lang-switch">
+                        <button class="lang-btn-main active" data-lang="en" onclick="setLang('en')">EN</button>
+                        <span class="lang-sep-main">/</span>
+                        <button class="lang-btn-main" data-lang="kr" onclick="setLang('kr')">KR</button>
+                    </div>
+                </div>
             </div>
         </nav>
 
         <!-- Hero -->
         <div class="hero">
-            <div class="hero-badge">Distributed SIGINT Platform</div>
-            <p class="hero-subtitle">Behind Everyone We Hear Everything</p>
-            <p class="hero-desc">
+            <div class="hero-badge">
+                <span class="i18n-en">Distributed SIGINT Platform</span>
+                <span class="i18n-kr">분산 SIGINT 플랫폼</span>
+            </div>
+            <p class="hero-subtitle">
+                <span class="i18n-en">Behind Everyone We Hear Everything</span>
+                <span class="i18n-kr">모두의 뒤에서, 모든 것을 듣는다</span>
+            </p>
+            <p class="hero-desc i18n-en">
                 A multi-site signals intelligence system for continuous wideband
                 RF surveillance — persistent waterfall archive, cross-station
                 emitter library, and forensic IQ workbench, all driven from a
                 single operator workstation.
             </p>
+            <p class="hero-desc i18n-kr">
+                다수의 SDR 수신소를 단일 운용 워크스테이션으로 통합하는 광대역 RF 감시 시스템 —
+                영구 워터폴 아카이브, 기지국 간 전파원 라이브러리,
+                포렌식 IQ 분석 환경을 모두 하나의 콘솔에서 제공합니다.
+            </p>
             <div class="hero-actions">
-                <button class="btn-primary" id="btn-discover">Discover Everything</button>
-            </div>
-            <div class="lang-switch">
-                <button class="lang-btn-main active" data-lang="en" onclick="setLang('en')">EN</button>
-                <span class="lang-sep-main">/</span>
-                <button class="lang-btn-main" data-lang="kr" onclick="setLang('kr')">KR</button>
+                <button class="btn-primary" id="btn-discover">
+                    <span class="i18n-en">Discover Everything</span>
+                    <span class="i18n-kr">시작하기</span>
+                </button>
             </div>
         </div>
 
@@ -71,8 +87,12 @@
                         <line x1="18" y1="12" x2="22" y2="12"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Distributed Collection Network</h3>
-                <p class="feature-desc">Receiver sites at multiple regional locations operate under a single workstation. Up to ten concurrent demodulator channels per site; AM, FM, AIS, ADS-B, and digital protocol auto-decode with no per-site configuration.</p>
+                <h3 class="feature-title">
+                    <span class="i18n-en">Distributed Collection Network</span>
+                    <span class="i18n-kr">분산 수집 네트워크</span>
+                </h3>
+                <p class="feature-desc i18n-en">Receiver sites at multiple regional locations operate under a single workstation. Up to ten concurrent demodulator channels per site; AM, FM, AIS, ADS-B, and digital protocol auto-decode with no per-site configuration.</p>
+                <p class="feature-desc i18n-kr">다수 지역의 수신 기지국을 단일 워크스테이션으로 통합 운용. 기지국당 최대 10채널 동시 복조; AM, FM, AIS, ADS-B 및 디지털 프로토콜 설정 없이 자동 디코드.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
@@ -82,8 +102,12 @@
                         <path d="M17 6l-2 2M7 18l2-2"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Live Orbital &amp; Aircraft Overlay</h3>
-                <p class="feature-desc">TLE-driven real-time tracking across LEO, MEO, and GEO bands — click a satellite to trace its full orbit. OpenSky ADS-B aircraft positions overlaid on the same globe for an integrated air-and-space picture.</p>
+                <h3 class="feature-title">
+                    <span class="i18n-en">Live Orbital &amp; Aircraft Overlay</span>
+                    <span class="i18n-kr">실시간 궤도 및 항공기 오버레이</span>
+                </h3>
+                <p class="feature-desc i18n-en">TLE-driven real-time tracking across LEO, MEO, and GEO bands — click a satellite to trace its full orbit. OpenSky ADS-B aircraft positions overlaid on the same globe for an integrated air-and-space picture.</p>
+                <p class="feature-desc i18n-kr">LEO, MEO, GEO 대역 TLE 기반 실시간 위성 추적 — 클릭 한 번으로 전체 궤도 경로 시각화. OpenSky ADS-B 항공기 위치를 동일 지구본에 통합 표시.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
@@ -93,8 +117,12 @@
                         <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Persistent Waterfall Archive</h3>
-                <p class="feature-desc">Every spectrum row from every site committed to a permanent record. Scroll back hours, days, or months from any analyst workstation; mission-coded IQ and audio archives ready for offline forensic reanalysis.</p>
+                <h3 class="feature-title">
+                    <span class="i18n-en">Persistent Waterfall Archive</span>
+                    <span class="i18n-kr">영구 워터폴 아카이브</span>
+                </h3>
+                <p class="feature-desc i18n-en">Every spectrum row from every site committed to a permanent record. Scroll back hours, days, or months from any analyst workstation; mission-coded IQ and audio archives ready for offline forensic reanalysis.</p>
+                <p class="feature-desc i18n-kr">모든 기지국의 모든 스펙트럼 행을 영구 기록. 어느 분석관 워크스테이션에서든 수 시간·일·월 전으로 스크롤; 미션 코드 기반 IQ 및 오디오 아카이브 오프라인 포렌식 재분석 지원.</p>
             </div>
         </div>
 
@@ -102,28 +130,35 @@
         <div class="stats-bar">
             <div class="hero-stat">
                 <span class="hero-stat-value" id="landing-station-count">0</span>
-                <span class="hero-stat-label">Sites Online</span>
+                <span class="hero-stat-label"><span class="i18n-en">Sites Online</span><span class="i18n-kr">온라인 기지국</span></span>
             </div>
             <div class="hero-stat-divider"></div>
             <div class="hero-stat">
                 <span class="hero-stat-value">24/7</span>
-                <span class="hero-stat-label">Monitoring</span>
+                <span class="hero-stat-label"><span class="i18n-en">Monitoring</span><span class="i18n-kr">상시 감시</span></span>
             </div>
             <div class="hero-stat-divider"></div>
             <div class="hero-stat">
                 <span class="hero-stat-value">Global</span>
-                <span class="hero-stat-label">Coverage</span>
+                <span class="hero-stat-label"><span class="i18n-en">Coverage</span><span class="i18n-kr">커버리지</span></span>
             </div>
         </div>
 
         <!-- Contact / Inquiry -->
         <div class="contact-section">
             <div class="contact-inner">
-                <h2 class="contact-title">도입 및 협력 문의</h2>
-                <p class="contact-desc">국방 조달 · 기술 협력 · 시스템 시연 — 문의는 이메일로 접수합니다.</p>
+                <h2 class="contact-title">
+                    <span class="i18n-en">Inquiries &amp; Partnerships</span>
+                    <span class="i18n-kr">도입 및 협력 문의</span>
+                </h2>
+                <p class="contact-desc i18n-en">Defense procurement · technical collaboration · system demonstration — contact us by email.</p>
+                <p class="contact-desc i18n-kr">국방 조달 · 기술 협력 · 시스템 시연 — 문의는 이메일로 접수합니다.</p>
                 <a class="contact-btn" href="mailto:contact@bewe.co.kr">contact@bewe.co.kr</a>
                 <div class="contact-ops">
-                    <a href="/status.html" class="contact-ops-link">실시간 운용 현황 보기 &rarr;</a>
+                    <a href="/status.html" class="contact-ops-link">
+                        <span class="i18n-en">View live operations &rarr;</span>
+                        <span class="i18n-kr">실시간 운용 현황 보기 &rarr;</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -921,11 +956,13 @@
     <script>
       function setLang(lang) {
         localStorage.setItem('bewe_lang', lang);
+        document.body.classList.toggle('lang-kr', lang === 'kr');
         document.querySelectorAll('[data-lang]').forEach(b =>
           b.classList.toggle('active', b.dataset.lang === lang));
       }
       (function() {
         const lang = localStorage.getItem('bewe_lang') || 'en';
+        document.body.classList.toggle('lang-kr', lang === 'kr');
         document.querySelectorAll('[data-lang]').forEach(b =>
           b.classList.toggle('active', b.dataset.lang === lang));
       })();

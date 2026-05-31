@@ -16,14 +16,9 @@
 <header class="g-header">
   <a href="/" class="g-logo">BEWE</a>
   <nav class="g-nav">
-    <a href="/#nav-about">About</a>
+    <a href="/">Home</a>
     <a href="/status.html">Operations</a>
     <a href="/guide.html" class="active">Guide</a>
-    <div class="g-lang-toggle">
-      <button class="g-lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
-      <span class="g-lang-sep">/</span>
-      <button class="g-lang-btn" data-lang="kr" onclick="setLang('kr')">KR</button>
-    </div>
   </nav>
 </header>
 
@@ -1102,20 +1097,10 @@
 </div>
 
 <script>
-  // ── i18n ─────────────────────────────────────────────────
-  function setLang(lang) {
-    localStorage.setItem('bewe_lang', lang);
-    applyLang(lang);
-  }
-
-  function applyLang(lang) {
-    document.body.classList.toggle('lang-kr', lang === 'kr');
-    document.querySelectorAll('[data-lang]').forEach(b =>
-      b.classList.toggle('active', b.dataset.lang === lang));
-  }
-
+  // ── i18n: apply stored language preference (toggle lives on main page) ───
   (function() {
-    applyLang(localStorage.getItem('bewe_lang') || 'en');
+    const lang = localStorage.getItem('bewe_lang') || 'en';
+    document.body.classList.toggle('lang-kr', lang === 'kr');
   })();
 
   // ── Tab switching ─────────────────────────────────────────

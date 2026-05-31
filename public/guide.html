@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEWE Guide</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────── -->
+<header class="g-header">
+  <a href="/" class="g-logo">BEWE</a>
+  <nav class="g-nav">
+    <a href="/#nav-about">About</a>
+    <a href="/status.html">Operations</a>
+    <a href="/guide.html" class="active">Guide</a>
+  </nav>
+</header>
+
+<!-- ── Layout ──────────────────────────────────────────────── -->
+<div class="g-layout">
+
+  <!-- Sidebar -->
+  <nav class="g-sidebar">
+    <div class="g-sidebar-label">사용자 가이드</div>
+    <button class="g-tab-btn active" data-tab="intro">
+      <span class="g-tab-icon">◎</span> BEWE란?
+    </button>
+    <button class="g-tab-btn" data-tab="globe">
+      <span class="g-tab-icon">◑</span> 지구본 보기
+    </button>
+    <button class="g-tab-btn" data-tab="stations">
+      <span class="g-tab-icon">▲</span> 기지국 정보
+    </button>
+    <button class="g-tab-btn" data-tab="satellites">
+      <span class="g-tab-icon">✦</span> 위성 추적
+    </button>
+    <button class="g-tab-btn" data-tab="monitoring">
+      <span class="g-tab-icon">▣</span> 모니터링
+    </button>
+  </nav>
+
+  <!-- Content -->
+  <main class="g-content">
+
+    <!-- ─── Tab 1: BEWE란? ─────────────────────────────────── -->
+    <section class="g-panel active" data-panel="intro">
+      <h1>BEWE란?</h1>
+      <p class="subtitle">
+        여러 지역의 SDR 수신소를 하나의 중앙 서버로 연결하는 분산 전파 감시 플랫폼입니다.
+        이 페이지는 처음 사용하는 분들을 위한 단계별 안내서입니다.
+      </p>
+
+      <h2>시스템 구성</h2>
+      <p>각 기지국(DGS)은 소프트웨어 정의 무선(SDR) 수신기를 운용하며, 중계 서버를 통해 이 웹페이지로 실시간 정보를 전달합니다.</p>
+
+      <div class="g-arch">
+<span class="ok">[기지국 DGS-1]</span> ──┐<br>
+<span class="ok">[기지국 DGS-2]</span> ──┤── <span class="hl">Central Relay</span> (port 7700) ──▶ <span class="hl">bewe.co.kr</span><br>
+<span class="ok">[기지국 DGS-3]</span> ──┤<br>
+<span class="ok">[기지국 DGS-4]</span> ──┘
+      </div>
+
+      <p>
+        기지국은 한국 각지에 설치된 물리적 수신 장비입니다. 중계 서버는 모든 기지국의 상태와 채널 정보를 집계하고,
+        이 웹페이지는 그 데이터를 실시간으로 표시합니다.
+      </p>
+
+      <h2>주요 기능</h2>
+      <div class="g-cards">
+        <div class="g-card">
+          <div class="g-card-icon">📡</div>
+          <div class="g-card-title">다채널 SDR 수신</div>
+          <div class="g-card-desc">AM · FM · DMR · AIS · ADS-B 자동 복조. 기지국당 최대 10채널 동시 운용.</div>
+        </div>
+        <div class="g-card">
+          <div class="g-card-icon">🛰</div>
+          <div class="g-card-title">실시간 위성 추적</div>
+          <div class="g-card-desc">TLE 기반 Kepler 궤도 전파. LEO/MEO/GEO 고도별 색상 구분, 궤도 경로 시각화.</div>
+        </div>
+        <div class="g-card">
+          <div class="g-card-icon">🗂</div>
+          <div class="g-card-title">IQ 히스토리 녹음</div>
+          <div class="g-card-desc">원시 IQ 스트림 장기 보관. 채널별 오디오 별도 녹음. 후처리 분석 지원.</div>
+        </div>
+      </div>
+
+      <div class="g-callout">
+        <span class="g-callout-icon">ℹ</span>
+        <span>이 웹페이지는 <strong>읽기 전용 모니터</strong>입니다. 기지국 제어, 채널 설정, 녹음 관리는 BE_WE 운용 소프트웨어에서 수행합니다.</span>
+      </div>
+
+      <h2>탐색 방법</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>지구본 보기</strong>
+            <p>메인 페이지 "Discover" 클릭 → 기지국 위치와 위성을 3D 지구본에서 확인</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <strong>기지국 정보</strong>
+            <p>지구본의 녹색 점 클릭 → 주파수, 채널 수, 녹음 상태 등 상세 정보</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <strong>모니터링 페이지</strong>
+            <p>상단 "Operations" 클릭 → 전체 기지국 상태 테이블과 채널 목록</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ─── Tab 2: 지구본 보기 ─────────────────────────────── -->
+    <section class="g-panel" data-panel="globe">
+      <h1>지구본 보기</h1>
+      <p class="subtitle">기지국과 위성의 실시간 위치를 3D 지구본에서 확인하는 방법입니다.</p>
+
+      <h2>진입 방법</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>메인 페이지 열기</strong>
+            <p><a href="/" style="color:var(--accent)">bewe.co.kr</a> 접속 후 우측 상단 <strong>"Discover"</strong> 버튼 클릭 — 또는 페이지 하단 <strong>"DISCOVER THE GLOBE"</strong> 버튼 클릭</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <strong>지구본이 나타납니다</strong>
+            <p>어두운 배경에 지구 텍스처와 기지국 마커(녹색 점)가 표시됩니다.</p>
+          </div>
+        </li>
+      </ul>
+
+      <h2>기본 조작</h2>
+      <table class="g-table">
+        <thead><tr><th>동작</th><th>마우스/터치</th><th>효과</th></tr></thead>
+        <tbody>
+          <tr><td>회전</td><td>드래그</td><td>지구 회전 (원하는 지역으로 이동)</td></tr>
+          <tr><td>줌 인/아웃</td><td>스크롤 휠</td><td>가까이/멀리 보기</td></tr>
+          <tr><td>터치 회전</td><td>한 손가락 드래그</td><td>지구 회전</td></tr>
+          <tr><td>터치 줌</td><td>두 손가락 핀치</td><td>확대/축소</td></tr>
+        </tbody>
+      </table>
+
+      <h2>화면 요소</h2>
+      <img src="assets/globe_sat_soi.png" alt="지구본 화면" class="g-screenshot">
+      <p class="g-screenshot-cap">지구본 보기 — 기지국 마커(녹색)와 위성(컬러 점) 표시 예시</p>
+
+      <table class="g-table">
+        <thead><tr><th>요소</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>녹색 점 (빛나는)</td><td>온라인 기지국 — 현재 수신 중</td></tr>
+          <tr><td>회색 점</td><td>오프라인 기지국 — 연결 없음</td></tr>
+          <tr><td>빨강/노랑/청백 작은 점</td><td>위성 (SAT 모드 켜져 있을 때, 고도별 색상)</td></tr>
+        </tbody>
+      </table>
+
+      <h2>뒤로 가기</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">→</div>
+          <div class="g-step-body">
+            <strong>좌측 상단 뒤로가기 버튼</strong>
+            <p>← 버튼을 클릭하면 메인 랜딩 페이지로 돌아갑니다.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ─── Tab 3: 기지국 정보 ─────────────────────────────── -->
+    <section class="g-panel" data-panel="stations">
+      <h1>기지국 정보</h1>
+      <p class="subtitle">지구본의 기지국 마커를 클릭하면 해당 기지국의 실시간 상태를 확인할 수 있습니다.</p>
+
+      <h2>팝업 열기</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>호버 — 이름 확인</strong>
+            <p>지구본의 기지국 점(녹색)에 마우스를 올리면 기지국 이름이 툴팁으로 나타납니다.</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <strong>클릭 — 상세 팝업</strong>
+            <p>클릭하면 팝업 창이 열려 주파수, 채널, 녹음 상태 등 자세한 정보를 표시합니다.</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <strong>팝업 닫기</strong>
+            <p>우측 상단 <strong>✕</strong> 버튼 클릭, 또는 팝업 바깥 빈 영역 클릭</p>
+          </div>
+        </li>
+      </ul>
+
+      <h2>팝업 필드 설명</h2>
+      <img src="assets/Main_Page.png" alt="기지국 운용 화면" class="g-screenshot">
+      <p class="g-screenshot-cap">BE_WE 운용 소프트웨어의 기지국 상태 화면</p>
+
+      <table class="g-table">
+        <thead><tr><th>항목</th><th>예시</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Name</td>
+            <td class="mono">DGS-4 (Suwon)</td>
+            <td>기지국 식별자 및 위치 표시명</td>
+          </tr>
+          <tr>
+            <td>Coordinates</td>
+            <td class="mono">37.25°N 127.05°E</td>
+            <td>기지국 GPS 좌표</td>
+          </tr>
+          <tr>
+            <td>Tier</td>
+            <td class="mono">2</td>
+            <td>수신 품질 등급. 값이 높을수록 고성능 장비</td>
+          </tr>
+          <tr>
+            <td>Users</td>
+            <td class="mono">3</td>
+            <td>현재 이 기지국에 접속 중인 운용자 수</td>
+          </tr>
+          <tr>
+            <td>Freq</td>
+            <td class="mono">433.920 MHz</td>
+            <td>수신기 중심 주파수. 수신 대역의 중심점</td>
+          </tr>
+          <tr>
+            <td>SR</td>
+            <td class="mono">2.00 MS/s</td>
+            <td>샘플레이트. 유효 수신 대역폭 ≈ SR / 2 (여기선 약 1 MHz)</td>
+          </tr>
+          <tr>
+            <td>Ch</td>
+            <td class="mono">3</td>
+            <td>현재 활성화된 복조 채널 수</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(248,113,113,0.15);color:#f87171;">REC</span></td>
+            <td>—</td>
+            <td>표시될 때: 현재 IQ 원시 신호를 디스크에 녹음 중</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="g-callout">
+        <span class="g-callout-icon">💡</span>
+        <span><strong>Freq + SR 해석 예시:</strong> Freq=433.920 MHz, SR=2.00 MS/s이면 432.920~434.920 MHz 대역을 수신 중입니다.</span>
+      </div>
+    </section>
+
+    <!-- ─── Tab 4: 위성 추적 ──────────────────────────────── -->
+    <section class="g-panel" data-panel="satellites">
+      <h1>위성 추적</h1>
+      <p class="subtitle">TLE(Two-Line Element) 궤도 데이터를 이용해 위성의 실시간 위치와 궤도 경로를 3D 지구본에 표시합니다.</p>
+
+      <h2>SAT 모드 선택</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>지구본 화면 우하단 SAT 버튼 확인</strong>
+            <p>지구본 뷰에서만 나타납니다. <strong>OFF / VISUAL / STARLINK</strong> 세 가지 모드가 있습니다.</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <strong>모드 선택</strong>
+            <p>
+              <strong>OFF</strong> — 위성 표시 숨김<br>
+              <strong>VISUAL</strong> — 육안 식별 가능한 위성 ~1,000개 (ISS, 기상위성, 각국 군사위성 등)<br>
+              <strong>STARLINK</strong> — SpaceX Starlink 군집 ~6,000개
+            </p>
+          </div>
+        </li>
+      </ul>
+
+      <h2>위성 색상 의미</h2>
+      <p>위성의 색상은 궤도 고도에 따라 구분됩니다. BE_WE C++ 앱과 동일한 기준을 사용합니다.</p>
+
+      <table class="g-table">
+        <thead><tr><th>색상</th><th>궤도</th><th>고도 범위</th><th>대표 위성</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(255,80,50,0.15);color:#ff6040;">빨강</span></td>
+            <td>LEO 저궤도</td>
+            <td class="mono">&lt; 2,000 km</td>
+            <td>ISS, 지구관측위성, 정찰위성</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(255,220,50,0.15);color:#ffdc32;">노랑</span></td>
+            <td>MEO 중궤도</td>
+            <td class="mono">2,000 – 35,000 km</td>
+            <td>GPS, GLONASS, Galileo, BeiDou</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(180,200,255,0.15);color:#b4c8ff;">청백</span></td>
+            <td>GEO 정지궤도</td>
+            <td class="mono">~35,786 km</td>
+            <td>방송위성, 통신위성, 기상위성</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>궤도 경로 보기</h2>
+      <img src="assets/globe_sat_soi.png" alt="위성 궤도 경로" class="g-screenshot">
+      <p class="g-screenshot-cap">위성 클릭 시 궤도 경로가 지구 주변에 표시됩니다</p>
+
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>위성 클릭</strong>
+            <p>지구본 위의 작은 컬러 점(위성)을 클릭하면 해당 위성의 전체 궤도 경로가 지구 주위에 선으로 표시됩니다.</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <strong>경로 숨기기</strong>
+            <p>같은 위성을 다시 클릭하거나, 빈 공간을 클릭하면 궤도 경로가 사라집니다.</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="g-callout">
+        <span class="g-callout-icon">📐</span>
+        <span>위성 위치는 TLE 데이터 기준 Kepler 원궤도(e=0) 근사 전파를 사용합니다. 실제 위치와 수 km 오차가 있을 수 있습니다. TLE는 1시간마다 CelesTrak에서 갱신됩니다.</span>
+      </div>
+    </section>
+
+    <!-- ─── Tab 5: 모니터링 ────────────────────────────────── -->
+    <section class="g-panel" data-panel="monitoring">
+      <h1>모니터링 페이지</h1>
+      <p class="subtitle">모든 기지국의 실시간 상태와 채널 정보를 테이블로 확인하는 Operations 페이지 사용법입니다.</p>
+
+      <h2>페이지 접근</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>상단 네비게이션 "Operations" 클릭</strong>
+            <p>메인 페이지 또는 이 가이드 상단 nav에서 "Operations" 클릭 →
+            <a href="/status.html" style="color:var(--accent)">/status.html</a></p>
+          </div>
+        </li>
+      </ul>
+
+      <h2>상단 통계 바 (KPI)</h2>
+      <p>페이지 상단에 전체 네트워크 현황이 한눈에 표시됩니다.</p>
+      <table class="g-table">
+        <thead><tr><th>항목</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>Online</td><td>현재 연결된(응답 중인) 기지국 수</td></tr>
+          <tr><td>Channels</td><td>모든 기지국의 활성 복조 채널 합계</td></tr>
+          <tr><td>Recording</td><td>현재 IQ 녹음 진행 중인 기지국 수</td></tr>
+          <tr><td>Users</td><td>전체 기지국에 접속 중인 운용자 수 합계</td></tr>
+        </tbody>
+      </table>
+
+      <h2>기지국 테이블 읽기</h2>
+      <table class="g-table">
+        <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>● (상태 LED)</td><td>녹색=온라인, 빨강=오프라인</td></tr>
+          <tr><td>Station</td><td>기지국 이름</td></tr>
+          <tr><td>Tier</td><td>수신 품질 등급</td></tr>
+          <tr><td>Freq</td><td>중심 주파수</td></tr>
+          <tr><td>SR</td><td>샘플레이트</td></tr>
+          <tr><td>Ch</td><td>활성 채널 수</td></tr>
+          <tr><td>Last Seen</td><td>마지막 신호 수신 경과 시간 (초 단위 실시간 업데이트)</td></tr>
+          <tr><td>Users</td><td>현재 접속 운용자 수</td></tr>
+        </tbody>
+      </table>
+
+      <div class="g-callout">
+        <span class="g-callout-icon">ℹ</span>
+        <span>온라인 기지국이 목록 위에, 오프라인 기지국이 아래에(흐리게) 표시됩니다. "Last Seen"은 서버 재요청 없이 브라우저에서 매초 자동 갱신됩니다.</span>
+      </div>
+
+      <h2>채널 상세 모달</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>기지국 행 클릭</strong>
+            <p>테이블에서 기지국 이름을 클릭하면 해당 기지국의 채널 목록 모달이 열립니다.</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <strong>채널 정보 확인</strong>
+            <p>각 채널의 주파수, 복조 방식, 녹음 여부가 표시됩니다. 주파수는 크게 강조 표시됩니다.</p>
+          </div>
+        </li>
+      </ul>
+
+      <img src="assets/channels_holding.png" alt="채널 목록" class="g-screenshot">
+      <p class="g-screenshot-cap">BE_WE 채널 보류 목록 화면 예시</p>
+
+      <h2>채널 타입 색상</h2>
+      <table class="g-table">
+        <thead><tr><th>색상</th><th>타입</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(96,165,250,0.15);color:#60a5fa;">파랑</span></td>
+            <td>AM</td>
+            <td>진폭 변조 (항공 VHF, 방송 등)</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(74,222,128,0.15);color:#4ade80;">초록</span></td>
+            <td>FM</td>
+            <td>주파수 변조 (방송, 무선 통신)</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(192,132,252,0.15);color:#c084fc;">보라</span></td>
+            <td>MAGIC</td>
+            <td>BE_WE 독자 협약 프로토콜</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(251,146,60,0.15);color:#fb923c;">주황</span></td>
+            <td>AIS</td>
+            <td>선박 자동 식별 시스템 (161.975 / 162.025 MHz)</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(251,191,36,0.15);color:#fbbf24;">노랑</span></td>
+            <td>ADS-B</td>
+            <td>항공기 자동 종속 감시 (1090 MHz)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <img src="assets/spectrum.png" alt="스펙트럼 표시" class="g-screenshot">
+      <p class="g-screenshot-cap">BE_WE 스펙트럼 표시 화면 — 주파수별 신호 강도 시각화</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const btns = document.querySelectorAll('.g-tab-btn');
+  const panels = document.querySelectorAll('.g-panel');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      btns.forEach(b => b.classList.toggle('active', b === btn));
+      panels.forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
+      document.querySelector('.g-content').scrollTop = 0;
+      window.scrollTo(0, 0);
+    });
+  });
+
+  // Activate tab from URL hash (e.g. /guide.html#satellites)
+  const hash = location.hash.slice(1);
+  if (hash) {
+    const btn = document.querySelector(`.g-tab-btn[data-tab="${hash}"]`);
+    if (btn) btn.click();
+  }
+</script>
+</body>
+</html>

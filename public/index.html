@@ -7,14 +7,14 @@
     <meta name="description" content="BEWE — 다거점 광대역 RF 수집, 실시간 C2, 영구 IQ 아카이브. GPS 교란·무인기·전술 통신 탐지. 한국형 분산 SIGINT 플랫폼.">
     <meta property="og:title" content="BEWE — 한국형 분산 SIGINT 플랫폼">
     <meta property="og:description" content="다거점 광대역 RF 수집, 실시간 C2, 영구 IQ 아카이브. GPS 교란·무인기·전술 통신 탐지.">
-    <meta property="og:image" content="https://bewe.co.kr/assets/globe_sat_soi.png">
+    <meta property="og:image" content="https://bewe.co.kr/assets/BEWE.png">
     <meta property="og:url" content="https://bewe.co.kr">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="BEWE">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="BEWE — 한국형 분산 SIGINT 플랫폼">
     <meta name="twitter:description" content="다거점 광대역 RF 수집, 실시간 C2, 영구 IQ 아카이브.">
-    <meta name="twitter:image" content="https://bewe.co.kr/assets/globe_sat_soi.png">
+    <meta name="twitter:image" content="https://bewe.co.kr/assets/BEWE.png">
     <meta name="theme-color" content="#000000">
     <link rel="canonical" href="https://bewe.co.kr">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,7 +155,7 @@
 
                     <!-- Slide 2 — Cover -->
                     <section class="ppt-slide ppt-cover" data-title="표지">
-                        <div class="ppt-cover-bg" style="background-image:url('assets/globe_sat_soi.png');"></div>
+                        <div class="ppt-cover-bg"></div>
                         <div class="ppt-cover-overlay"></div>
                         <div class="ppt-cover-content">
                             <div class="ppt-eyebrow">한국형 분산 SIGINT 플랫폼 · KOREAN DISTRIBUTED SIGINT PLATFORM</div>
@@ -591,10 +591,6 @@
                                 <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>교란 이벤트 IQ 자동 보존</b><p>교란 신호를 IQ 파일로 자동 저장. 사후 신호 특성 분석과 국제 기구 신고용 증거 자료로 활용합니다.</p></div></div>
                                 <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>3D Globe 영향권 시각화</b><p>노드별 수신 강도를 Globe에 표시해 교란 영향권을 지도 위에 실시간으로 가시화합니다.</p></div></div>
                             </div>
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/globe_sat_soi.png" alt="GPS jamming globe view" loading="lazy">
-                                <figcaption>3D Globe C2 — 전방 노드 위치와 교란 영향권을 동시에 표시</figcaption>
-                            </figure>
                         </div>
                     </section>
 
@@ -604,10 +600,6 @@
                         <h2 class="ppt-h2">적성 위성 다운링크 감시</h2>
                         <p class="ppt-lead">중국·러시아·북한 ISR 위성이 한반도 상공을 지나는 매 순간 — 자동으로 신호를 포착하고 기록합니다.</p>
                         <div class="ppt-split">
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/globe_sat_soi.png" alt="Satellite orbit tracking" loading="lazy">
-                                <figcaption>LEO/MEO/GEO 4계층 TLE 카탈로그 — 적성 위성 궤도와 전방 노드 위치를 겹쳐 패스 예측</figcaption>
-                            </figure>
                             <div class="ppt-split-text">
                                 <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>TLE 자동 갱신 · 패스 예측</b><p>Celestrak TLE 카탈로그 자동 동기화. 중국·러시아 ISR 위성과 북한 만리경의 한반도 통과 시간을 사전 예측해 수집 일정을 자동 편성합니다.</p></div></div>
                                 <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>패스별 자동 IQ 녹화</b><p>미션 코드 기반으로 위성 패스마다 IQ 파일을 자동 생성·저장. 수집된 신호는 도플러 보정 후 변조 분석이 가능합니다.</p></div></div>
@@ -694,10 +686,6 @@
                         <h2 class="ppt-h2">운용 장면 — 3D Globe 작전 지도</h2>
                         <p class="ppt-lead">전방 노드 위치와 적성 위성 궤도를 한 화면에 — 분석관 한 명이 전 구역을 동시에 관제합니다.</p>
                         <div class="ppt-split">
-                            <figure class="ppt-figure ppt-figure-side">
-                                <img src="assets/globe_sat_soi.png" alt="3D Globe operational view" loading="lazy">
-                                <figcaption>3D Globe — 전방 HOST 마커 · Starlink / SOI / LEO · MEO · GEO 4계층 위성 궤도 실시간 표시</figcaption>
-                            </figure>
                             <div class="ppt-split-text">
                                 <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>전방 노드 실시간 상태 표시</b><p>각 HOST가 위·경도와 운용 상태를 Central로 송출 → Globe 마커 자동 갱신. 클릭 한 번으로 해당 스테이션 스펙트럼에 즉시 접속.</p></div></div>
                                 <div class="ppt-bullet"><span class="bullet-dot"></span><div><b>적성 위성 궤적 오버레이</b><p>TLE 자동 갱신으로 중국·러시아·북한 ISR 위성의 한반도 통과 예정 경로를 전방 노드 위치와 함께 표시.</p></div></div>
@@ -841,7 +829,7 @@
 
                     <!-- Slide 22 — 마무리 -->
                     <section class="ppt-slide ppt-closing" data-title="마무리">
-                        <div class="ppt-cover-bg" style="background-image:url('assets/globe_sat_soi.png');"></div>
+                        <div class="ppt-cover-bg"></div>
                         <div class="ppt-cover-overlay"></div>
                         <div class="ppt-cover-content">
                             <div class="ppt-eyebrow">BEWE · 한국형 분산 SIGINT 플랫폼</div>

@@ -19,6 +19,11 @@
     <a href="/#nav-about">About</a>
     <a href="/status.html">Operations</a>
     <a href="/guide.html" class="active">Guide</a>
+    <div class="g-lang-toggle">
+      <button class="g-lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <span class="g-lang-sep">/</span>
+      <button class="g-lang-btn" data-lang="kr" onclick="setLang('kr')">KR</button>
+    </div>
   </nav>
 </header>
 
@@ -29,19 +34,24 @@
   <nav class="g-sidebar">
     <div class="g-sidebar-label">사용자 가이드</div>
     <button class="g-tab-btn active" data-tab="intro">
-      <span class="g-tab-icon">◎</span> BEWE란?
+      <span class="g-tab-icon">◎</span>
+      <span class="i18n-en">What is BEWE?</span><span class="i18n-kr">BEWE란?</span>
     </button>
     <button class="g-tab-btn" data-tab="globe">
-      <span class="g-tab-icon">◑</span> 지구본 보기
+      <span class="g-tab-icon">◑</span>
+      <span class="i18n-en">Globe View</span><span class="i18n-kr">지구본 보기</span>
     </button>
     <button class="g-tab-btn" data-tab="stations">
-      <span class="g-tab-icon">▲</span> 기지국 정보
+      <span class="g-tab-icon">▲</span>
+      <span class="i18n-en">Station Info</span><span class="i18n-kr">기지국 정보</span>
     </button>
     <button class="g-tab-btn" data-tab="satellites">
-      <span class="g-tab-icon">✦</span> 위성 추적
+      <span class="g-tab-icon">✦</span>
+      <span class="i18n-en">Satellites</span><span class="i18n-kr">위성 추적</span>
     </button>
     <button class="g-tab-btn" data-tab="monitoring">
-      <span class="g-tab-icon">▣</span> 모니터링
+      <span class="g-tab-icon">▣</span>
+      <span class="i18n-en">Monitoring</span><span class="i18n-kr">모니터링</span>
     </button>
   </nav>
 
@@ -50,82 +60,106 @@
 
     <!-- ─── Tab 1: BEWE란? ─────────────────────────────────── -->
     <section class="g-panel active" data-panel="intro">
-      <h1>BEWE란?</h1>
-      <p class="subtitle">
-        여러 지역의 SDR 수신소를 하나의 중앙 서버로 연결하는 분산 전파 감시 플랫폼입니다.
-        이 페이지는 처음 사용하는 분들을 위한 단계별 안내서입니다.
-      </p>
+      <h1><span class="i18n-en">What is BEWE?</span><span class="i18n-kr">BEWE란?</span></h1>
+      <p class="subtitle i18n-en">A distributed RF surveillance platform connecting multiple SDR receiving stations through a central relay server. This guide walks first-time users through the interface step by step.</p>
+      <p class="subtitle i18n-kr">여러 지역의 SDR 수신소를 하나의 중앙 서버로 연결하는 분산 전파 감시 플랫폼입니다. 이 페이지는 처음 사용하는 분들을 위한 단계별 안내서입니다.</p>
 
-      <h2>시스템 구성</h2>
-      <p>각 기지국(DGS)은 소프트웨어 정의 무선(SDR) 수신기를 운용하며, 중계 서버를 통해 이 웹페이지로 실시간 정보를 전달합니다.</p>
+      <!-- EN -->
+      <div class="i18n-en">
+        <h2>System Architecture</h2>
+        <p>Each DGS station runs SDR receivers and streams real-time telemetry to this web interface via the central relay server.</p>
+        <div class="g-arch">
+<span class="ok">[Station DGS-1]</span> ──┐<br>
+<span class="ok">[Station DGS-2]</span> ──┤── <span class="hl">Central Relay</span> (port 7700) ──▶ <span class="hl">bewe.co.kr</span><br>
+<span class="ok">[Station DGS-3]</span> ──┤<br>
+<span class="ok">[Station DGS-4]</span> ──┘
+        </div>
+        <p>Stations are physical receiving installations across Korea. The relay server aggregates status and channel data from all stations; this web page displays that data in real time.</p>
+        <h2>Key Features</h2>
+        <div class="g-cards">
+          <div class="g-card">
+            <div class="g-card-icon">📡</div>
+            <div class="g-card-title">Multi-Channel SDR</div>
+            <div class="g-card-desc">AM · FM · DMR · AIS · ADS-B auto-demodulation. Up to 10 simultaneous channels per station.</div>
+          </div>
+          <div class="g-card">
+            <div class="g-card-icon">🛰</div>
+            <div class="g-card-title">Live Satellite Tracking</div>
+            <div class="g-card-desc">TLE-based Kepler propagation. Color-coded LEO/MEO/GEO altitude bands, orbital path visualization.</div>
+          </div>
+          <div class="g-card">
+            <div class="g-card-icon">🗂</div>
+            <div class="g-card-title">IQ History Recording</div>
+            <div class="g-card-desc">Long-term raw IQ stream archiving. Per-channel audio recording. Post-processing analysis support.</div>
+          </div>
+        </div>
+        <div class="g-callout">
+          <span class="g-callout-icon">ℹ</span>
+          <span>This web interface is a <strong>read-only monitor</strong>. Station control, channel configuration, and recording management are performed in the BE_WE operator application.</span>
+        </div>
+        <h2>How to Navigate</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Globe View</strong><p>Click "Discover" on the main page → view station locations and satellites on the 3D globe.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Station Info</strong><p>Click a green dot on the globe → frequency, channel count, recording status, and more.</p></div></li>
+          <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>Monitoring Page</strong><p>Click "Operations" in the header → full station status table and channel list.</p></div></li>
+        </ul>
+      </div>
 
-      <div class="g-arch">
+      <!-- KR -->
+      <div class="i18n-kr">
+        <h2>시스템 구성</h2>
+        <p>각 기지국(DGS)은 소프트웨어 정의 무선(SDR) 수신기를 운용하며, 중계 서버를 통해 이 웹페이지로 실시간 정보를 전달합니다.</p>
+        <div class="g-arch">
 <span class="ok">[기지국 DGS-1]</span> ──┐<br>
 <span class="ok">[기지국 DGS-2]</span> ──┤── <span class="hl">Central Relay</span> (port 7700) ──▶ <span class="hl">bewe.co.kr</span><br>
 <span class="ok">[기지국 DGS-3]</span> ──┤<br>
 <span class="ok">[기지국 DGS-4]</span> ──┘
-      </div>
-
-      <p>
-        기지국은 한국 각지에 설치된 물리적 수신 장비입니다. 중계 서버는 모든 기지국의 상태와 채널 정보를 집계하고,
-        이 웹페이지는 그 데이터를 실시간으로 표시합니다.
-      </p>
-
-      <h2>주요 기능</h2>
-      <div class="g-cards">
-        <div class="g-card">
-          <div class="g-card-icon">📡</div>
-          <div class="g-card-title">다채널 SDR 수신</div>
-          <div class="g-card-desc">AM · FM · DMR · AIS · ADS-B 자동 복조. 기지국당 최대 10채널 동시 운용.</div>
         </div>
-        <div class="g-card">
-          <div class="g-card-icon">🛰</div>
-          <div class="g-card-title">실시간 위성 추적</div>
-          <div class="g-card-desc">TLE 기반 Kepler 궤도 전파. LEO/MEO/GEO 고도별 색상 구분, 궤도 경로 시각화.</div>
+        <p>기지국은 한국 각지에 설치된 물리적 수신 장비입니다. 중계 서버는 모든 기지국의 상태와 채널 정보를 집계하고, 이 웹페이지는 그 데이터를 실시간으로 표시합니다.</p>
+        <h2>주요 기능</h2>
+        <div class="g-cards">
+          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">다채널 SDR 수신</div><div class="g-card-desc">AM · FM · DMR · AIS · ADS-B 자동 복조. 기지국당 최대 10채널 동시 운용.</div></div>
+          <div class="g-card"><div class="g-card-icon">🛰</div><div class="g-card-title">실시간 위성 추적</div><div class="g-card-desc">TLE 기반 Kepler 궤도 전파. LEO/MEO/GEO 고도별 색상 구분, 궤도 경로 시각화.</div></div>
+          <div class="g-card"><div class="g-card-icon">🗂</div><div class="g-card-title">IQ 히스토리 녹음</div><div class="g-card-desc">원시 IQ 스트림 장기 보관. 채널별 오디오 별도 녹음. 후처리 분석 지원.</div></div>
         </div>
-        <div class="g-card">
-          <div class="g-card-icon">🗂</div>
-          <div class="g-card-title">IQ 히스토리 녹음</div>
-          <div class="g-card-desc">원시 IQ 스트림 장기 보관. 채널별 오디오 별도 녹음. 후처리 분석 지원.</div>
-        </div>
+        <div class="g-callout"><span class="g-callout-icon">ℹ</span><span>이 웹페이지는 <strong>읽기 전용 모니터</strong>입니다. 기지국 제어, 채널 설정, 녹음 관리는 BE_WE 운용 소프트웨어에서 수행합니다.</span></div>
+        <h2>탐색 방법</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>지구본 보기</strong><p>메인 페이지 "Discover" 클릭 → 기지국 위치와 위성을 3D 지구본에서 확인</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>기지국 정보</strong><p>지구본의 녹색 점 클릭 → 주파수, 채널 수, 녹음 상태 등 상세 정보</p></div></li>
+          <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>모니터링 페이지</strong><p>상단 "Operations" 클릭 → 전체 기지국 상태 테이블과 채널 목록</p></div></li>
+        </ul>
       </div>
-
-      <div class="g-callout">
-        <span class="g-callout-icon">ℹ</span>
-        <span>이 웹페이지는 <strong>읽기 전용 모니터</strong>입니다. 기지국 제어, 채널 설정, 녹음 관리는 BE_WE 운용 소프트웨어에서 수행합니다.</span>
-      </div>
-
-      <h2>탐색 방법</h2>
-      <ul class="g-steps">
-        <li class="g-step">
-          <div class="g-step-num">1</div>
-          <div class="g-step-body">
-            <strong>지구본 보기</strong>
-            <p>메인 페이지 "Discover" 클릭 → 기지국 위치와 위성을 3D 지구본에서 확인</p>
-          </div>
-        </li>
-        <li class="g-step">
-          <div class="g-step-num">2</div>
-          <div class="g-step-body">
-            <strong>기지국 정보</strong>
-            <p>지구본의 녹색 점 클릭 → 주파수, 채널 수, 녹음 상태 등 상세 정보</p>
-          </div>
-        </li>
-        <li class="g-step">
-          <div class="g-step-num">3</div>
-          <div class="g-step-body">
-            <strong>모니터링 페이지</strong>
-            <p>상단 "Operations" 클릭 → 전체 기지국 상태 테이블과 채널 목록</p>
-          </div>
-        </li>
-      </ul>
     </section>
 
     <!-- ─── Tab 2: 지구본 보기 ─────────────────────────────── -->
     <section class="g-panel" data-panel="globe">
-      <h1>지구본 보기</h1>
-      <p class="subtitle">기지국과 위성의 실시간 위치를 3D 지구본에서 확인하는 방법입니다.</p>
-
+      <h1><span class="i18n-en">Globe View</span><span class="i18n-kr">지구본 보기</span></h1>
+      <p class="subtitle i18n-en">View real-time positions of stations and satellites on the interactive 3D globe.</p>
+      <p class="subtitle i18n-kr">기지국과 위성의 실시간 위치를 3D 지구본에서 확인하는 방법입니다.</p>
+      <div class="i18n-en">
+        <h2>Entering the Globe</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Open the main page</strong><p>Go to <a href="/" style="color:var(--accent)">bewe.co.kr</a> and click <strong>"Discover"</strong> (top right) — or click <strong>"DISCOVER THE GLOBE"</strong> at the bottom of the page.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>The globe appears</strong><p>Earth texture and station markers (green dots) are shown on a dark background.</p></div></li>
+        </ul>
+        <h2>Basic Controls</h2>
+        <table class="g-table"><thead><tr><th>Action</th><th>Input</th><th>Effect</th></tr></thead><tbody>
+          <tr><td>Rotate</td><td>Drag</td><td>Spin the globe to any region</td></tr>
+          <tr><td>Zoom</td><td>Scroll wheel</td><td>Zoom in / zoom out</td></tr>
+          <tr><td>Touch rotate</td><td>One-finger drag</td><td>Spin the globe</td></tr>
+          <tr><td>Touch zoom</td><td>Two-finger pinch</td><td>Zoom in / zoom out</td></tr>
+        </tbody></table>
+        <h2>Screen Elements</h2>
+        <table class="g-table"><thead><tr><th>Element</th><th>Description</th></tr></thead><tbody>
+          <tr><td>Green dot (glowing)</td><td>Online station — currently receiving</td></tr>
+          <tr><td>Gray dot</td><td>Offline station — no connection</td></tr>
+          <tr><td>Red / yellow / blue-white dots</td><td>Satellites (when SAT mode is on; color = altitude band)</td></tr>
+        </tbody></table>
+        <h2>Going Back</h2>
+        <ul class="g-steps"><li class="g-step"><div class="g-step-num">→</div><div class="g-step-body"><strong>Back button (top left)</strong><p>Click the ← button to return to the main landing page.</p></div></li></ul>
+      </div>
+      <div class="i18n-kr">
       <h2>진입 방법</h2>
       <ul class="g-steps">
         <li class="g-step">
@@ -176,13 +210,44 @@
           </div>
         </li>
       </ul>
+      </div><!-- /i18n-kr globe -->
     </section>
 
     <!-- ─── Tab 3: 기지국 정보 ─────────────────────────────── -->
     <section class="g-panel" data-panel="stations">
-      <h1>기지국 정보</h1>
-      <p class="subtitle">지구본의 기지국 마커를 클릭하면 해당 기지국의 실시간 상태를 확인할 수 있습니다.</p>
+      <h1><span class="i18n-en">Station Info</span><span class="i18n-kr">기지국 정보</span></h1>
+      <p class="subtitle i18n-en">Click a station marker on the globe to view real-time status details for that station.</p>
+      <p class="subtitle i18n-kr">지구본의 기지국 마커를 클릭하면 해당 기지국의 실시간 상태를 확인할 수 있습니다.</p>
 
+      <!-- EN -->
+      <div class="i18n-en">
+        <h2>Opening the Popup</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Hover — see name</strong><p>Hover over a green dot on the globe to see the station name tooltip.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Click — details popup</strong><p>Click to open the popup showing frequency, channels, recording status, and more.</p></div></li>
+          <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>Close popup</strong><p>Click the <strong>✕</strong> button (top right), or click anywhere outside the popup.</p></div></li>
+        </ul>
+        <h2>Popup Field Reference</h2>
+        <img src="assets/Main_Page.png" alt="BE_WE station view" class="g-screenshot">
+        <p class="g-screenshot-cap">BE_WE operator application — station status screen</p>
+        <table class="g-table">
+          <thead><tr><th>Field</th><th>Example</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Name</td><td class="mono">DGS-4 (Suwon)</td><td>Station identifier and display name</td></tr>
+            <tr><td>Coordinates</td><td class="mono">37.25°N 127.05°E</td><td>GPS location</td></tr>
+            <tr><td>Tier</td><td class="mono">2</td><td>Equipment grade. Higher = higher-performance / wider bandwidth</td></tr>
+            <tr><td>Users</td><td class="mono">3</td><td>Operators currently logged in to this station</td></tr>
+            <tr><td>Freq</td><td class="mono">433.920 MHz</td><td>Receiver center frequency — midpoint of the receive band</td></tr>
+            <tr><td>SR</td><td class="mono">2.00 MS/s</td><td>Sample rate. Effective bandwidth ≈ SR/2 (here ~1 MHz)</td></tr>
+            <tr><td>Ch</td><td class="mono">3</td><td>Number of active demodulation channels</td></tr>
+            <tr><td><span class="g-badge" style="background:rgba(248,113,113,0.15);color:#f87171;font-size:11px;">REC</span></td><td>—</td><td>Currently recording raw IQ signal to disk</td></tr>
+          </tbody>
+        </table>
+        <div class="g-callout"><span class="g-callout-icon">💡</span><span><strong>Freq + SR example:</strong> Freq=433.920 MHz, SR=2.00 MS/s means the station receives from 432.920 to 434.920 MHz.</span></div>
+      </div>
+
+      <!-- KR -->
+      <div class="i18n-kr">
       <h2>팝업 열기</h2>
       <ul class="g-steps">
         <li class="g-step">
@@ -262,13 +327,42 @@
         <span class="g-callout-icon">💡</span>
         <span><strong>Freq + SR 해석 예시:</strong> Freq=433.920 MHz, SR=2.00 MS/s이면 432.920~434.920 MHz 대역을 수신 중입니다.</span>
       </div>
+      </div><!-- /i18n-kr stations -->
     </section>
 
     <!-- ─── Tab 4: 위성 추적 ──────────────────────────────── -->
     <section class="g-panel" data-panel="satellites">
-      <h1>위성 추적</h1>
-      <p class="subtitle">TLE(Two-Line Element) 궤도 데이터를 이용해 위성의 실시간 위치와 궤도 경로를 3D 지구본에 표시합니다.</p>
+      <h1><span class="i18n-en">Satellite Tracking</span><span class="i18n-kr">위성 추적</span></h1>
+      <p class="subtitle i18n-en">Satellites are tracked in real time using TLE (Two-Line Element) orbital data and displayed on the 3D globe.</p>
+      <p class="subtitle i18n-kr">TLE(Two-Line Element) 궤도 데이터를 이용해 위성의 실시간 위치와 궤도 경로를 3D 지구본에 표시합니다.</p>
 
+      <!-- EN -->
+      <div class="i18n-en">
+        <h2>Selecting SAT Mode</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Find the SAT button (bottom right of globe view)</strong><p>Only visible while in globe view. Three modes available: <strong>OFF / VISUAL / STARLINK</strong>.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Select a mode</strong><p><strong>OFF</strong> — hide all satellites.<br><strong>VISUAL</strong> — ~1,000 naked-eye-visible satellites (ISS, weather satellites, etc.).<br><strong>STARLINK</strong> — SpaceX Starlink constellation (~6,000 satellites).</p></div></li>
+        </ul>
+        <h2>Satellite Color Meanings</h2>
+        <p>Color indicates orbital altitude. Identical to the BE_WE C++ application.</p>
+        <table class="g-table">
+          <thead><tr><th>Color</th><th>Orbit</th><th>Altitude</th><th>Examples</th></tr></thead>
+          <tbody>
+            <tr><td><span class="g-badge" style="background:rgba(255,80,50,0.15);color:#ff6040;">Red</span></td><td>LEO Low Earth</td><td class="mono">&lt; 2,000 km</td><td>ISS, earth observation, reconnaissance</td></tr>
+            <tr><td><span class="g-badge" style="background:rgba(255,220,50,0.15);color:#ffdc32;">Yellow</span></td><td>MEO Medium Earth</td><td class="mono">2,000–35,000 km</td><td>GPS, GLONASS, Galileo, BeiDou</td></tr>
+            <tr><td><span class="g-badge" style="background:rgba(180,200,255,0.15);color:#b4c8ff;">Blue-white</span></td><td>GEO Geostationary</td><td class="mono">~35,786 km</td><td>Broadcast and communications satellites</td></tr>
+          </tbody>
+        </table>
+        <h2>Viewing Orbital Paths</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Click a satellite</strong><p>Click any colored dot to display that satellite's complete orbital path around the globe.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Hide the path</strong><p>Click the same satellite again, or click empty space to clear the orbital path.</p></div></li>
+        </ul>
+        <div class="g-callout"><span class="g-callout-icon">📐</span><span>Satellite positions use Kepler circular orbit (e=0) propagation from TLE data. Accuracy is within a few km. TLEs are refreshed from CelesTrak every hour.</span></div>
+      </div>
+
+      <!-- KR -->
+      <div class="i18n-kr">
       <h2>SAT 모드 선택</h2>
       <ul class="g-steps">
         <li class="g-step">
@@ -341,16 +435,145 @@
         <span class="g-callout-icon">📐</span>
         <span>위성 위치는 TLE 데이터 기준 Kepler 원궤도(e=0) 근사 전파를 사용합니다. 실제 위치와 수 km 오차가 있을 수 있습니다. TLE는 1시간마다 CelesTrak에서 갱신됩니다.</span>
       </div>
+      </div><!-- /i18n-kr satellites -->
     </section>
 
     <!-- ─── Tab 5: 모니터링 ────────────────────────────────── -->
     <section class="g-panel" data-panel="monitoring">
-      <h1>모니터링 페이지</h1>
-      <p class="subtitle">
+      <h1><span class="i18n-en">Monitoring</span><span class="i18n-kr">모니터링 페이지</span></h1>
+      <p class="subtitle i18n-en">
+        The <a href="/status.html" style="color:var(--accent)">Operations page</a> is a real-time dashboard for the entire network.
+        One click on a station card reveals channels, analysts, scheduled missions, and the recording archive.
+      </p>
+      <p class="subtitle i18n-kr">
         <a href="/status.html" style="color:var(--accent)">Operations 페이지</a>는 전체 네트워크의 실시간 상태를 보여주는 대시보드입니다.
         기지국 카드 클릭 한 번으로 채널·분석관·예약 임무·녹음 아카이브를 모두 확인할 수 있습니다.
       </p>
 
+      <!-- EN ─────────────────────────────────────────────────── -->
+      <div class="i18n-en">
+
+        <h2>Getting There</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Click "Operations" in the nav</strong><p>Available from the main page, globe view, or this guide's top nav → <a href="/status.html" style="color:var(--accent)">/status.html</a></p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Check CENTRAL ONLINE</strong><p>The green pill (● CENTRAL ONLINE, top right) confirms the relay server is connected. Red = no response.</p></div></li>
+        </ul>
+
+        <h2>KPI Summary Cards</h2>
+        <p>Four cards at the top summarize the entire network. Auto-refreshes every 3 seconds.</p>
+        <table class="g-table">
+          <thead><tr><th>Card</th><th>Meaning</th><th>Status Color</th></tr></thead>
+          <tbody>
+            <tr><td>Sites Active</td><td>Online / total station count</td><td>All = green · partial = yellow · none = red</td></tr>
+            <tr><td>Analysts On Duty</td><td>Total operators logged in across all stations</td><td>≥1 = green · 0 = gray</td></tr>
+            <tr><td>Active Channels</td><td>Total demodulation channels across all stations</td><td>≥1 = green</td></tr>
+            <tr><td>Mission Recording</td><td>Stations with HIST IQ archive active</td><td>≥1 = green · 0 = gray (Standby)</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Station Card — Collapsed</h2>
+        <p>Station list: online first, offline faded at the bottom.</p>
+        <table class="g-table">
+          <thead><tr><th>Element</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>● LED green</td><td>Online — receiving heartbeat from relay</td></tr>
+            <tr><td>● LED red</td><td>Offline — no response; card is faded</td></tr>
+            <tr><td><span class="g-badge" style="background:rgba(248,113,113,0.15);color:#f87171;font-size:11px;">● REC</span></td><td>HIST IQ archive recording in progress (blinking)</td></tr>
+            <tr><td>Tier N</td><td>Equipment grade. Higher = better performance / wider bandwidth</td></tr>
+            <tr><td>operated by…</td><td>BE_WE operator ID currently logged in to this station</td></tr>
+            <tr><td>LIVE / Xs ago</td><td>LIVE = currently responding. "14m ago" = time since last response (browser-updated per second)</td></tr>
+            <tr><td>▾ arrow</td><td>Click to expand the detail panel</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Station Card — Expanded</h2>
+        <ul class="g-steps">
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Click the card header</strong><p>Click anywhere on the station name area to expand. Click again to collapse.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Detail data auto-loads</strong><p>Channels, analysts, and scheduled missions refresh every 5 seconds while expanded.</p></div></li>
+        </ul>
+
+        <h2>Active Channels</h2>
+        <p>Each row is one demodulation channel: number · mode · center frequency · bandwidth · recording status.</p>
+        <table class="g-table">
+          <thead><tr><th>Element</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>01 / 02 …</td><td>Channel number (index in BE_WE app, starts at 1)</td></tr>
+            <tr><td>Mode badge</td><td>AM · FM · USB · LSB · CW · ADS-B · AIS (see color table below)</td></tr>
+            <tr><td>Frequency</td><td>Center frequency — midpoint between start and end</td></tr>
+            <tr><td>Bandwidth</td><td>Channel bandwidth. Center ± (BW/2)</td></tr>
+            <tr><td><span class="g-chrec iq">IQ REC</span></td><td>Raw IQ written to disk (maximum data, full post-processing possible)</td></tr>
+            <tr><td><span class="g-chrec audio">AUDIO REC</span></td><td>Demodulated audio only (small file, for listening)</td></tr>
+            <tr><td><span class="g-chrec none">standby</span></td><td>Demodulating but not recording</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Demodulation Mode Colors</h2>
+        <table class="g-table">
+          <thead><tr><th>Mode</th><th>Description</th><th>Typical Use</th><th>Typical Frequency</th></tr></thead>
+          <tbody>
+            <tr><td><span class="g-chmode am">AM</span></td><td>Amplitude modulation</td><td>Air traffic VHF, AM broadcast</td><td>118–137 MHz, 526–1605 kHz</td></tr>
+            <tr><td><span class="g-chmode fm">FM</span></td><td>Frequency modulation</td><td>FM broadcast, amateur, PMR</td><td>87.5–108 MHz, 144–146 MHz</td></tr>
+            <tr><td><span class="g-chmode usb">USB / LSB</span></td><td>Single sideband</td><td>HF shortwave, maritime</td><td>2–30 MHz</td></tr>
+            <tr><td><span class="g-chmode cw">CW</span></td><td>Morse code</td><td>Military HF beacons, amateur</td><td>HF band</td></tr>
+            <tr><td><span class="g-chmode ais">AIS</span></td><td>Ship auto-identification</td><td>Vessel position / ID</td><td>161.975 / 162.025 MHz</td></tr>
+            <tr><td><span class="g-chmode adsb">ADS-B</span></td><td>Aircraft auto-surveillance</td><td>Aircraft position / altitude / speed</td><td>1090 MHz</td></tr>
+            <tr><td><span class="g-chmode magic">MAGIC</span></td><td>BE_WE proprietary</td><td>Internal data link and control</td><td>Configurable</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Connected Analysts</h2>
+        <p>Currently logged-in operators for this station. Each pill shows Tier level and user ID.</p>
+        <div class="g-callout"><span class="g-callout-icon">ℹ</span><span><strong>Tier</strong> = operator permission level. T1 = read-only · T2 = channel control · T3 = full admin. Higher = more access.</span></div>
+
+        <h2>Scheduled Missions</h2>
+        <p>Automatic recording schedules configured in the BE_WE application. Start and stop at the specified time.</p>
+        <table class="g-table">
+          <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><span class="g-sched-status idle">IDLE</span></td><td>Waiting — scheduled time not yet reached</td></tr>
+            <tr><td><span class="g-sched-status armed">ARMED</span></td><td>Ready — will transition to RECORDING shortly</td></tr>
+            <tr><td><span class="g-sched-status active">RECORDING</span></td><td>Active now — recording in progress</td></tr>
+            <tr><td><span class="g-sched-status done">DONE</span></td><td>Complete — file saved to HIST archive</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Mission Archive — HIST Recording</h2>
+        <p>When a station card shows the <span class="g-srec" style="display:inline-flex;"><span class="dot" style="animation:none;"></span>REC</span> badge, a HIST IQ archive is in progress.</p>
+        <table class="g-table">
+          <thead><tr><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Started</td><td>Recording start time (local HH:MM)</td></tr>
+            <tr><td>Elapsed</td><td>Time since recording started</td></tr>
+            <tr><td>Center Freq</td><td>Center frequency of the IQ stream being archived</td></tr>
+            <tr><td>Bandwidth</td><td>Capture bandwidth (= sample rate). All signals within this range are saved</td></tr>
+          </tbody>
+        </table>
+        <img src="assets/history.png" alt="HIST archive" class="g-screenshot">
+        <p class="g-screenshot-cap">BE_WE HIST long-term waterfall archive — scroll back through time to review past signals</p>
+        <div class="g-callout warn"><span class="g-callout-icon">⚠</span><span>HIST files are stored on the station's local disk. The web interface only shows recording status; playback requires the BE_WE operator application.</span></div>
+
+        <h2>Operator Note</h2>
+        <p>A text input area inside each expanded station card. Log current activity, anomalies, or handover notes. Server-saved — visible to all connected operators.</p>
+        <ul class="g-steps"><li class="g-step"><div class="g-step-num">→</div><div class="g-step-body"><strong>Type and press Enter (Shift+Enter for new line)</strong><p>Saved to server immediately. Other analysts who open the same station card see the same note.</p></div></li></ul>
+
+        <h2>Radiosonde Tracking</h2>
+        <p>Below the station list, the <strong>Radiosonde Tracking</strong> section displays weather balloon signals detected by stations in range.</p>
+        <table class="g-table">
+          <thead><tr><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Model</td><td>Sonde transmitter type (RS41, RS92, etc.)</td></tr>
+            <tr><td>Coordinates</td><td>Current GPS position</td></tr>
+            <tr><td>Altitude ↑</td><td>Current altitude (m). ↑ = ascending · ↓ = descending</td></tr>
+            <tr><td>Frequency</td><td>Sonde transmit frequency (400–406 MHz band)</td></tr>
+            <tr><td>Receiving Station</td><td>Station ID that captured this sonde</td></tr>
+          </tbody>
+        </table>
+        <div class="g-callout ok"><span class="g-callout-icon">✓</span><span>Radiosondes are launched daily at 00:00 and 12:00 UTC. Auto-detected when they enter a station's receive range (~200 km) and the station is tuned to the 400–406 MHz band.</span></div>
+
+      </div><!-- /i18n-en -->
+
+      <!-- KR ─────────────────────────────────────────────────── -->
+      <div class="i18n-kr">
       <!-- ─ 1. 접근 ─ -->
       <h2>접근 방법</h2>
       <ul class="g-steps">
@@ -872,12 +1095,30 @@
         <span>라디오존데는 기상 예보를 위해 매일 00:00 · 12:00 UTC에 발사됩니다. 수신 가능 범위(~200 km)와 기지국 주파수 설정이 맞을 때 자동 포착됩니다.</span>
       </div>
 
+      </div><!-- /i18n-kr monitoring -->
     </section>
 
   </main>
 </div>
 
 <script>
+  // ── i18n ─────────────────────────────────────────────────
+  function setLang(lang) {
+    localStorage.setItem('bewe_lang', lang);
+    applyLang(lang);
+  }
+
+  function applyLang(lang) {
+    document.body.classList.toggle('lang-kr', lang === 'kr');
+    document.querySelectorAll('[data-lang]').forEach(b =>
+      b.classList.toggle('active', b.dataset.lang === lang));
+  }
+
+  (function() {
+    applyLang(localStorage.getItem('bewe_lang') || 'en');
+  })();
+
+  // ── Tab switching ─────────────────────────────────────────
   const btns = document.querySelectorAll('.g-tab-btn');
   const panels = document.querySelectorAll('.g-panel');
 

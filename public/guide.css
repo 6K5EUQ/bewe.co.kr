@@ -352,6 +352,35 @@ body {
   border-color: rgba(74,222,128,0.2);
 }
 
+/* ── i18n language toggle ────────────────────────────────── */
+.i18n-kr { display: none; }
+body.lang-kr .i18n-en { display: none; }
+body.lang-kr .i18n-kr { display: revert; }
+
+.g-lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.g-lang-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.g-lang-btn:hover { color: var(--text-dim); }
+.g-lang-btn.active { color: var(--accent); background: var(--accent-dim); }
+.g-lang-sep { color: var(--text-faint); font-size: 11px; }
+
 /* ── UI Mockup components ────────────────────────────────── */
 .g-demo {
   background: #03060f;

@@ -30,6 +30,11 @@ const JOIN_SUMMARY_SIZE = 36;   // central_proto.hpp::CentralJoinSummary
 const HIST_INFO_SIZE    = 96;   // central_proto.hpp::CentralHostHistInfo
 const SCHED_ENTRY_SIZE  = 88;   // net_protocol.hpp::SchedSyncEntry
 
+// Display name overrides — keyed by station_id
+const STATION_NAME_OVERRIDE = {
+    'DGS-4_DGS-4': 'DGS-4 (Suwon)',
+};
+
 let cachedStations = [];
 let cachedStationsV2 = [];   // status-page v2 — extended LIST including operator/freq/sr
 
@@ -105,9 +110,10 @@ function fetchStations() {
                 const lon = -payload.readFloatLE(off + 100);
                 const tier = payload[off + 104];
                 const users = payload[off + 105];
+                const sid = idBuf.toString('utf8').replace(/\0/g, '');
                 stations.push({
-                    station_id: idBuf.toString('utf8').replace(/\0/g, ''),
-                    name: nameBuf.toString('utf8').replace(/\0/g, ''),
+                    station_id: sid,
+                    name: STATION_NAME_OVERRIDE[sid] || nameBuf.toString('utf8').replace(/\0/g, ''),
                     lat, lon, tier, users
                 });
             }
@@ -204,9 +210,10 @@ function fetchStationsV2() {
                 const sample_rate_hz = payload.readUInt32LE(off + 148);
                 const hist_recording = payload[off + 152];
                 const channel_count  = payload[off + 153];
+                const sid2 = idBuf.toString('utf8').replace(/\0/g, '');
                 stations.push({
-                    station_id:    idBuf.toString('utf8').replace(/\0/g, ''),
-                    name:          nameBuf.toString('utf8').replace(/\0/g, ''),
+                    station_id:    sid2,
+                    name:          STATION_NAME_OVERRIDE[sid2] || nameBuf.toString('utf8').replace(/\0/g, ''),
                     lat, lon, tier, users,
                     operator_login: opBuf.toString('utf8').replace(/\0/g, ''),
                     center_freq_hz, sample_rate_hz,

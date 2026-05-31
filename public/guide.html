@@ -350,107 +350,532 @@
     <!-- ─── Tab 5: 모니터링 ────────────────────────────────── -->
     <section class="g-panel" data-panel="monitoring">
       <h1>모니터링 페이지</h1>
-      <p class="subtitle">모든 기지국의 실시간 상태와 채널 정보를 테이블로 확인하는 Operations 페이지 사용법입니다.</p>
+      <p class="subtitle">
+        <a href="/status.html" style="color:var(--accent)">Operations 페이지</a>는 전체 네트워크의 실시간 상태를 보여주는 대시보드입니다.
+        기지국 카드 클릭 한 번으로 채널·분석관·예약 임무·녹음 아카이브를 모두 확인할 수 있습니다.
+      </p>
 
-      <h2>페이지 접근</h2>
+      <!-- ─ 1. 접근 ─ -->
+      <h2>접근 방법</h2>
       <ul class="g-steps">
         <li class="g-step">
           <div class="g-step-num">1</div>
           <div class="g-step-body">
             <strong>상단 네비게이션 "Operations" 클릭</strong>
-            <p>메인 페이지 또는 이 가이드 상단 nav에서 "Operations" 클릭 →
+            <p>메인 페이지, 지구본 뷰, 또는 이 가이드 우상단 nav에서 클릭 →
             <a href="/status.html" style="color:var(--accent)">/status.html</a></p>
-          </div>
-        </li>
-      </ul>
-
-      <h2>상단 통계 바 (KPI)</h2>
-      <p>페이지 상단에 전체 네트워크 현황이 한눈에 표시됩니다.</p>
-      <table class="g-table">
-        <thead><tr><th>항목</th><th>설명</th></tr></thead>
-        <tbody>
-          <tr><td>Online</td><td>현재 연결된(응답 중인) 기지국 수</td></tr>
-          <tr><td>Channels</td><td>모든 기지국의 활성 복조 채널 합계</td></tr>
-          <tr><td>Recording</td><td>현재 IQ 녹음 진행 중인 기지국 수</td></tr>
-          <tr><td>Users</td><td>전체 기지국에 접속 중인 운용자 수 합계</td></tr>
-        </tbody>
-      </table>
-
-      <h2>기지국 테이블 읽기</h2>
-      <table class="g-table">
-        <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
-        <tbody>
-          <tr><td>● (상태 LED)</td><td>녹색=온라인, 빨강=오프라인</td></tr>
-          <tr><td>Station</td><td>기지국 이름</td></tr>
-          <tr><td>Tier</td><td>수신 품질 등급</td></tr>
-          <tr><td>Freq</td><td>중심 주파수</td></tr>
-          <tr><td>SR</td><td>샘플레이트</td></tr>
-          <tr><td>Ch</td><td>활성 채널 수</td></tr>
-          <tr><td>Last Seen</td><td>마지막 신호 수신 경과 시간 (초 단위 실시간 업데이트)</td></tr>
-          <tr><td>Users</td><td>현재 접속 운용자 수</td></tr>
-        </tbody>
-      </table>
-
-      <div class="g-callout">
-        <span class="g-callout-icon">ℹ</span>
-        <span>온라인 기지국이 목록 위에, 오프라인 기지국이 아래에(흐리게) 표시됩니다. "Last Seen"은 서버 재요청 없이 브라우저에서 매초 자동 갱신됩니다.</span>
-      </div>
-
-      <h2>채널 상세 모달</h2>
-      <ul class="g-steps">
-        <li class="g-step">
-          <div class="g-step-num">1</div>
-          <div class="g-step-body">
-            <strong>기지국 행 클릭</strong>
-            <p>테이블에서 기지국 이름을 클릭하면 해당 기지국의 채널 목록 모달이 열립니다.</p>
           </div>
         </li>
         <li class="g-step">
           <div class="g-step-num">2</div>
           <div class="g-step-body">
-            <strong>채널 정보 확인</strong>
-            <p>각 채널의 주파수, 복조 방식, 녹음 여부가 표시됩니다. 주파수는 크게 강조 표시됩니다.</p>
+            <strong>CENTRAL ONLINE 확인</strong>
+            <p>우상단 초록 알약(●&nbsp;CENTRAL ONLINE)이 표시되면 중계 서버와 정상 연결된 상태입니다. 빨간색이면 서버 응답 없음.</p>
           </div>
         </li>
       </ul>
 
-      <img src="assets/channels_holding.png" alt="채널 목록" class="g-screenshot">
-      <p class="g-screenshot-cap">BE_WE 채널 보류 목록 화면 예시</p>
+      <!-- ─ 2. KPI ─ -->
+      <h2>KPI 통계 카드</h2>
+      <p>페이지 상단 4개 카드가 전체 네트워크 현황을 요약합니다. 3초마다 자동 갱신됩니다.</p>
 
-      <h2>채널 타입 색상</h2>
+      <div class="g-demo">
+        <div class="g-demo-label">KPI 카드 예시</div>
+        <div class="g-kpi-row">
+          <div class="g-kpi-card ok">
+            <div class="g-kpi-lbl">Sites Active</div>
+            <div class="g-kpi-val">4<span class="sub">/ 4</span></div>
+            <div class="g-kpi-note">All sites operational</div>
+          </div>
+          <div class="g-kpi-card ok">
+            <div class="g-kpi-lbl">Analysts On Duty</div>
+            <div class="g-kpi-val">3</div>
+            <div class="g-kpi-note">Live monitoring</div>
+          </div>
+          <div class="g-kpi-card ok">
+            <div class="g-kpi-lbl">Active Channels</div>
+            <div class="g-kpi-val">9</div>
+            <div class="g-kpi-note">Concurrent demodulation</div>
+          </div>
+          <div class="g-kpi-card ok">
+            <div class="g-kpi-lbl">Mission Recording</div>
+            <div class="g-kpi-val">2</div>
+            <div class="g-kpi-note">Permanent archive active</div>
+          </div>
+        </div>
+      </div>
+
       <table class="g-table">
-        <thead><tr><th>색상</th><th>타입</th><th>설명</th></tr></thead>
+        <thead><tr><th>카드</th><th>의미</th><th>색상 조건</th></tr></thead>
         <tbody>
           <tr>
-            <td><span class="g-badge" style="background:rgba(96,165,250,0.15);color:#60a5fa;">파랑</span></td>
-            <td>AM</td>
-            <td>진폭 변조 (항공 VHF, 방송 등)</td>
+            <td>Sites Active</td>
+            <td>온라인 기지국 수 / 전체 기지국 수</td>
+            <td>전체=초록, 일부=노랑, 전부 오프=빨강</td>
           </tr>
           <tr>
-            <td><span class="g-badge" style="background:rgba(74,222,128,0.15);color:#4ade80;">초록</span></td>
-            <td>FM</td>
-            <td>주파수 변조 (방송, 무선 통신)</td>
+            <td>Analysts On Duty</td>
+            <td>현재 BE_WE 앱 접속 중인 운용자 합계</td>
+            <td>1명 이상=초록, 0명=회색</td>
           </tr>
           <tr>
-            <td><span class="g-badge" style="background:rgba(192,132,252,0.15);color:#c084fc;">보라</span></td>
-            <td>MAGIC</td>
-            <td>BE_WE 독자 협약 프로토콜</td>
+            <td>Active Channels</td>
+            <td>전체 기지국의 활성 복조 채널 합계</td>
+            <td>1개 이상=초록</td>
           </tr>
           <tr>
-            <td><span class="g-badge" style="background:rgba(251,146,60,0.15);color:#fb923c;">주황</span></td>
-            <td>AIS</td>
-            <td>선박 자동 식별 시스템 (161.975 / 162.025 MHz)</td>
-          </tr>
-          <tr>
-            <td><span class="g-badge" style="background:rgba(251,191,36,0.15);color:#fbbf24;">노랑</span></td>
-            <td>ADS-B</td>
-            <td>항공기 자동 종속 감시 (1090 MHz)</td>
+            <td>Mission Recording</td>
+            <td>IQ 아카이브(HIST) 녹음 중인 기지국 수</td>
+            <td>1개 이상=초록, 0=회색(Standby)</td>
           </tr>
         </tbody>
       </table>
 
-      <img src="assets/spectrum.png" alt="스펙트럼 표시" class="g-screenshot">
-      <p class="g-screenshot-cap">BE_WE 스펙트럼 표시 화면 — 주파수별 신호 강도 시각화</p>
+      <!-- ─ 3. 기지국 카드 ─ -->
+      <h2>기지국 카드 — 접힌 상태</h2>
+      <p>기지국 목록은 온라인이 위, 오프라인이 아래(흐리게)로 자동 정렬됩니다.</p>
+
+      <div class="g-demo">
+        <div class="g-demo-label">기지국 카드 예시</div>
+
+        <!-- 온라인 카드 -->
+        <div class="g-station-mock">
+          <div class="g-station-head-mock">
+            <div>
+              <div style="display:flex;align-items:center;">
+                <span class="g-led on"></span>
+                <span class="g-sname">DGS-4 (Suwon)</span>
+                <span class="g-srec"><span class="dot"></span>REC</span>
+              </div>
+              <div class="g-smeta">Tier 2 · operated by operator01</div>
+              <div class="g-smeta" style="margin-top:2px;">37.250° N · 127.050° E</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="g-sage live">LIVE</div>
+              <div style="color:rgba(232,237,245,0.3);font-size:16px;margin-top:2px;">▾</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오프라인 카드 -->
+        <div class="g-station-mock" style="opacity:0.45;">
+          <div class="g-station-head-mock">
+            <div>
+              <div style="display:flex;align-items:center;">
+                <span class="g-led off"></span>
+                <span class="g-sname">DGS-2 (Changwon)</span>
+              </div>
+              <div class="g-smeta">Tier 1</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="g-sage">14m ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <table class="g-table">
+        <thead><tr><th>요소</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>● LED (초록)</td>
+            <td>온라인 — 중계 서버에서 응답 수신 중</td>
+          </tr>
+          <tr>
+            <td>● LED (빨강)</td>
+            <td>오프라인 — 응답 없음, 카드 흐리게 표시</td>
+          </tr>
+          <tr>
+            <td><span class="g-badge" style="background:rgba(248,113,113,0.15);color:#f87171;font-size:11px;">● REC</span></td>
+            <td>HIST IQ 아카이브 녹음 진행 중 (깜빡임)</td>
+          </tr>
+          <tr>
+            <td>Tier N</td>
+            <td>수신 장비 등급. 숫자가 높을수록 고성능·고대역폭</td>
+          </tr>
+          <tr>
+            <td>operated by …</td>
+            <td>현재 이 기지국에 로그인된 BE_WE 운용자 ID</td>
+          </tr>
+          <tr>
+            <td>LIVE / Xs ago</td>
+            <td>LIVE = 현재 응답 중. "14m ago" = 마지막 수신 후 경과 시간 (브라우저에서 매초 갱신)</td>
+          </tr>
+          <tr>
+            <td>▾ 화살표</td>
+            <td>클릭하면 상세 패널 펼침</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ─ 4. 펼친 상태 ─ -->
+      <h2>기지국 카드 — 펼친 상태</h2>
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <strong>카드 헤더 클릭</strong>
+            <p>기지국 이름 영역을 클릭하면 상세 패널이 아래로 펼쳐집니다. 다시 클릭하면 접힙니다.</p>
+          </div>
+        </li>
+        <li class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <strong>펼쳐진 상태에서 세부 데이터 자동 로드</strong>
+            <p>5초마다 채널·분석관·예약 임무 정보가 자동 갱신됩니다.</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="g-demo">
+        <div class="g-demo-label">펼쳐진 기지국 카드 예시</div>
+        <div class="g-station-mock">
+          <div class="g-station-head-mock">
+            <div>
+              <div style="display:flex;align-items:center;">
+                <span class="g-led on"></span>
+                <span class="g-sname">DGS-4 (Suwon)</span>
+                <span class="g-srec"><span class="dot"></span>REC</span>
+              </div>
+              <div class="g-smeta">Tier 2 · operated by operator01 · 37.250° N · 127.050° E</div>
+            </div>
+            <div class="g-sage live">LIVE ▴</div>
+          </div>
+          <div class="g-station-body-mock">
+            <!-- Stats row -->
+            <div class="g-stat-row">
+              <div class="g-stat-item">
+                <div class="g-stat-lbl">Analysts</div>
+                <div class="g-stat-val">2</div>
+              </div>
+              <div class="g-stat-item">
+                <div class="g-stat-lbl">Channels</div>
+                <div class="g-stat-val">3</div>
+              </div>
+              <div class="g-stat-item">
+                <div class="g-stat-lbl">Center Freq</div>
+                <div class="g-stat-val" style="font-size:14px;">433.920 MHz</div>
+              </div>
+            </div>
+            <!-- Note -->
+            <div style="font-size:10px;color:rgba(232,237,245,0.35);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Operator Note</div>
+            <div class="g-note-mock">현재 145 MHz 대역 모니터링 중. 특이사항 없음.</div>
+            <!-- Channels -->
+            <div class="g-detail-title">Active Channels (3)</div>
+            <div class="g-ch-row">
+              <span class="g-chnum">01</span>
+              <span class="g-chmode fm">FM</span>
+              <span class="g-chfreq">433.920 MHz</span>
+              <span class="g-chbw">200 kHz</span>
+              <span class="g-chrec iq">IQ REC</span>
+            </div>
+            <div class="g-ch-row">
+              <span class="g-chnum">02</span>
+              <span class="g-chmode am">AM</span>
+              <span class="g-chfreq">121.500 MHz</span>
+              <span class="g-chbw">10 kHz</span>
+              <span class="g-chrec audio">AUDIO REC</span>
+            </div>
+            <div class="g-ch-row">
+              <span class="g-chnum">03</span>
+              <span class="g-chmode adsb">ADS-B</span>
+              <span class="g-chfreq">1090.000 MHz</span>
+              <span class="g-chbw">2000 kHz</span>
+              <span class="g-chrec none">standby</span>
+            </div>
+            <!-- Analysts -->
+            <div class="g-detail-title">Connected Analysts (2)</div>
+            <div class="g-joins">
+              <span class="g-join-pill"><span class="g-join-tier">T2</span>operator01</span>
+              <span class="g-join-pill"><span class="g-join-tier">T1</span>analyst03</span>
+            </div>
+            <!-- Missions -->
+            <div class="g-detail-title">Scheduled Missions (2)</div>
+            <div class="g-sched-row">
+              <span class="g-sched-num">#1</span>
+              <span><span class="g-sched-freq">144.800 MHz</span> → 아마추어</span>
+              <span class="g-sched-time">08:00 · 30m</span>
+              <span class="g-sched-status done">DONE</span>
+            </div>
+            <div class="g-sched-row">
+              <span class="g-sched-num">#2</span>
+              <span><span class="g-sched-freq">162.025 MHz</span> → AIS Ch87B</span>
+              <span class="g-sched-time">09:30 · 1h</span>
+              <span class="g-sched-status armed">ARMED</span>
+            </div>
+            <!-- HIST -->
+            <div class="g-detail-title">Mission Archive (HIST)</div>
+            <div class="g-hist-grid">
+              <div class="g-hist-item"><div class="g-hist-lbl">Started</div><div class="g-hist-val">08:42</div></div>
+              <div class="g-hist-item"><div class="g-hist-lbl">Elapsed</div><div class="g-hist-val">1.2h</div></div>
+              <div class="g-hist-item"><div class="g-hist-lbl">Center Freq</div><div class="g-hist-val">433.920 MHz</div></div>
+              <div class="g-hist-item"><div class="g-hist-lbl">Bandwidth</div><div class="g-hist-val">2000 kHz</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ 5. 채널 상세 ─ -->
+      <h2>채널 목록 (Active Channels)</h2>
+      <p>각 행이 하나의 복조 채널입니다. 채널 번호 · 복조 방식 · 중심주파수 · 대역폭 · 녹음 상태가 표시됩니다.</p>
+
+      <table class="g-table">
+        <thead><tr><th>요소</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>01 / 02 …</td>
+            <td>채널 번호 (BE_WE 앱 내 인덱스, 1부터 시작)</td>
+          </tr>
+          <tr>
+            <td>복조 방식 뱃지</td>
+            <td>AM · FM · USB · LSB · CW · ADS-B · AIS (아래 색상표 참고)</td>
+          </tr>
+          <tr>
+            <td>주파수 (MHz)</td>
+            <td>채널 중심 주파수. 스타트~엔드 주파수의 중간값</td>
+          </tr>
+          <tr>
+            <td>대역폭 (kHz)</td>
+            <td>채널 점유 대역. 중심주파수 ± (BW/2)</td>
+          </tr>
+          <tr>
+            <td><span class="g-chrec iq">IQ REC</span></td>
+            <td>IQ 원시 신호를 디스크에 기록 중 (최대 데이터, 후처리 가능)</td>
+          </tr>
+          <tr>
+            <td><span class="g-chrec audio">AUDIO REC</span></td>
+            <td>복조된 오디오만 기록 중 (용량 적음, 청취용)</td>
+          </tr>
+          <tr>
+            <td><span class="g-chrec none">standby</span></td>
+            <td>복조 중이지만 녹음은 하지 않는 상태</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>복조 방식 색상</h2>
+      <table class="g-table">
+        <thead><tr><th>뱃지</th><th>방식</th><th>대표 용도</th><th>전형 주파수</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="g-chmode am">AM</span></td>
+            <td>진폭 변조</td>
+            <td>항공 VHF 관제, AM 방송</td>
+            <td>118–137 MHz, 526–1605 kHz</td>
+          </tr>
+          <tr>
+            <td><span class="g-chmode fm">FM</span></td>
+            <td>주파수 변조</td>
+            <td>FM 방송, 아마추어 교신, 업무용 무선</td>
+            <td>87.5–108 MHz, 144–146 MHz</td>
+          </tr>
+          <tr>
+            <td><span class="g-chmode usb">USB / LSB</span></td>
+            <td>단측파대</td>
+            <td>HF 단파 교신, 해상 무선</td>
+            <td>2–30 MHz</td>
+          </tr>
+          <tr>
+            <td><span class="g-chmode cw">CW</span></td>
+            <td>모스 부호</td>
+            <td>군용 HF 비컨, 아마추어</td>
+            <td>HF 대역</td>
+          </tr>
+          <tr>
+            <td><span class="g-chmode ais">AIS</span></td>
+            <td>선박 자동 식별</td>
+            <td>선박 위치·ID 자동 수신</td>
+            <td>161.975 / 162.025 MHz</td>
+          </tr>
+          <tr>
+            <td><span class="g-chmode adsb">ADS-B</span></td>
+            <td>항공기 자동 감시</td>
+            <td>항공기 위치·고도·속도 자동 수신</td>
+            <td>1090 MHz</td>
+          </tr>
+          <tr>
+            <td><span class="g-chmode magic">MAGIC</span></td>
+            <td>BE_WE 독자 프로토콜</td>
+            <td>내부 데이터 링크 및 제어</td>
+            <td>설정에 따름</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ─ 6. 분석관 ─ -->
+      <h2>접속 분석관 (Connected Analysts)</h2>
+      <p>현재 이 기지국에 BE_WE 앱으로 로그인된 운용자 목록입니다. 각 알약에 Tier와 사용자 ID가 표시됩니다.</p>
+
+      <div class="g-demo">
+        <div class="g-demo-label">분석관 알약 예시</div>
+        <div class="g-joins">
+          <span class="g-join-pill"><span class="g-join-tier">T2</span>operator01</span>
+          <span class="g-join-pill"><span class="g-join-tier">T1</span>analyst03</span>
+          <span class="g-join-pill"><span class="g-join-tier">T3</span>supervisor</span>
+        </div>
+      </div>
+
+      <div class="g-callout">
+        <span class="g-callout-icon">ℹ</span>
+        <span><strong>Tier</strong>는 운용자 권한 등급입니다. T1=기본 열람, T2=채널 제어, T3=전체 관리 권한. 숫자가 높을수록 높은 권한.</span>
+      </div>
+
+      <!-- ─ 7. 예약 임무 ─ -->
+      <h2>예약 임무 (Scheduled Missions)</h2>
+      <p>운용자가 BE_WE 앱에서 설정한 자동 녹음 스케줄입니다. 지정 시간에 자동으로 녹음을 시작하고 종료합니다.</p>
+
+      <div class="g-demo">
+        <div class="g-demo-label">예약 임무 예시</div>
+        <div class="g-sched-row">
+          <span class="g-sched-num">#1</span>
+          <span><span class="g-sched-freq">144.800 MHz</span> → 아마추어 패킷</span>
+          <span class="g-sched-time">08:00 · 30m</span>
+          <span class="g-sched-status done">DONE</span>
+        </div>
+        <div class="g-sched-row">
+          <span class="g-sched-num">#2</span>
+          <span><span class="g-sched-freq">162.025 MHz</span> → AIS Ch87B</span>
+          <span class="g-sched-time">09:30 · 1h</span>
+          <span class="g-sched-status armed">ARMED</span>
+        </div>
+        <div class="g-sched-row">
+          <span class="g-sched-num">#3</span>
+          <span><span class="g-sched-freq">121.500 MHz</span> → 항공 비상</span>
+          <span class="g-sched-time">10:00 · 2h</span>
+          <span class="g-sched-status active">RECORDING</span>
+        </div>
+        <div class="g-sched-row">
+          <span class="g-sched-num">#4</span>
+          <span><span class="g-sched-freq">433.920 MHz</span></span>
+          <span class="g-sched-time">14:00 · 4h</span>
+          <span class="g-sched-status idle">IDLE</span>
+        </div>
+      </div>
+
+      <table class="g-table">
+        <thead><tr><th>상태</th><th>의미</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="g-sched-status idle">IDLE</span></td>
+            <td>아직 시작 시간이 되지 않음. 대기 중</td>
+          </tr>
+          <tr>
+            <td><span class="g-sched-status armed">ARMED</span></td>
+            <td>시작 직전 준비 완료 상태. 곧 RECORDING으로 전환됨</td>
+          </tr>
+          <tr>
+            <td><span class="g-sched-status active">RECORDING</span></td>
+            <td>현재 녹음 진행 중</td>
+          </tr>
+          <tr>
+            <td><span class="g-sched-status done">DONE</span></td>
+            <td>녹음 완료. 파일이 HIST 아카이브에 저장됨</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ─ 8. HIST ─ -->
+      <h2>임무 아카이브 — HIST 녹음</h2>
+      <p>
+        기지국 카드에 <span class="g-srec" style="display:inline-flex;"><span class="dot" style="animation:none;"></span>REC</span> 뱃지가 표시되면 현재 HIST(History) IQ 아카이브가 진행 중입니다.
+        이 섹션에서 녹음 시작 시간과 경과 시간, 수신 주파수·대역폭을 확인합니다.
+      </p>
+
+      <div class="g-demo">
+        <div class="g-demo-label">HIST 아카이브 정보 예시</div>
+        <div class="g-hist-grid">
+          <div class="g-hist-item">
+            <div class="g-hist-lbl">Started</div>
+            <div class="g-hist-val">08:42</div>
+          </div>
+          <div class="g-hist-item">
+            <div class="g-hist-lbl">Elapsed</div>
+            <div class="g-hist-val">1.2h</div>
+          </div>
+          <div class="g-hist-item">
+            <div class="g-hist-lbl">Center Freq</div>
+            <div class="g-hist-val">433.920 MHz</div>
+          </div>
+          <div class="g-hist-item">
+            <div class="g-hist-lbl">Bandwidth</div>
+            <div class="g-hist-val">2000 kHz</div>
+          </div>
+        </div>
+      </div>
+
+      <table class="g-table">
+        <thead><tr><th>항목</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>Started</td><td>HIST 녹음 시작 시각 (로컬 시간 HH:MM)</td></tr>
+          <tr><td>Elapsed</td><td>녹음 시작 후 경과 시간</td></tr>
+          <tr><td>Center Freq</td><td>녹음 중인 IQ 스트림의 중심 주파수</td></tr>
+          <tr><td>Bandwidth</td><td>캡처 대역폭 (= 샘플레이트). 이 범위 안의 모든 신호가 저장됨</td></tr>
+        </tbody>
+      </table>
+
+      <img src="assets/history.png" alt="HIST 아카이브" class="g-screenshot">
+      <p class="g-screenshot-cap">BE_WE HIST 장기 워터폴 아카이브 — 시간축으로 스크롤하며 과거 신호 열람</p>
+
+      <div class="g-callout warn">
+        <span class="g-callout-icon">⚠</span>
+        <span>HIST 파일은 기지국 로컬 디스크에 저장됩니다. 웹 인터페이스에서는 녹음 진행 상황만 확인 가능하며, 파일 재생은 BE_WE 운용 소프트웨어에서 수행합니다.</span>
+      </div>
+
+      <!-- ─ 9. Operator Note ─ -->
+      <h2>운용자 노트 (Operator Note)</h2>
+      <p>
+        펼쳐진 기지국 카드 안에 텍스트 입력 영역이 있습니다. 현재 상황, 특이사항, 인수인계 내용 등을 자유롭게 기록할 수 있습니다.
+        서버에 저장되어 다른 접속자도 동일한 노트를 볼 수 있습니다.
+      </p>
+
+      <div class="g-demo">
+        <div class="g-demo-label">노트 입력 예시</div>
+        <div class="g-note-mock">현재 433 MHz 대역 집중 모니터링. 14:30 교대 예정. — operator01</div>
+      </div>
+
+      <ul class="g-steps">
+        <li class="g-step">
+          <div class="g-step-num">→</div>
+          <div class="g-step-body">
+            <strong>입력 후 Enter (또는 Shift+Enter로 줄바꿈)</strong>
+            <p>서버에 즉시 저장됩니다. 다른 분석관이 같은 기지국 카드를 열면 동일한 노트가 보입니다.</p>
+          </div>
+        </li>
+      </ul>
+
+      <!-- ─ 10. Radiosonde ─ -->
+      <h2>라디오존데 추적 (Radiosonde Tracking)</h2>
+      <p>
+        기지국 목록 아래 <strong>Radiosonde Tracking</strong> 섹션이 있습니다.
+        기상청 등에서 띄우는 라디오존데(기상 관측 풍선)가 수신 범위 안에 있을 때 자동으로 추적됩니다.
+      </p>
+
+      <div class="g-demo">
+        <div class="g-demo-label">라디오존데 수신 예시</div>
+        <div class="g-sonde-row">
+          <span class="g-sonde-id">RS41-SG</span>
+          <span style="color:rgba(232,237,245,0.6);">37.24°N 127.06°E</span>
+          <span class="g-sonde-alt">↑ 18,420 m</span>
+          <span class="g-sonde-meta">402.500 MHz · DGS-4</span>
+        </div>
+      </div>
+
+      <table class="g-table">
+        <thead><tr><th>필드</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>모델명</td><td>존데 송신기 타입 (RS41, RS92 등)</td></tr>
+          <tr><td>좌표</td><td>현재 GPS 위치</td></tr>
+          <tr><td>고도 ↑</td><td>현재 고도 (m). 상승 중이면 ↑, 하강이면 ↓</td></tr>
+          <tr><td>주파수</td><td>존데 송신 주파수 (400–406 MHz 대역)</td></tr>
+          <tr><td>수신 기지국</td><td>이 존데를 포착한 기지국 ID</td></tr>
+        </tbody>
+      </table>
+
+      <div class="g-callout ok">
+        <span class="g-callout-icon">✓</span>
+        <span>라디오존데는 기상 예보를 위해 매일 00:00 · 12:00 UTC에 발사됩니다. 수신 가능 범위(~200 km)와 기지국 주파수 설정이 맞을 때 자동 포착됩니다.</span>
+      </div>
+
     </section>
 
   </main>

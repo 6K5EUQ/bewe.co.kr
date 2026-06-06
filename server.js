@@ -210,6 +210,7 @@ function fetchStationsV2() {
                 const sample_rate_hz = payload.readUInt32LE(off + 148);
                 const hist_recording = payload[off + 152];
                 const channel_count  = payload[off + 153];
+                const bat_pct        = payload[off + 154];
                 const sid2 = idBuf.toString('utf8').replace(/\0/g, '');
                 stations.push({
                     station_id:    sid2,
@@ -219,6 +220,7 @@ function fetchStationsV2() {
                     center_freq_hz, sample_rate_hz,
                     hist_recording: !!hist_recording,
                     channel_count,
+                    bat_pct,
                 });
             }
             settled = true;
@@ -279,6 +281,7 @@ function fetchStationDetail(station_id) {
                 sample_rate_hz: p.readUInt32LE(40),
                 hist_recording: !!p[44],
                 channel_count:  p[45],
+                bat_pct:        p[46],
                 channels: [],
             };
             const chBase = 48; // 32 + 8 + 4 + 1 + 1 + 2
@@ -631,6 +634,7 @@ app.get('/api/stations', (req, res) => {
             sample_rate_hz:  v2.sample_rate_hz  || 0,
             hist_recording:  !!v2.hist_recording,
             channel_count:   v2.channel_count   || 0,
+            bat_pct:         v2.bat_pct,
         };
     });
     res.json(result);
@@ -671,6 +675,7 @@ app.get('/api/status', (req, res) => {
             sample_rate_hz:  v2.sample_rate_hz || 0,
             hist_recording:  !!v2.hist_recording,
             channel_count:   v2.channel_count || 0,
+            bat_pct:         v2.bat_pct,
         });
     }
     stations.sort((a, b) => (a.name || '').localeCompare(b.name || ''));

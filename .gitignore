@@ -1,2 +1,5 @@
 node_modules/
 .env
+
+# Claude guidance pointer (synced via private claude.md repo)
+CLAUDE.md

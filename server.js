@@ -561,6 +561,49 @@ async function sondePollLoop() {
 }
 sondePollLoop();
 
+// ── Flightradar24 feeder (fr24feed on DGS-2) ────────────────────────────────
+// fr24feed exposes monitor.json on :8754. Requires bind-interface="0.0.0.0"
+// in /etc/fr24feed.ini so it accepts requests from the Tailscale interface.
+const FR24_URL     = (process.env.FR24_URL || 'http://100.126.69.82:8754').replace(/\/+$/, '');
+const FR24_POLL_MS = 6000;
+
+let cachedFr24 = {
+    reachable: false, feed_status: null, alias: null, mode: null,
+    ac_tracked: null, ac_adsb: null, rx_connected: false,
+    messages: null, version: null, last_ac_sent: null, lastUpdate: null,
+};
+
+async function fetchFr24() {
+    const r = await fetch(FR24_URL + '/monitor.json', { signal: AbortSignal.timeout(5000) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    // fr24feed serves Content-Type text/plain; non-private sources get a plain
+    // warning instead of JSON — JSON.parse failure means blocked → unreachable.
+    const m = JSON.parse(await r.text());
+    const int = (v) => { const n = parseInt(v, 10); return isFinite(n) ? n : null; };
+    cachedFr24 = {
+        reachable:    true,
+        feed_status:  m.feed_status || null,            // "connected" when feeding
+        alias:        m.feed_alias || null,             // e.g. "T-RKPE5"
+        mode:         m.feed_current_mode || m.feed_configured_mode || null,
+        ac_tracked:   int(m.feed_num_ac_tracked),
+        ac_adsb:      int(m.feed_num_ac_adsb_tracked),
+        rx_connected: m.rx_connected === '1',
+        messages:     int(m.num_messages),
+        version:      m.build_version || null,
+        last_ac_sent: int(m.feed_last_ac_sent_time),    // unix seconds
+        lastUpdate:   Date.now(),
+    };
+}
+
+async function fr24PollLoop() {
+    while (true) {
+        try { await fetchFr24(); }
+        catch (e) { cachedFr24 = { ...cachedFr24, reachable: false }; }
+        await new Promise(r => setTimeout(r, FR24_POLL_MS));
+    }
+}
+fr24PollLoop();
+
 // ── Station notes (persisted across restarts) ──────────────────────────────
 const fs = require('fs');
 const NOTES_FILE = path.join(__dirname, 'data', 'station_notes.json');
@@ -646,6 +689,10 @@ app.get('/api/aircraft', (req, res) => {
 
 app.get('/api/sonde', (req, res) => {
     res.json(cachedSonde);
+});
+
+app.get('/api/fr24', (req, res) => {
+    res.json(cachedFr24);
 });
 
 app.get('/api/status', (req, res) => {

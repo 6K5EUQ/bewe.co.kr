@@ -529,6 +529,13 @@
 </div>
 <div id="sonde-panel"></div>
 
+<!-- Flightradar24 -->
+<div class="section-title">
+    <span>Flightradar24 Feed</span>
+    <span class="count" id="fr24-count">–</span>
+</div>
+<div id="fr24-panel"></div>
+
 <div class="footer">
     <span class="live"><span class="pill-dot" style="color:var(--ok);background:var(--ok)"></span> LIVE · auto-refresh every 3s</span>
     <span>BEWE Operations Console · 2026</span>
@@ -1012,6 +1019,84 @@ async function pollSonde() {
     }
 }
 
+// ── Flightradar24 ───────────────────────────────────────────────────
+function renderFr24(d) {
+    const panel = document.getElementById('fr24-panel');
+    const countEl = document.getElementById('fr24-count');
+    if (!panel) return;
+
+    if (!d || !d.reachable) {
+        if (countEl) countEl.textContent = 'feeder offline';
+        panel.innerHTML = `
+            <div class="sonde-bar offline">
+                <div class="sonde-bar-id">
+                    <span class="status-led led-off"></span>
+                    <div>
+                        <span class="sonde-recv-name">DGS-2 Feeder</span>
+                        <div class="sonde-recv-meta">ADS-B feeder · fr24feed</div>
+                    </div>
+                </div>
+                <span class="sonde-badge off">Offline</span>
+            </div>
+            <div class="detail-empty" style="padding:8px 2px;">fr24feed is unreachable — the ADS-B feeder on DGS-2 may be down.</div>`;
+        return;
+    }
+
+    const n = d.ac_tracked ?? 0;
+    if (countEl) countEl.textContent = n > 0 ? (n + ' aircraft') : 'standby';
+
+    const feeding = d.feed_status === 'connected';
+    let state, scls;
+    if (feeding)             { state = 'Feeding'; scls = 'dec'; }
+    else if (d.rx_connected) { state = 'RX only'; scls = 'scan'; }
+    else                     { state = 'Idle';    scls = 'idle'; }
+
+    const alias = d.alias ? (' · ' + d.alias) : '';
+    const ver = d.version ? (' · fr24feed ' + d.version) : '';
+    const lastSent = d.last_ac_sent ? fmtAge(Date.now() - d.last_ac_sent * 1000) : '—';
+    const nonAdsb = (d.ac_tracked != null && d.ac_adsb != null) ? (d.ac_tracked - d.ac_adsb) : null;
+
+    panel.innerHTML = `
+        <div class="sonde-bar">
+            <div class="sonde-bar-id">
+                <span class="status-led led-on"></span>
+                <div>
+                    <span class="sonde-recv-name">DGS-2 Feeder</span>
+                    <div class="sonde-recv-meta">ADS-B 1090 MHz${escapeHtml(alias)}${escapeHtml(ver)}</div>
+                </div>
+            </div>
+            <span class="sonde-badge ${scls}">${state}</span>
+        </div>
+        <div class="sonde-grid">
+            <div class="sonde-card">
+                <div class="sonde-card-head">
+                    <span class="sonde-type">Feed</span>
+                    <span class="sonde-serial">${escapeHtml(d.mode || '—')}</span>
+                </div>
+                <div class="sonde-alt">${n}<span class="u">aircraft tracked</span></div>
+                <div class="sonde-stats">
+                    <div><div class="sl">ADS-B</div><div class="sv">${d.ac_adsb ?? '—'}</div></div>
+                    <div><div class="sl">Other</div><div class="sv">${nonAdsb ?? '—'}</div></div>
+                    <div><div class="sl">Msgs</div><div class="sv">${d.messages == null ? '—' : d.messages.toLocaleString('en-US')}</div></div>
+                </div>
+                <div class="sonde-foot">
+                    <span>${feeding ? 'feed.fr24.com connected' : 'feed disconnected'}</span>
+                    <span>sent ${lastSent}</span>
+                </div>
+            </div>
+        </div>`;
+}
+
+async function pollFr24() {
+    try {
+        const r = await fetch('/api/fr24');
+        if (!r.ok) throw new Error('fr24 unreachable');
+        renderFr24(await r.json());
+    } catch (e) {
+        renderFr24(null);
+    }
+}
+
 async function poll() {
     try {
         const r = await fetch('/api/status');
@@ -1048,6 +1133,8 @@ async function poll() {
     setInterval(poll, POLL_MS);
     pollSonde();
     setInterval(pollSonde, SONDE_POLL_MS);
+    pollFr24();
+    setInterval(pollFr24, SONDE_POLL_MS);
 })();
 </script>
 </body>

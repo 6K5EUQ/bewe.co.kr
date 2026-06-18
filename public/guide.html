@@ -32,9 +32,13 @@
       <span class="g-tab-icon">◎</span>
       <span class="i18n-en">What is BEWE?</span><span class="i18n-kr">BEWE란?</span>
     </button>
+    <button class="g-tab-btn" data-tab="collection">
+      <span class="g-tab-icon">≋</span>
+      <span class="i18n-en">Collection &amp; Analysis</span><span class="i18n-kr">수집·분석</span>
+    </button>
     <button class="g-tab-btn" data-tab="globe">
       <span class="g-tab-icon">◑</span>
-      <span class="i18n-en">Globe View</span><span class="i18n-kr">지구본 보기</span>
+      <span class="i18n-en">Globe &amp; Emitter Fix</span><span class="i18n-kr">지구본·표적 측위</span>
     </button>
     <button class="g-tab-btn" data-tab="stations">
       <span class="g-tab-icon">▲</span>
@@ -42,7 +46,7 @@
     </button>
     <button class="g-tab-btn" data-tab="satellites">
       <span class="g-tab-icon">✦</span>
-      <span class="i18n-en">Satellites</span><span class="i18n-kr">위성 추적</span>
+      <span class="i18n-en">Satellite Downlink Surveillance</span><span class="i18n-kr">위성 다운링크 감시</span>
     </button>
     <button class="g-tab-btn" data-tab="monitoring">
       <span class="g-tab-icon">▣</span>
@@ -56,88 +60,201 @@
     <!-- ─── Tab 1: BEWE란? ─────────────────────────────────── -->
     <section class="g-panel active" data-panel="intro">
       <h1><span class="i18n-en">What is BEWE?</span><span class="i18n-kr">BEWE란?</span></h1>
-      <p class="subtitle i18n-en">A distributed RF surveillance platform connecting multiple SDR receiving stations through a central relay server. This guide walks first-time users through the interface step by step.</p>
-      <p class="subtitle i18n-kr">여러 지역의 SDR 수신소를 하나의 중앙 서버로 연결하는 분산 전파 감시 플랫폼입니다. 이 페이지는 처음 사용하는 분들을 위한 단계별 안내서입니다.</p>
+      <p class="subtitle i18n-en">A distributed, wideband, persistent <strong>SIGINT</strong> (Signals Intelligence) platform — forward collection nodes (HOST) fused through a single Central server and observed from analyst workstations (JOIN). <em>Behind Everyone, We hear Everything.</em> This guide walks first-time users through the web interface and the SIGINT capabilities behind it.</p>
+      <p class="subtitle i18n-kr">분산·광대역·상시 <strong>SIGINT</strong>(신호정보) 플랫폼입니다. 전방 수집 노드(HOST)를 단일 Central 서버로 융합하고, 분석관 워크스테이션(JOIN)에서 관측합니다. <em>Behind Everyone, We hear Everything.</em> 이 페이지는 웹 인터페이스와 그 배경의 SIGINT 기능을 처음 사용하는 분들을 위해 안내합니다.</p>
 
       <!-- EN -->
       <div class="i18n-en">
+        <h2>Why SIGINT</h2>
+        <p>SIGINT reads adversary capability and intent directly from the electromagnetic spectrum — independent of weather, time of day, or line of sight. Alongside HUMINT (agents) and IMINT (imagery), it is the pillar that delivers <strong>real-time</strong> warning. On the modern battlefield the first thing to arrive is not the weapon, but the RF signal: GPS jamming, UAS control links, missile pre-launch telemetry. BEWE is the distributed collection and analysis platform for that pillar.</p>
+
         <h2>System Architecture</h2>
-        <p>Each DGS station runs SDR receivers and streams real-time telemetry to this web interface via the central relay server.</p>
+        <p>Three tiers operate as one platform. Each HOST owns an SDR receiver and streams live telemetry; Central fuses every site; JOIN analysts observe and command any authorized HOST.</p>
         <div class="g-arch">
-<span class="ok">[Station DGS-1]</span> ──┐<br>
-<span class="ok">[Station DGS-2]</span> ──┤── <span class="hl">Central Relay</span> (port 7700) ──▶ <span class="hl">bewe.co.kr</span><br>
-<span class="ok">[Station DGS-3]</span> ──┤<br>
-<span class="ok">[Station DGS-4]</span> ──┘
+<span class="ok">[HOST + SDR]</span> ──┐<br>
+<span class="ok">[HOST + SDR]</span> ──┤── <span class="hl">Central</span> (port 7700 · permanent archive + emitter DB) ──▶ <span class="hl">JOIN / bewe.co.kr</span><br>
+<span class="ok">[HOST + SDR]</span> ──┘
         </div>
-        <p>Stations are physical receiving installations across Korea. The relay server aggregates status and channel data from all stations; this web page displays that data in real time.</p>
-        <h2>Key Features</h2>
+        <p><strong>HOST</strong> — forward collection node; owns the receiver and produces the live waterfall, demodulator channels, IQ captures, and HIST archive. <strong>Central</strong> — single-port relay holding the permanent archive of all sites and the cross-station emitter database. <strong>JOIN</strong> — analyst workstation; multiple JOINs may share one HOST. This web page is a JOIN-class read-only view.</p>
+
+        <img src="assets/spectrum.png" alt="HOST collection screen" class="g-screenshot">
+        <p class="g-screenshot-cap">HOST collection screen — live spectrum (top), waterfall (bottom), and channel / record status (right)</p>
+
+        <h2>Core SIGINT Capabilities</h2>
         <div class="g-cards">
-          <div class="g-card">
-            <div class="g-card-icon">📡</div>
-            <div class="g-card-title">Multi-Channel SDR</div>
-            <div class="g-card-desc">AM · FM · DMR · AIS · ADS-B auto-demodulation. Up to 10 simultaneous channels per station.</div>
-          </div>
-          <div class="g-card">
-            <div class="g-card-icon">🛰</div>
-            <div class="g-card-title">Live Satellite Tracking</div>
-            <div class="g-card-desc">TLE-based Kepler propagation. Color-coded LEO/MEO/GEO altitude bands, orbital path visualization.</div>
-          </div>
-          <div class="g-card">
-            <div class="g-card-icon">🗂</div>
-            <div class="g-card-title">IQ History Recording</div>
-            <div class="g-card-desc">Long-term raw IQ stream archiving. Per-channel audio recording. Post-processing analysis support.</div>
-          </div>
+          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">COMINT</div><div class="g-card-desc">Ten concurrent demodulators (AM · FM · USB · LSB · CW) across HF/VHF/UHF. The Holding List keeps tracking even when the adversary moves frequency.</div></div>
+          <div class="g-card"><div class="g-card-icon">🧭</div><div class="g-card-title">Direction Finding</div><div class="g-card-desc">Multi-site lines of bearing intersect to fix an emitter on the 3D globe in real time, with an error ellipse.</div></div>
+          <div class="g-card"><div class="g-card-icon">🛩</div><div class="g-card-title">Protocol Decode</div><div class="g-card-desc">ACARS aircraft datalink, AIS vessels, and WiFi 802.11 beacons decoded to content and fused across all stations.</div></div>
+          <div class="g-card"><div class="g-card-icon">📐</div><div class="g-card-title">ELINT</div><div class="g-card-desc">Radar / missile-seeker / telemetry signals analyzed across nine domains. PRI · PRF · pulse duration · baud auto-measured.</div></div>
+          <div class="g-card"><div class="g-card-icon">🚫</div><div class="g-card-title">GPS Jamming Detection</div><div class="g-card-desc">Distributed nodes triangulate a jamming source by TDOA. Wideband GNSS (L1/L2, GLONASS, BeiDou, Galileo) monitored; footprint mapped on the globe.</div></div>
+          <div class="g-card"><div class="g-card-icon">🗂</div><div class="g-card-title">Persistent Archive</div><div class="g-card-desc">Mission-coded IQ / audio / HIST consolidated on Central. Auto-accumulating emitter database survives personnel rotation.</div></div>
         </div>
         <div class="g-callout">
           <span class="g-callout-icon">ℹ</span>
-          <span>This web interface is a <strong>read-only monitor</strong>. Station control, channel configuration, and recording management are performed in the BE_WE operator application.</span>
+          <span>This web interface is a <strong>read-only monitor</strong> (JOIN-class). Live collection, channel control, decode-module activation, and recording are performed in the BE_WE operator application — the web page reflects that activity in real time.</span>
         </div>
         <h2>How to Navigate</h2>
         <ul class="g-steps">
-          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Globe View</strong><p>Click "Discover" on the main page → view station locations and satellites on the 3D globe.</p></div></li>
-          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Station Info</strong><p>Click a green dot on the globe → frequency, channel count, recording status, and more.</p></div></li>
-          <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>Monitoring Page</strong><p>Click "Operations" in the header → full station status table and channel list.</p></div></li>
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Collection &amp; Analysis</strong><p>How raw IQ becomes intelligence — spectrum/waterfall, ten-channel COMINT, decode modules, ELINT analyzer.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Globe &amp; Emitter Fix</strong><p>Click "Discover" on the main page → collection nodes, emitter fixes, and satellites on the 3D globe.</p></div></li>
+          <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>Operations</strong><p>Click "Operations" in the header → full network status, channels, missions, and archive.</p></div></li>
         </ul>
       </div>
 
       <!-- KR -->
       <div class="i18n-kr">
+        <h2>왜 SIGINT인가</h2>
+        <p>SIGINT는 적의 능력과 의도를 전자기 스펙트럼에서 직접 읽어냅니다 — 날씨·주야·가시선에 무관하게. HUMINT(인적 첩보), IMINT(영상 정보)와 함께 <strong>실시간</strong> 경보를 제공하는 정보 축입니다. 현대 전장에서 가장 먼저 도달하는 것은 무기가 아니라 RF 신호입니다: GPS 재밍, 무인기 통제 링크, 미사일 발사 전 원격측정. BEWE는 그 축을 담당하는 분산 수집·분석 플랫폼입니다.</p>
+
         <h2>시스템 구성</h2>
-        <p>각 기지국(DGS)은 소프트웨어 정의 무선(SDR) 수신기를 운용하며, 중계 서버를 통해 이 웹페이지로 실시간 정보를 전달합니다.</p>
+        <p>세 계층이 하나의 플랫폼으로 동작합니다. 각 HOST는 SDR 수신기를 보유하고 실시간 정보를 송출하며, Central이 모든 기지국을 융합하고, JOIN 분석관이 인가된 HOST를 관측·지휘합니다.</p>
         <div class="g-arch">
-<span class="ok">[기지국 DGS-1]</span> ──┐<br>
-<span class="ok">[기지국 DGS-2]</span> ──┤── <span class="hl">Central Relay</span> (port 7700) ──▶ <span class="hl">bewe.co.kr</span><br>
-<span class="ok">[기지국 DGS-3]</span> ──┤<br>
-<span class="ok">[기지국 DGS-4]</span> ──┘
+<span class="ok">[HOST + SDR]</span> ──┐<br>
+<span class="ok">[HOST + SDR]</span> ──┤── <span class="hl">Central</span> (포트 7700 · 영구 아카이브 + 에미터 DB) ──▶ <span class="hl">JOIN / bewe.co.kr</span><br>
+<span class="ok">[HOST + SDR]</span> ──┘
         </div>
-        <p>기지국은 한국 각지에 설치된 물리적 수신 장비입니다. 중계 서버는 모든 기지국의 상태와 채널 정보를 집계하고, 이 웹페이지는 그 데이터를 실시간으로 표시합니다.</p>
-        <h2>주요 기능</h2>
+        <p><strong>HOST</strong> — 전방 수집 노드. 수신기를 보유하고 실시간 워터폴·복조 채널·IQ 캡처·HIST 아카이브를 생성합니다. <strong>Central</strong> — 모든 기지국의 영구 아카이브와 기지국 간 에미터 데이터베이스를 보유하는 단일 포트 중계 서버. <strong>JOIN</strong> — 분석관 워크스테이션. 여러 JOIN이 한 HOST를 동시에 공유할 수 있습니다. 이 웹페이지는 JOIN 계층의 읽기 전용 뷰입니다.</p>
+
+        <img src="assets/spectrum.png" alt="HOST 수집 화면" class="g-screenshot">
+        <p class="g-screenshot-cap">HOST 수집 화면 — 실시간 스펙트럼(상)·워터폴(하), 우측에 채널·녹음 상태</p>
+
+        <h2>핵심 SIGINT 기능</h2>
         <div class="g-cards">
-          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">다채널 SDR 수신</div><div class="g-card-desc">AM · FM · DMR · AIS · ADS-B 자동 복조. 기지국당 최대 10채널 동시 운용.</div></div>
-          <div class="g-card"><div class="g-card-icon">🛰</div><div class="g-card-title">실시간 위성 추적</div><div class="g-card-desc">TLE 기반 Kepler 궤도 전파. LEO/MEO/GEO 고도별 색상 구분, 궤도 경로 시각화.</div></div>
-          <div class="g-card"><div class="g-card-icon">🗂</div><div class="g-card-title">IQ 히스토리 녹음</div><div class="g-card-desc">원시 IQ 스트림 장기 보관. 채널별 오디오 별도 녹음. 후처리 분석 지원.</div></div>
+          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">COMINT (통신 감청)</div><div class="g-card-desc">HF/VHF/UHF 10채널 동시 복조 (AM · FM · USB · LSB · CW). Holding List로 적이 주파수를 옮겨도 추적 유지.</div></div>
+          <div class="g-card"><div class="g-card-icon">🧭</div><div class="g-card-title">방향 탐지 (DF)</div><div class="g-card-desc">다중 기지국 방위선(LOB)이 교차해 3D 지구본에 표적 위치를 오차 타원과 함께 실시간 측위.</div></div>
+          <div class="g-card"><div class="g-card-icon">🛩</div><div class="g-card-title">프로토콜 디코드</div><div class="g-card-desc">ACARS 항공 데이터링크, AIS 선박, WiFi 802.11 비컨을 내용 단위로 디코드해 전 기지국 융합.</div></div>
+          <div class="g-card"><div class="g-card-icon">📐</div><div class="g-card-title">ELINT (전자정보)</div><div class="g-card-desc">레이더 · 미사일 시커 · 텔레메트리 신호를 9개 도메인으로 분석. PRI · PRF · 펄스폭 · Baud 자동 측정.</div></div>
+          <div class="g-card"><div class="g-card-icon">🚫</div><div class="g-card-title">GPS 재밍 탐지</div><div class="g-card-desc">분산 노드가 TDOA로 재밍원 삼각측량. 광대역 GNSS(L1/L2, GLONASS, BeiDou, Galileo) 감시, 영향권 지구본 표시.</div></div>
+          <div class="g-card"><div class="g-card-icon">🗂</div><div class="g-card-title">상시 아카이브</div><div class="g-card-desc">임무코드 기반 IQ · 오디오 · HIST를 Central에 통합. 자동 축적 에미터 DB로 인력 교대에도 지식 보존.</div></div>
         </div>
-        <div class="g-callout"><span class="g-callout-icon">ℹ</span><span>이 웹페이지는 <strong>읽기 전용 모니터</strong>입니다. 기지국 제어, 채널 설정, 녹음 관리는 BE_WE 운용 소프트웨어에서 수행합니다.</span></div>
+        <div class="g-callout"><span class="g-callout-icon">ℹ</span><span>이 웹페이지는 <strong>읽기 전용 모니터</strong>(JOIN 계층)입니다. 실시간 수집, 채널 제어, 디코드 모듈 활성화, 녹음은 BE_WE 운용 소프트웨어에서 수행하며 — 웹페이지는 그 활동을 실시간으로 반영합니다.</span></div>
         <h2>탐색 방법</h2>
         <ul class="g-steps">
-          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>지구본 보기</strong><p>메인 페이지 "Discover" 클릭 → 기지국 위치와 위성을 3D 지구본에서 확인</p></div></li>
-          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>기지국 정보</strong><p>지구본의 녹색 점 클릭 → 주파수, 채널 수, 녹음 상태 등 상세 정보</p></div></li>
-          <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>모니터링 페이지</strong><p>상단 "Operations" 클릭 → 전체 기지국 상태 테이블과 채널 목록</p></div></li>
+          <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>수집·분석</strong><p>원시 IQ가 정보로 바뀌는 과정 — 스펙트럼·워터폴, 10채널 COMINT, 디코드 모듈, ELINT 분석기</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>지구본·표적 측위</strong><p>메인 페이지 "Discover" 클릭 → 수집 노드·표적 측위·위성을 3D 지구본에서 확인</p></div></li>
+          <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>Operations</strong><p>상단 "Operations" 클릭 → 전체 네트워크 상태·채널·임무·아카이브</p></div></li>
         </ul>
       </div>
     </section>
 
-    <!-- ─── Tab 2: 지구본 보기 ─────────────────────────────── -->
+    <!-- ─── Tab 2: 수집·분석 ──────────────────────────────── -->
+    <section class="g-panel" data-panel="collection">
+      <h1><span class="i18n-en">Collection &amp; Analysis</span><span class="i18n-kr">수집·분석</span></h1>
+      <p class="subtitle i18n-en">What a HOST actually collects — and how raw IQ becomes intelligence. Live spectrum and waterfall, ten-channel COMINT with a Holding List, licensed protocol-decode modules, and a nine-domain ELINT analyzer.</p>
+      <p class="subtitle i18n-kr">HOST가 실제로 수집하는 것 — 그리고 원시 IQ가 정보로 바뀌는 과정. 실시간 스펙트럼·워터폴, 10채널 COMINT와 Holding List, 프로토콜 디코드 모듈, 9개 도메인 ELINT 분석기를 다룹니다.</p>
+
+      <!-- EN -->
+      <div class="i18n-en">
+        <h2>The Collection Screen</h2>
+        <p>The HOST screen is split into two: an instantaneous <strong>spectrum</strong> (top) and a <strong>waterfall</strong> (bottom — frequency on the X axis, time scrolling down, brightness = signal strength). A <strong>max-hold</strong> trace latches peak energy so intermittent and burst emissions are not missed between sweeps. The right panel shows system status (SDR, sample rate, center frequency), connected operators, active channels, the Holding List, and recording state.</p>
+        <img src="assets/max_decay.png" alt="Spectrum with max-hold" class="g-screenshot">
+        <p class="g-screenshot-cap">Spectrum with max-hold (yellow) — latches peaks so burst and frequency-hopping emissions are caught between sweeps</p>
+
+        <h2>COMINT — Ten Channels &amp; the Holding List</h2>
+        <p>Up to ten demodulators run at once — AM · FM · USB · LSB · CW — each working a slice of the received band. Frequencies of interest are parked in the <strong>Holding List</strong> (Waiting Channels) so a target stays tracked even when the adversary moves frequency. A 60-second rolling IQ buffer enables post-event replay of frequency-hopping and burst transmissions.</p>
+        <img src="assets/channels_holding.png" alt="Multi-channel demodulation with Holding List" class="g-screenshot">
+        <p class="g-screenshot-cap">Multi-channel demodulation (colored markers) with the Holding List populated — Active Channels and Waiting Channels on the right</p>
+
+        <h2>Tactical Band Plan</h2>
+        <p>Frequency allocations — DPRK tactical bands, UAS control bands, satellite downlink bands — are defined by <strong>category and color</strong> (label, start, end, category, description) and propagated to every JOIN analyst display, so all sites read the same picture.</p>
+        <img src="assets/band_plan.png" alt="Band plan editor" class="g-screenshot">
+        <p class="g-screenshot-cap">Band Info editor — a tactical allocation defined by category and color, synced to all analysts</p>
+
+        <h2>Protocol Decode Modules (DEMOD)</h2>
+        <p>Beyond raw collection, BEWE decodes the <strong>content</strong> of structured digital transmissions. Modules are licensed per subscription and activate without redeployment. From the DEMOD panel an analyst applies a decoder to any channel filter on any station; the owning HOST demodulates and decoded records fan out through Central to every subscribed JOIN.</p>
+        <table class="g-table">
+          <thead><tr><th>Module</th><th>Signal</th><th>Decoded Content</th></tr></thead>
+          <tbody>
+            <tr><td><span class="g-badge" style="background:rgba(96,165,250,0.15);color:#60a5fa;">ACARS</span></td><td>VHF aircraft datalink (~131 MHz)</td><td>Registration · flight · type · airline · country · message label / text · uplink/downlink</td></tr>
+            <tr><td><span class="g-chmode ais">AIS</span></td><td>Maritime VHF (161.975 / 162.025 MHz)</td><td>Vessel MMSI · position · course · type · name — rendered on a 2D map overlay</td></tr>
+            <tr><td><span class="g-badge" style="background:rgba(167,139,250,0.15);color:#a78bfa;">WiFi</span></td><td>802.11 beacons, 2.4 / 5 GHz</td><td>SSID · channel · security (Open/WPA/WPA2) · PHY (11b/g/n/ac/ax) · BSSID — from 6 Mbps OFDM and 1 Mbps DSSS</td></tr>
+          </tbody>
+        </table>
+
+        <h2>ELINT — Radar &amp; Missile Signal Analysis</h2>
+        <p>Radar, missile-seeker, and telemetry signals are analyzed across <strong>nine domains</strong>: Spectrogram · Freq · Amp · Phase · I/Q · Constellation · Audio · M-th Power · Bits. The analyzer auto-measures <strong>PRI · PRF · pulse duration · baud</strong> and modulation type, and auto-detects the preamble.</p>
+        <img src="assets/analyzer_freq_pri.png" alt="ELINT analyzer frequency domain" class="g-screenshot">
+        <p class="g-screenshot-cap">ELINT analyzer (Freq domain) — PRI / PRF / pulse duration / baud auto-measured; preamble region auto-detected</p>
+        <img src="assets/analyzer_bits.png" alt="ELINT analyzer bits domain" class="g-screenshot">
+        <p class="g-screenshot-cap">ELINT analyzer (Bits domain) — demodulated bit stream with AIS / ADS-B / UAV pattern matching and BIN / HEX / BITMAP views</p>
+
+        <h2>Direction Finding (DF)</h2>
+        <p>When the same signal is received simultaneously at multiple active sites, each projects a <strong>line of bearing</strong> toward the emitter; intersecting LOBs localize the source in real time on the 3D globe, with an error ellipse.</p>
+        <div class="g-callout"><span class="g-callout-icon">🧭</span><span>The emitter fix and its error ellipse render live on the globe alongside the collection nodes. See the <strong>Globe &amp; Emitter Fix</strong> tab.</span></div>
+
+        <h2>GPS Jamming Detection</h2>
+        <p>A single receive site cannot bound a jamming footprint — only distributed nodes can triangulate. BEWE continuously monitors wideband GNSS (GPS L1/L2, GLONASS, BeiDou, Galileo), estimates the jamming source by <strong>TDOA</strong>, auto-preserves the event IQ for later characterization, and maps per-node signal strength on the globe.</p>
+
+        <h2>Persistent Archive &amp; Emitter Database</h2>
+        <p>Every capture is <strong>mission-coded</strong> (e.g. A03 = January 3) and consolidated into the Central archive. Frequency and identifying tags (MMSI, callsign, unit IDs) drive automatic matching; first-seen / last-seen timestamps, contributing stations, and analyst notes consolidate onto one record. Unidentified signals queue for analyst adjudication.</p>
+        <img src="assets/file_info.png" alt="Signal metadata record" class="g-screenshot">
+        <p class="g-screenshot-cap">Signal metadata record — mission code, frequency, modulation, tags, priority (the emitter database)</p>
+        <div class="g-callout warn"><span class="g-callout-icon">⚠</span><span>HOST local disk retains roughly <strong>2 months</strong> (rotating, auto-purge on mission-code rollover). The <strong>Central archive is permanent</strong> — the institutional system of record.</span></div>
+      </div><!-- /i18n-en collection -->
+
+      <!-- KR -->
+      <div class="i18n-kr">
+        <h2>수집 화면</h2>
+        <p>HOST 화면은 둘로 나뉩니다 — 순간 <strong>스펙트럼</strong>(상단)과 <strong>워터폴</strong>(하단: X축 주파수, 아래로 흐르는 시간, 밝기 = 신호 세기). <strong>Max-hold</strong> 트레이스가 피크 에너지를 붙잡아, 스윕 사이의 간헐·버스트 신호를 놓치지 않습니다. 우측 패널은 시스템 상태(SDR, 샘플레이트, 중심주파수), 접속 운용자, 활성 채널, Holding List, 녹음 상태를 표시합니다.</p>
+        <img src="assets/max_decay.png" alt="Max-hold 스펙트럼" class="g-screenshot">
+        <p class="g-screenshot-cap">Max-hold(노란색) 스펙트럼 — 피크를 붙잡아 버스트·주파수도약 신호를 스윕 사이에도 포착</p>
+
+        <h2>COMINT — 10채널과 Holding List</h2>
+        <p>최대 10개 복조기가 동시 동작합니다 — AM · FM · USB · LSB · CW — 각자 수신 대역의 일부를 담당합니다. 관심 주파수는 <strong>Holding List</strong>(대기 채널)에 보관되어, 적이 주파수를 옮겨도 표적 추적이 유지됩니다. 60초 롤링 IQ 버퍼로 주파수도약·버스트 송신을 사후 재생·분석할 수 있습니다.</p>
+        <img src="assets/channels_holding.png" alt="다채널 복조 + Holding List" class="g-screenshot">
+        <p class="g-screenshot-cap">다채널 동시 복조(컬러 마커) + Holding List — 우측에 활성 채널(Active)·대기 채널(Waiting)</p>
+
+        <h2>전술 밴드플랜</h2>
+        <p>주파수 할당 — DPRK 전술 대역, 무인기 통제 대역, 위성 다운링크 대역 — 을 <strong>카테고리·색상</strong>(라벨, 시작, 끝, 카테고리, 설명)으로 정의하고, 모든 JOIN 분석관 화면에 전파해 전 기지국이 동일한 그림을 공유합니다.</p>
+        <img src="assets/band_plan.png" alt="밴드플랜 편집기" class="g-screenshot">
+        <p class="g-screenshot-cap">Band Info 편집기 — 카테고리·색상으로 정의한 전술 할당, 전 분석관에 동기화</p>
+
+        <h2>프로토콜 디코드 모듈 (DEMOD)</h2>
+        <p>원시 수집을 넘어, BEWE는 구조화된 디지털 송신의 <strong>내용</strong>을 디코드합니다. 모듈은 구독 단위로 라이선스되며 재배포 없이 활성화됩니다. DEMOD 패널에서 분석관이 어느 기지국의 어느 채널 필터에든 디코더를 적용하면, 소유 HOST가 복조하고 디코드 레코드가 Central을 거쳐 구독 중인 모든 JOIN으로 확산됩니다.</p>
+        <table class="g-table">
+          <thead><tr><th>모듈</th><th>신호</th><th>디코드 내용</th></tr></thead>
+          <tbody>
+            <tr><td><span class="g-badge" style="background:rgba(96,165,250,0.15);color:#60a5fa;">ACARS</span></td><td>VHF 항공 데이터링크 (~131 MHz)</td><td>등록기호 · 편명 · 기종 · 항공사 · 국가 · 메시지 라벨/본문 · 업/다운링크</td></tr>
+            <tr><td><span class="g-chmode ais">AIS</span></td><td>해상 VHF (161.975 / 162.025 MHz)</td><td>선박 MMSI · 위치 · 침로 · 종류 · 선명 — 2D 지도 오버레이</td></tr>
+            <tr><td><span class="g-badge" style="background:rgba(167,139,250,0.15);color:#a78bfa;">WiFi</span></td><td>802.11 비컨, 2.4 / 5 GHz</td><td>SSID · 채널 · 보안(Open/WPA/WPA2) · PHY(11b/g/n/ac/ax) · BSSID — 6 Mbps OFDM·1 Mbps DSSS</td></tr>
+          </tbody>
+        </table>
+
+        <h2>ELINT — 레이더·미사일 신호 분석</h2>
+        <p>레이더 · 미사일 시커 · 텔레메트리 신호를 <strong>9개 도메인</strong>으로 분석합니다: Spectrogram · Freq · Amp · Phase · I/Q · Constellation · Audio · M-th Power · Bits. 분석기는 <strong>PRI · PRF · 펄스폭 · Baud</strong>와 변조 방식을 자동 측정하고 프리앰블을 자동 검출합니다.</p>
+        <img src="assets/analyzer_freq_pri.png" alt="ELINT 분석기 주파수 도메인" class="g-screenshot">
+        <p class="g-screenshot-cap">ELINT 분석기(Freq 도메인) — PRI / PRF / 펄스폭 / Baud 자동 측정, 프리앰블 자동 검출</p>
+        <img src="assets/analyzer_bits.png" alt="ELINT 분석기 비트 도메인" class="g-screenshot">
+        <p class="g-screenshot-cap">ELINT 분석기(Bits 도메인) — 복조 비트스트림, AIS / ADS-B / UAV 패턴 인식, BIN / HEX / BITMAP 표시</p>
+
+        <h2>방향 탐지 (DF)</h2>
+        <p>동일 신호가 여러 활성 기지국에서 동시에 수신되면, 각 기지국이 표적을 향한 <strong>방위선(LOB)</strong>을 투영하고, 교차하는 LOB가 3D 지구본 위에 신호원을 오차 타원과 함께 실시간 측위합니다.</p>
+        <div class="g-callout"><span class="g-callout-icon">🧭</span><span>표적 위치와 오차 타원은 수집 노드와 함께 지구본에 실시간 표시됩니다. <strong>지구본·표적 측위</strong> 탭 참고.</span></div>
+
+        <h2>GPS 재밍 탐지</h2>
+        <p>단일 수신소로는 재밍 영향권을 한정할 수 없습니다 — 분산 노드만이 삼각측량할 수 있습니다. BEWE는 광대역 GNSS(GPS L1/L2, GLONASS, BeiDou, Galileo)를 상시 감시하고, <strong>TDOA</strong>로 재밍원을 추정하며, 사건 IQ를 자동 보존하고, 노드별 신호 세기를 지구본에 표시합니다.</p>
+
+        <h2>상시 아카이브 &amp; 에미터 DB</h2>
+        <p>모든 캡처는 <strong>임무코드</strong>(예: A03 = 1월 3일)로 분류되어 Central 아카이브에 통합됩니다. 주파수와 식별 태그(MMSI, 콜사인, 부대 식별자)로 자동 매칭하고, 최초/최종 관측 시각·기여 기지국·분석관 노트를 하나의 레코드로 통합합니다. 미식별 신호는 분석관 판정 대기열로 들어갑니다.</p>
+        <img src="assets/file_info.png" alt="신호 메타데이터 레코드" class="g-screenshot">
+        <p class="g-screenshot-cap">신호 메타데이터 레코드 — 임무코드·주파수·변조·태그·우선순위 (에미터 데이터베이스)</p>
+        <div class="g-callout warn"><span class="g-callout-icon">⚠</span><span>HOST 로컬 디스크는 약 <strong>2개월</strong> 보관(순환, 임무코드 롤오버 시 자동 삭제). <strong>Central 아카이브는 영구 보존</strong> — 기관의 기록 원본입니다.</span></div>
+      </div><!-- /i18n-kr collection -->
+    </section>
+
+    <!-- ─── Tab 3: 지구본 보기 ─────────────────────────────── -->
     <section class="g-panel" data-panel="globe">
-      <h1><span class="i18n-en">Globe View</span><span class="i18n-kr">지구본 보기</span></h1>
-      <p class="subtitle i18n-en">View real-time positions of stations and satellites on the interactive 3D globe.</p>
-      <p class="subtitle i18n-kr">기지국과 위성의 실시간 위치를 3D 지구본에서 확인하는 방법입니다.</p>
+      <h1><span class="i18n-en">Globe &amp; Emitter Fix</span><span class="i18n-kr">지구본·표적 측위</span></h1>
+      <p class="subtitle i18n-en">The interactive 3D globe shows the real-time positions of collection nodes, satellites, and direction-finding emitter fixes — the common operating picture of the network.</p>
+      <p class="subtitle i18n-kr">인터랙티브 3D 지구본은 수집 노드·위성·방향탐지 표적 측위 위치를 실시간으로 표시합니다 — 네트워크의 공통 작전 상황도입니다.</p>
       <div class="i18n-en">
         <h2>Entering the Globe</h2>
         <ul class="g-steps">
           <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Open the main page</strong><p>Go to <a href="/" style="color:var(--accent)">bewe.co.kr</a> and click <strong>"Discover"</strong> (top right) — or click <strong>"DISCOVER THE GLOBE"</strong> at the bottom of the page.</p></div></li>
-          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>The globe appears</strong><p>Earth texture and station markers (green dots) are shown on a dark background.</p></div></li>
+          <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>The globe appears</strong><p>Earth texture and collection-node markers (green dots) are shown on a dark background.</p></div></li>
         </ul>
+        <img src="assets/Main_Page.png" alt="BEWE 3D globe" class="g-screenshot">
+        <p class="g-screenshot-cap">BEWE 3D globe (Station Discovery view) — the common operating picture; click Discover to populate collection nodes, satellites, and emitter fixes</p>
         <h2>Basic Controls</h2>
         <table class="g-table"><thead><tr><th>Action</th><th>Input</th><th>Effect</th></tr></thead><tbody>
           <tr><td>Rotate</td><td>Drag</td><td>Spin the globe to any region</td></tr>
@@ -147,9 +264,11 @@
         </tbody></table>
         <h2>Screen Elements</h2>
         <table class="g-table"><thead><tr><th>Element</th><th>Description</th></tr></thead><tbody>
-          <tr><td>Green dot (glowing)</td><td>Online station — currently receiving</td></tr>
-          <tr><td>Gray dot</td><td>Offline station — no connection</td></tr>
+          <tr><td>Green dot (glowing)</td><td>Online collection node (HOST) — currently receiving</td></tr>
+          <tr><td>Gray dot</td><td>Offline node — no connection</td></tr>
           <tr><td>Red / yellow / blue-white dots</td><td>Satellites (when SAT mode is on; color = altitude band)</td></tr>
+          <tr><td>Emitter fix + error ellipse</td><td>Direction-finding source location from intersecting multi-site bearings (LOBs)</td></tr>
+          <tr><td>Jamming footprint</td><td>Per-node GNSS signal-strength heat when a GPS jamming event is detected</td></tr>
         </tbody></table>
         <h2>Going Back</h2>
         <ul class="g-steps"><li class="g-step"><div class="g-step-num">→</div><div class="g-step-body"><strong>Back button (top left)</strong><p>Click the ← button to return to the main landing page.</p></div></li></ul>
@@ -168,10 +287,13 @@
           <div class="g-step-num">2</div>
           <div class="g-step-body">
             <strong>지구본이 나타납니다</strong>
-            <p>어두운 배경에 지구 텍스처와 기지국 마커(녹색 점)가 표시됩니다.</p>
+            <p>어두운 배경에 지구 텍스처와 수집 노드 마커(녹색 점)가 표시됩니다.</p>
           </div>
         </li>
       </ul>
+
+      <img src="assets/Main_Page.png" alt="BEWE 3D 지구본" class="g-screenshot">
+      <p class="g-screenshot-cap">BEWE 3D 지구본 (Station Discovery 화면) — 공통 상황도. Discover를 누르면 수집 노드·위성·표적 측위가 표시됨</p>
 
       <h2>기본 조작</h2>
       <table class="g-table">
@@ -189,9 +311,11 @@
       <table class="g-table">
         <thead><tr><th>요소</th><th>설명</th></tr></thead>
         <tbody>
-          <tr><td>녹색 점 (빛나는)</td><td>온라인 기지국 — 현재 수신 중</td></tr>
-          <tr><td>회색 점</td><td>오프라인 기지국 — 연결 없음</td></tr>
+          <tr><td>녹색 점 (빛나는)</td><td>온라인 수집 노드(HOST) — 현재 수신 중</td></tr>
+          <tr><td>회색 점</td><td>오프라인 노드 — 연결 없음</td></tr>
           <tr><td>빨강/노랑/청백 작은 점</td><td>위성 (SAT 모드 켜져 있을 때, 고도별 색상)</td></tr>
+          <tr><td>표적 측위 + 오차 타원</td><td>다중 기지국 방위선(LOB) 교차로 산출한 방향탐지 신호원 위치</td></tr>
+          <tr><td>재밍 영향권</td><td>GPS 재밍 탐지 시 노드별 GNSS 신호 세기 히트맵</td></tr>
         </tbody>
       </table>
 
@@ -208,11 +332,11 @@
       </div><!-- /i18n-kr globe -->
     </section>
 
-    <!-- ─── Tab 3: 기지국 정보 ─────────────────────────────── -->
+    <!-- ─── Tab 4: 기지국 정보 ─────────────────────────────── -->
     <section class="g-panel" data-panel="stations">
       <h1><span class="i18n-en">Station Info</span><span class="i18n-kr">기지국 정보</span></h1>
-      <p class="subtitle i18n-en">Click a station marker on the globe to view real-time status details for that station.</p>
-      <p class="subtitle i18n-kr">지구본의 기지국 마커를 클릭하면 해당 기지국의 실시간 상태를 확인할 수 있습니다.</p>
+      <p class="subtitle i18n-en">Click a node marker on the globe to view real-time status for that collection node (HOST) — frequency, channels, operators, and recording state.</p>
+      <p class="subtitle i18n-kr">지구본의 노드 마커를 클릭하면 해당 수집 노드(HOST)의 실시간 상태 — 주파수·채널·운용자·녹음 상태 — 를 확인할 수 있습니다.</p>
 
       <!-- EN -->
       <div class="i18n-en">
@@ -223,8 +347,8 @@
           <li class="g-step"><div class="g-step-num">3</div><div class="g-step-body"><strong>Close popup</strong><p>Click the <strong>✕</strong> button (top right), or click anywhere outside the popup.</p></div></li>
         </ul>
         <h2>Popup Field Reference</h2>
-        <img src="assets/Main_Page.png" alt="BE_WE station view" class="g-screenshot">
-        <p class="g-screenshot-cap">BE_WE operator application — station status screen</p>
+        <img src="assets/BEWE.png" alt="BE_WE HOST screen" class="g-screenshot">
+        <p class="g-screenshot-cap">BE_WE HOST screen — the live signals this node is collecting (spectrum, active channels, archive)</p>
         <table class="g-table">
           <thead><tr><th>Field</th><th>Example</th><th>Description</th></tr></thead>
           <tbody>
@@ -269,8 +393,8 @@
       </ul>
 
       <h2>팝업 필드 설명</h2>
-      <img src="assets/Main_Page.png" alt="기지국 운용 화면" class="g-screenshot">
-      <p class="g-screenshot-cap">BE_WE 운용 소프트웨어의 기지국 상태 화면</p>
+      <img src="assets/BEWE.png" alt="BE_WE HOST 화면" class="g-screenshot">
+      <p class="g-screenshot-cap">BE_WE HOST 화면 — 이 노드가 수집 중인 실시간 신호 (스펙트럼·활성 채널·아카이브)</p>
 
       <table class="g-table">
         <thead><tr><th>항목</th><th>예시</th><th>설명</th></tr></thead>
@@ -325,11 +449,11 @@
       </div><!-- /i18n-kr stations -->
     </section>
 
-    <!-- ─── Tab 4: 위성 추적 ──────────────────────────────── -->
+    <!-- ─── Tab 5: 위성 다운링크 ──────────────────────────── -->
     <section class="g-panel" data-panel="satellites">
-      <h1><span class="i18n-en">Satellite Tracking</span><span class="i18n-kr">위성 추적</span></h1>
-      <p class="subtitle i18n-en">Satellites are tracked in real time using TLE (Two-Line Element) orbital data and displayed on the 3D globe.</p>
-      <p class="subtitle i18n-kr">TLE(Two-Line Element) 궤도 데이터를 이용해 위성의 실시간 위치와 궤도 경로를 3D 지구본에 표시합니다.</p>
+      <h1><span class="i18n-en">Satellite Downlink Surveillance</span><span class="i18n-kr">위성 다운링크 감시</span></h1>
+      <p class="subtitle i18n-en">Adversary ISR satellite passes are surveilled from TLE (Two-Line Element) orbital data and displayed on the 3D globe. Every overhead pass of a Satellite of Interest (SOI) can be auto-captured for downlink analysis.</p>
+      <p class="subtitle i18n-kr">TLE(Two-Line Element) 궤도 데이터로 적성 ISR 위성의 통과를 감시하고 3D 지구본에 표시합니다. 관심 위성(SOI)의 모든 머리 위 통과는 다운링크 분석을 위해 자동 캡처할 수 있습니다.</p>
 
       <!-- EN -->
       <div class="i18n-en">
@@ -339,7 +463,7 @@
           <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Select a mode</strong><p><strong>OFF</strong> — hide all satellites.<br><strong>VISUAL</strong> — ~1,000 naked-eye-visible satellites (ISS, weather satellites, etc.).<br><strong>STARLINK</strong> — SpaceX Starlink constellation (~6,000 satellites).</p></div></li>
         </ul>
         <h2>Satellite Color Meanings</h2>
-        <p>Color indicates orbital altitude. Identical to the BE_WE C++ application.</p>
+        <p>Color indicates orbital altitude band.</p>
         <table class="g-table">
           <thead><tr><th>Color</th><th>Orbit</th><th>Altitude</th><th>Examples</th></tr></thead>
           <tbody>
@@ -353,7 +477,8 @@
           <li class="g-step"><div class="g-step-num">1</div><div class="g-step-body"><strong>Click a satellite</strong><p>Click any colored dot to display that satellite's complete orbital path around the globe.</p></div></li>
           <li class="g-step"><div class="g-step-num">2</div><div class="g-step-body"><strong>Hide the path</strong><p>Click the same satellite again, or click empty space to clear the orbital path.</p></div></li>
         </ul>
-        <div class="g-callout"><span class="g-callout-icon">📐</span><span>Satellite positions use Kepler circular orbit (e=0) propagation from TLE data. Accuracy is within a few km. TLEs are refreshed from CelesTrak every hour.</span></div>
+        <div class="g-callout"><span class="g-callout-icon">📐</span><span>Satellite positions use Kepler circular orbit (e=0) propagation from TLE data. Accuracy is within a few km. TLEs are refreshed from CelesTrak every hour, and pass prediction auto-populates the collection schedule from overflight times.</span></div>
+        <div class="g-callout ok"><span class="g-callout-icon">🛰</span><span><strong>SOI auto-capture:</strong> each pass of a Satellite of Interest (Chinese / Russian / DPRK ISR) is auto-recorded as mission-coded IQ. Doppler curves are compared across receive sites to fingerprint and disambiguate the satellite's mission — comms, ISR, or GNSS jamming.</span></div>
       </div>
 
       <!-- KR -->
@@ -381,7 +506,7 @@
       </ul>
 
       <h2>위성 색상 의미</h2>
-      <p>위성의 색상은 궤도 고도에 따라 구분됩니다. BE_WE C++ 앱과 동일한 기준을 사용합니다.</p>
+      <p>위성의 색상은 궤도 고도 대역에 따라 구분됩니다.</p>
 
       <table class="g-table">
         <thead><tr><th>색상</th><th>궤도</th><th>고도 범위</th><th>대표 위성</th></tr></thead>
@@ -428,12 +553,16 @@
 
       <div class="g-callout">
         <span class="g-callout-icon">📐</span>
-        <span>위성 위치는 TLE 데이터 기준 Kepler 원궤도(e=0) 근사 전파를 사용합니다. 실제 위치와 수 km 오차가 있을 수 있습니다. TLE는 1시간마다 CelesTrak에서 갱신됩니다.</span>
+        <span>위성 위치는 TLE 데이터 기준 Kepler 원궤도(e=0) 근사 전파를 사용합니다. 실제 위치와 수 km 오차가 있을 수 있습니다. TLE는 1시간마다 CelesTrak에서 갱신되며, 통과 예측이 머리 위 통과 시각으로 수집 스케줄을 자동 구성합니다.</span>
+      </div>
+      <div class="g-callout ok">
+        <span class="g-callout-icon">🛰</span>
+        <span><strong>SOI 자동 캡처:</strong> 관심 위성(중국·러시아·DPRK ISR)의 매 통과를 임무코드 IQ로 자동 녹음합니다. 다중 수신 기지국의 도플러 곡선을 비교해 위성의 임무 — 통신·ISR·GNSS 재밍 — 를 지문화·식별합니다.</span>
       </div>
       </div><!-- /i18n-kr satellites -->
     </section>
 
-    <!-- ─── Tab 5: 모니터링 ────────────────────────────────── -->
+    <!-- ─── Tab 6: 모니터링 ────────────────────────────────── -->
     <section class="g-panel" data-panel="monitoring">
       <h1><span class="i18n-en">Monitoring</span><span class="i18n-kr">모니터링 페이지</span></h1>
       <p class="subtitle i18n-en">

@@ -755,10 +755,12 @@ app.get('/api/station/:id/detail', async (req, res) => {
 });
 
 // ── DGS-2 Battery API (polls bat_api.py on DGS-2:9731) ──────────────────────
-const DGS2_BAT_URL = process.env.DGS2_BAT_URL || 'http://100.126.69.82:9731/battery';
-const BAT_POLL_MS  = 30000;
+const DGS2_BAT_URL  = process.env.DGS2_BAT_URL || 'http://100.126.69.82:9731/battery';
+const BAT_POLL_MS   = 30 * 1000;
+const BAT_HIST_MS   = 24 * 60 * 60 * 1000; // keep 24h
 let   cachedBatDGS2 = null;
 let   cachedBatDGS2At = 0;
+const batHistory    = []; // { ts, bat_pct, status }
 
 function fetchDGS2Battery() {
     return new Promise((resolve) => {
@@ -776,20 +778,30 @@ function fetchDGS2Battery() {
 async function batPollLoop() {
     while (true) {
         const b = await fetchDGS2Battery();
-        if (b) { cachedBatDGS2 = b; cachedBatDGS2At = Date.now(); }
+        if (b) {
+            cachedBatDGS2   = b;
+            cachedBatDGS2At = Date.now();
+            batHistory.push({ ts: cachedBatDGS2At, bat_pct: b.bat_pct, status: b.status });
+            const cutoff = cachedBatDGS2At - BAT_HIST_MS;
+            while (batHistory.length && batHistory[0].ts < cutoff) batHistory.shift();
+        }
         await new Promise(r => setTimeout(r, BAT_POLL_MS));
     }
 }
 batPollLoop();
 
 // station_id may be 'DGS-2' or 'DGS-2_DGS-2' depending on relay encoding
+function isDGS2(id) { return id === 'DGS-2' || id === 'DGS-2_DGS-2'; }
+
 app.get('/api/battery/:id', (req, res) => {
-    const id = req.params.id;
-    if (id === 'DGS-2' || id === 'DGS-2_DGS-2') {
-        if (!cachedBatDGS2) return res.status(503).json({ error: 'battery data unavailable' });
-        return res.json({ ...cachedBatDGS2, fetched_at: cachedBatDGS2At });
-    }
-    res.status(404).json({ error: 'no battery data for this station' });
+    if (!isDGS2(req.params.id)) return res.status(404).json({ error: 'no battery data for this station' });
+    if (!cachedBatDGS2) return res.status(503).json({ error: 'battery data unavailable' });
+    res.json({ bat_pct: cachedBatDGS2.bat_pct, status: cachedBatDGS2.status, fetched_at: cachedBatDGS2At });
+});
+
+app.get('/api/battery/:id/history', (req, res) => {
+    if (!isDGS2(req.params.id)) return res.status(404).json({ error: 'no history for this station' });
+    res.json(batHistory);
 });
 
 app.listen(PORT, () => {

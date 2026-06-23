@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const net = require('net');
 const path = require('path');
+const https = require('https');
+const http = require('http');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -289,12 +291,11 @@ function fetchStationDetail(station_id) {
                 const o = chBase + i * HSTATE_CH_SIZE;
                 if (!p[o]) continue; // active=0 → skip
                 out.channels.push({
-                    index: i,
-                    mode:         p[o + 1],
-                    digital_mode: p[o + 2],
-                    iq_rec_on:    !!p[o + 3],
-                    audio_rec_on: !!p[o + 4],
-                    dem_run:      !!p[o + 5],
+                    index:        i,
+                    mode:         p[o + 1],   // 0=NONE,1=AM,2=FM
+                    iq_rec_on:    !!p[o + 2],
+                    audio_rec_on: !!p[o + 3],
+                    dem_run:      !!p[o + 4],
                     s_mhz: p.readFloatLE(o + 8),
                     e_mhz: p.readFloatLE(o + 12),
                     owner: p.subarray(o + 16, o + 48).toString('utf8').replace(/\0/g, ''),
@@ -751,6 +752,39 @@ app.get('/api/station/:id/detail', async (req, res) => {
     const detail = await fetchStationDetail(id);
     if (!detail) return res.status(404).json({ error: 'station unavailable' });
     res.json(detail);
+});
+
+// ── DGS-2 Battery API (polls bat_api.py on DGS-2:9731) ──────────────────────
+const DGS2_BAT_URL = process.env.DGS2_BAT_URL || 'http://100.126.69.82:9731/battery';
+const BAT_POLL_MS  = 30000;
+let   cachedBatDGS2 = null;
+let   cachedBatDGS2At = 0;
+
+function fetchDGS2Battery() {
+    return new Promise((resolve) => {
+        const mod = DGS2_BAT_URL.startsWith('https') ? https : http;
+        mod.get(DGS2_BAT_URL, { timeout: 4000 }, (r) => {
+            let raw = '';
+            r.on('data', d => raw += d);
+            r.on('end', () => {
+                try { resolve(JSON.parse(raw)); } catch { resolve(null); }
+            });
+        }).on('error', () => resolve(null)).on('timeout', function() { this.destroy(); resolve(null); });
+    });
+}
+
+async function batPollLoop() {
+    while (true) {
+        const b = await fetchDGS2Battery();
+        if (b) { cachedBatDGS2 = b; cachedBatDGS2At = Date.now(); }
+        await new Promise(r => setTimeout(r, BAT_POLL_MS));
+    }
+}
+batPollLoop();
+
+app.get('/api/battery/DGS-2', (req, res) => {
+    if (!cachedBatDGS2) return res.status(503).json({ error: 'battery data unavailable' });
+    res.json({ ...cachedBatDGS2, fetched_at: cachedBatDGS2At });
 });
 
 app.listen(PORT, () => {

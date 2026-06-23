@@ -376,12 +376,36 @@
             font-variant-numeric: tabular-nums;
         }
 
-        .bat-row { display: flex; align-items: center; gap: 12px; }
+        .bat-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
         .bat-pct { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 52px; }
         .bat-pct.low  { color: #ff6650; }
         .bat-pct.med  { color: #ffb800; }
         .bat-pct.high { color: #3cdc64; }
         .bat-bar { font-family: monospace; font-size: 12px; color: var(--text-faint); letter-spacing: 1px; }
+        .bat-status {
+            display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; padding: 2px 8px; border-radius: 4px;
+        }
+        .bat-status.charging    { background: rgba(74,222,128,0.12); color: #3cdc64; }
+        .bat-status.discharging { background: rgba(251,191,36,0.12); color: #ffb800; }
+        .bat-status.notcharging { background: rgba(255,255,255,0.06); color: var(--text-dim); }
+        .bat-status.full        { background: rgba(74,222,128,0.12); color: #3cdc64; }
+        .bat-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 8px; margin-top: 4px;
+        }
+        .bat-grid-item .lbl {
+            font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+            color: var(--text-faint); text-transform: uppercase; margin-bottom: 3px;
+        }
+        .bat-grid-item .val { font-size: 13px; color: #fff; font-weight: 600; font-variant-numeric: tabular-nums; }
+        .chrow .chdemod {
+            display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+            padding: 1px 5px; border-radius: 3px;
+            background: rgba(139,92,246,0.15); color: #a78bfa;
+            text-transform: uppercase; margin-left: 5px;
+        }
+        .chrow .dem-active { color: #3cdc64; font-size: 9px; margin-left: 4px; }
 
         /* ── Radiosonde ────────────────────────────────────────────── */
         .sonde-bar {
@@ -545,9 +569,11 @@
 const POLL_MS = 3000;
 const DETAIL_POLL_MS = 5000;
 const SONDE_POLL_MS = 6000;
+const BAT_DETAIL_STATIONS = new Set(['DGS-2']);
 const expanded = new Set();
 const detailCache = new Map();
 const detailTimers = new Map();
+const batCache = new Map();
 let notes = {};                // station_id -> { text, updatedAt }
 const noteDirty = new Set();   // currently being edited — don't overwrite from server
 
@@ -724,16 +750,37 @@ function renderDetail(id) {
 
     let html = '';
 
-    if (d.bat_pct >= 1 && d.bat_pct <= 100) {
-        const batCls = d.bat_pct <= 20 ? 'low' : d.bat_pct <= 50 ? 'med' : 'high';
-        const batBar = Math.round(d.bat_pct / 10);
-        const filled = '['.padEnd(1) + '#'.repeat(batBar).padEnd(10, '-') + ']';
+    const batDetail = batCache.get(id);
+    const batPct = batDetail?.bat_pct ?? d.bat_pct;
+    if (batPct >= 1 && batPct <= 100) {
+        const batCls = batPct <= 20 ? 'low' : batPct <= 50 ? 'med' : 'high';
+        const batBar = Math.round(batPct / 10);
+        const filled = '[' + '#'.repeat(batBar).padEnd(10, '-') + ']';
+        const statusRaw = (batDetail?.status || '').toLowerCase().replace(/\s+/g, '');
+        const statusCls = statusRaw === 'charging' ? 'charging'
+                        : statusRaw === 'discharging' ? 'discharging'
+                        : statusRaw === 'full' ? 'full' : 'notcharging';
+        const statusLabel = batDetail?.status || '';
+        let batExtra = '';
+        if (batDetail) {
+            const vV   = batDetail.voltage_now_uv  ? (batDetail.voltage_now_uv  / 1e6).toFixed(2) + ' V'  : '—';
+            const chNow  = batDetail.charge_now_uah  ? (batDetail.charge_now_uah  / 1000).toFixed(0) + ' mAh' : '—';
+            const chFull = batDetail.charge_full_uah ? (batDetail.charge_full_uah / 1000).toFixed(0) + ' mAh' : '—';
+            const cyc  = batDetail.cycle_count != null ? batDetail.cycle_count : '—';
+            batExtra = `<div class="bat-grid">
+                <div class="bat-grid-item"><div class="lbl">Voltage</div><div class="val">${vV}</div></div>
+                <div class="bat-grid-item"><div class="lbl">Charge</div><div class="val">${chNow} / ${chFull}</div></div>
+                <div class="bat-grid-item"><div class="lbl">Cycles</div><div class="val">${cyc}</div></div>
+            </div>`;
+        }
         html += `<div class="detail-section detail-bat">
             <div class="detail-title">Host Battery</div>
             <div class="bat-row">
-                <span class="bat-pct ${batCls}">${d.bat_pct}%</span>
+                <span class="bat-pct ${batCls}">${batPct}%</span>
                 <span class="bat-bar">${filled}</span>
+                ${statusLabel ? `<span class="bat-status ${statusCls}">${escapeHtml(statusLabel)}</span>` : ''}
             </div>
+            ${batExtra}
         </div>`;
     }
 
@@ -750,9 +797,10 @@ function renderDetail(id) {
             if (c.iq_rec_on)          rec = `<span class="chrec iq">IQ REC</span>`;
             else if (c.audio_rec_on)  rec = `<span class="chrec audio">AUDIO REC</span>`;
             const owner = c.owner ? ` · ${escapeHtml(c.owner)}` : '';
+            const demTag = c.dem_run ? `<span class="dem-active">▶</span>` : '';
             html += `<div class="chrow">
                 <span class="chnum">${String(c.index + 1).padStart(2,'0')}</span>
-                <span><span class="chmode">${modeName(c.mode)}</span><span class="chfreq">${center.toFixed(3)} MHz</span>${owner}</span>
+                <span><span class="chmode">${modeName(c.mode)}</span><span class="chfreq">${center.toFixed(3)} MHz</span>${demTag}${owner}</span>
                 <span style="color:var(--text-faint);font-size:11px;">${bw_kHz.toFixed(0)} kHz</span>
                 ${rec}
             </div>`;
@@ -822,6 +870,7 @@ window.toggleStation = function(id, ev) {
     } else {
         expanded.add(id);
         fetchDetail(id);
+        if (BAT_DETAIL_STATIONS.has(id)) fetchBatDetail(id);
         detailTimers.set(id, setInterval(() => fetchDetail(id), DETAIL_POLL_MS));
     }
     const card = document.querySelector(`.station[data-id="${id}"]`);
@@ -838,6 +887,21 @@ async function fetchDetail(id) {
         if (!r.ok) return;
         const d = await r.json();
         detailCache.set(id, d);
+        if (BAT_DETAIL_STATIONS.has(id)) fetchBatDetail(id);
+        const card = document.querySelector(`.station[data-id="${id}"]`);
+        if (card && card.classList.contains('expanded')) {
+            const detail = card.querySelector('.detail');
+            if (detail) detail.innerHTML = renderDetail(id);
+        }
+    } catch (e) { /* silent */ }
+}
+
+async function fetchBatDetail(id) {
+    try {
+        const r = await fetch('/api/battery/' + encodeURIComponent(id));
+        if (!r.ok) return;
+        const b = await r.json();
+        batCache.set(id, b);
         const card = document.querySelector(`.station[data-id="${id}"]`);
         if (card && card.classList.contains('expanded')) {
             const detail = card.querySelector('.detail');

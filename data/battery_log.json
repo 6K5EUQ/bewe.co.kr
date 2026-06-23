@@ -1,0 +1,11 @@
+[
+  {
+    "ts": "2026-06-23T16:04:33Z",
+    "bat_pct": 97,
+    "status": "Not charging",
+    "charge_now_uah": 4559000,
+    "charge_full_uah": 4700000,
+    "voltage_now_uv": 17401000,
+    "cycle_count": 55
+  }
+]

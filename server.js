@@ -782,9 +782,14 @@ async function batPollLoop() {
 }
 batPollLoop();
 
-app.get('/api/battery/DGS-2', (req, res) => {
-    if (!cachedBatDGS2) return res.status(503).json({ error: 'battery data unavailable' });
-    res.json({ ...cachedBatDGS2, fetched_at: cachedBatDGS2At });
+// station_id may be 'DGS-2' or 'DGS-2_DGS-2' depending on relay encoding
+app.get('/api/battery/:id', (req, res) => {
+    const id = req.params.id;
+    if (id === 'DGS-2' || id === 'DGS-2_DGS-2') {
+        if (!cachedBatDGS2) return res.status(503).json({ error: 'battery data unavailable' });
+        return res.json({ ...cachedBatDGS2, fetched_at: cachedBatDGS2At });
+    }
+    res.status(404).json({ error: 'no battery data for this station' });
 });
 
 app.listen(PORT, () => {

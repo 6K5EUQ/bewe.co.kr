@@ -613,7 +613,7 @@ function fmtDuration(sec) {
     if (m < 60) return m + 'm';
     return (sec / 3600).toFixed(1) + 'h';
 }
-const MODE_NAMES = ['AM','FM','USB','LSB','CW','DIGITAL','—','—','—','—'];
+const MODE_NAMES = ['—','AM','FM','—','—','—','—','—','—','—'];
 function modeName(m) { return MODE_NAMES[m] || '—'; }
 const SCHED_STATUS = { 0: ['idle','IDLE'], 1: ['armed','ARMED'], 2: ['active','RECORDING'], 3: ['done','DONE'] };
 function schedStatus(s) { return SCHED_STATUS[s] || ['idle','—']; }

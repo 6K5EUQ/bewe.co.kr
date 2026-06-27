@@ -755,12 +755,15 @@ app.get('/api/station/:id/detail', async (req, res) => {
 });
 
 // ── DGS-2 Battery API (polls bat_api.py on DGS-2:9731) ──────────────────────
-const DGS2_BAT_URL  = process.env.DGS2_BAT_URL || 'http://100.126.69.82:9731/battery';
-const BAT_POLL_MS   = 30 * 1000;
-const BAT_HIST_MS   = 24 * 60 * 60 * 1000; // keep 24h
-let   cachedBatDGS2 = null;
+const DGS2_BAT_URL    = process.env.DGS2_BAT_URL || 'http://100.126.69.82:9731/battery';
+const BAT_POLL_MS     = 30 * 1000;
+const BAT_LOG_MS      = 30 * 60 * 1000;  // log to file every 30 min
+const BAT_RETAIN_MS   = 10 * 24 * 60 * 60 * 1000; // keep 10 days
+const BAT_LOG_FILE    = path.join(__dirname, 'data', 'battery_DGS-2.json');
+let   cachedBatDGS2   = null;
 let   cachedBatDGS2At = 0;
-const batHistory    = []; // { ts, bat_pct, status }
+const batHistory      = []; // { ts, bat_pct, status }
+let   lastBatLogAt    = 0;
 
 function fetchDGS2Battery() {
     return new Promise((resolve) => {
@@ -775,15 +778,38 @@ function fetchDGS2Battery() {
     });
 }
 
+function saveBatLog(entry) {
+    try {
+        let log = [];
+        if (fs.existsSync(BAT_LOG_FILE)) {
+            try { log = JSON.parse(fs.readFileSync(BAT_LOG_FILE, 'utf8')); } catch { log = []; }
+        }
+        const cutoff = new Date(Date.now() - BAT_RETAIN_MS).toISOString();
+        log = log.filter(e => e.t > cutoff);
+        log.push(entry);
+        fs.writeFileSync(BAT_LOG_FILE, JSON.stringify(log, null, 1));
+    } catch (e) { console.error('bat log save:', e.message); }
+}
+
 async function batPollLoop() {
     while (true) {
+        const now = Date.now();
         const b = await fetchDGS2Battery();
         if (b) {
             cachedBatDGS2   = b;
-            cachedBatDGS2At = Date.now();
-            batHistory.push({ ts: cachedBatDGS2At, bat_pct: b.bat_pct, status: b.status });
-            const cutoff = cachedBatDGS2At - BAT_HIST_MS;
+            cachedBatDGS2At = now;
+            batHistory.push({ ts: now, bat_pct: b.bat_pct, status: b.status });
+            const cutoff = now - BAT_RETAIN_MS;
             while (batHistory.length && batHistory[0].ts < cutoff) batHistory.shift();
+        }
+        if (now - lastBatLogAt >= BAT_LOG_MS) {
+            lastBatLogAt = now;
+            saveBatLog({
+                t:       new Date(now).toISOString(),
+                online:  !!b,
+                bat_pct: b ? (b.bat_pct ?? null) : null,
+                status:  b ? (b.status  ?? null) : null,
+            });
         }
         await new Promise(r => setTimeout(r, BAT_POLL_MS));
     }

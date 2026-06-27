@@ -82,7 +82,7 @@
 
         <h2>Core SIGINT Capabilities</h2>
         <div class="g-cards">
-          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">COMINT</div><div class="g-card-desc">Ten concurrent demodulators (AM · FM · USB · LSB · CW) across HF/VHF/UHF. The Holding List keeps tracking even when the adversary moves frequency.</div></div>
+          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">COMINT</div><div class="g-card-desc">Ten concurrent demodulators (AM · FM) across VHF/UHF. The Holding List keeps tracking even when the adversary moves frequency.</div></div>
           <div class="g-card"><div class="g-card-icon">🧭</div><div class="g-card-title">Direction Finding</div><div class="g-card-desc">Multi-site lines of bearing intersect to fix an emitter on the 3D globe in real time, with an error ellipse.</div></div>
           <div class="g-card"><div class="g-card-icon">🛩</div><div class="g-card-title">Protocol Decode</div><div class="g-card-desc">ACARS aircraft datalink, AIS vessels, and WiFi 802.11 beacons decoded to content and fused across all stations.</div></div>
           <div class="g-card"><div class="g-card-icon">📐</div><div class="g-card-title">ELINT</div><div class="g-card-desc">Radar / missile-seeker / telemetry signals analyzed across nine domains. PRI · PRF · pulse duration · baud auto-measured.</div></div>
@@ -120,7 +120,7 @@
 
         <h2>핵심 SIGINT 기능</h2>
         <div class="g-cards">
-          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">COMINT (통신 감청)</div><div class="g-card-desc">HF/VHF/UHF 10채널 동시 복조 (AM · FM · USB · LSB · CW). Holding List로 적이 주파수를 옮겨도 추적 유지.</div></div>
+          <div class="g-card"><div class="g-card-icon">📡</div><div class="g-card-title">COMINT (통신 감청)</div><div class="g-card-desc">VHF/UHF 10채널 동시 복조 (AM · FM). Holding List로 적이 주파수를 옮겨도 추적 유지.</div></div>
           <div class="g-card"><div class="g-card-icon">🧭</div><div class="g-card-title">방향 탐지 (DF)</div><div class="g-card-desc">다중 기지국 방위선(LOB)이 교차해 3D 지구본에 표적 위치를 오차 타원과 함께 실시간 측위.</div></div>
           <div class="g-card"><div class="g-card-icon">🛩</div><div class="g-card-title">프로토콜 디코드</div><div class="g-card-desc">ACARS 항공 데이터링크, AIS 선박, WiFi 802.11 비컨을 내용 단위로 디코드해 전 기지국 융합.</div></div>
           <div class="g-card"><div class="g-card-icon">📐</div><div class="g-card-title">ELINT (전자정보)</div><div class="g-card-desc">레이더 · 미사일 시커 · 텔레메트리 신호를 9개 도메인으로 분석. PRI · PRF · 펄스폭 · Baud 자동 측정.</div></div>
@@ -151,7 +151,7 @@
         <p class="g-screenshot-cap">Spectrum with max-hold (yellow) — latches peaks so burst and frequency-hopping emissions are caught between sweeps</p>
 
         <h2>COMINT — Ten Channels &amp; the Holding List</h2>
-        <p>Up to ten demodulators run at once — AM · FM · USB · LSB · CW — each working a slice of the received band. Frequencies of interest are parked in the <strong>Holding List</strong> (Waiting Channels) so a target stays tracked even when the adversary moves frequency. A 60-second rolling IQ buffer enables post-event replay of frequency-hopping and burst transmissions.</p>
+        <p>Up to ten demodulators run at once — AM · FM — each working a slice of the received band. Frequencies of interest are parked in the <strong>Holding List</strong> (Waiting Channels) so a target stays tracked even when the adversary moves frequency. A 60-second rolling IQ buffer enables post-event replay of frequency-hopping and burst transmissions.</p>
         <img src="assets/channels_holding.png" alt="Multi-channel demodulation with Holding List" class="g-screenshot">
         <p class="g-screenshot-cap">Multi-channel demodulation (colored markers) with the Holding List populated — Active Channels and Waiting Channels on the right</p>
 
@@ -200,7 +200,7 @@
         <p class="g-screenshot-cap">Max-hold(노란색) 스펙트럼 — 피크를 붙잡아 버스트·주파수도약 신호를 스윕 사이에도 포착</p>
 
         <h2>COMINT — 10채널과 Holding List</h2>
-        <p>최대 10개 복조기가 동시 동작합니다 — AM · FM · USB · LSB · CW — 각자 수신 대역의 일부를 담당합니다. 관심 주파수는 <strong>Holding List</strong>(대기 채널)에 보관되어, 적이 주파수를 옮겨도 표적 추적이 유지됩니다. 60초 롤링 IQ 버퍼로 주파수도약·버스트 송신을 사후 재생·분석할 수 있습니다.</p>
+        <p>최대 10개 복조기가 동시 동작합니다 — AM · FM — 각자 수신 대역의 일부를 담당합니다. 관심 주파수는 <strong>Holding List</strong>(대기 채널)에 보관되어, 적이 주파수를 옮겨도 표적 추적이 유지됩니다. 60초 롤링 IQ 버퍼로 주파수도약·버스트 송신을 사후 재생·분석할 수 있습니다.</p>
         <img src="assets/channels_holding.png" alt="다채널 복조 + Holding List" class="g-screenshot">
         <p class="g-screenshot-cap">다채널 동시 복조(컬러 마커) + Holding List — 우측에 활성 채널(Active)·대기 채널(Waiting)</p>
 
@@ -617,7 +617,7 @@
           <thead><tr><th>Element</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td>01 / 02 …</td><td>Channel number (index in BE_WE app, starts at 1)</td></tr>
-            <tr><td>Mode badge</td><td>AM · FM · USB · LSB · CW · ADS-B · AIS (see color table below)</td></tr>
+            <tr><td>Mode badge</td><td>AM · FM · ADS-B · AIS (see color table below)</td></tr>
             <tr><td>Frequency</td><td>Center frequency — midpoint between start and end</td></tr>
             <tr><td>Bandwidth</td><td>Channel bandwidth. Center ± (BW/2)</td></tr>
             <tr><td><span class="g-chrec iq">IQ REC</span></td><td>Raw IQ written to disk (maximum data, full post-processing possible)</td></tr>
@@ -632,8 +632,6 @@
           <tbody>
             <tr><td><span class="g-chmode am">AM</span></td><td>Amplitude modulation</td><td>Air traffic VHF, AM broadcast</td><td>118–137 MHz, 526–1605 kHz</td></tr>
             <tr><td><span class="g-chmode fm">FM</span></td><td>Frequency modulation</td><td>FM broadcast, amateur, PMR</td><td>87.5–108 MHz, 144–146 MHz</td></tr>
-            <tr><td><span class="g-chmode usb">USB / LSB</span></td><td>Single sideband</td><td>HF shortwave, maritime</td><td>2–30 MHz</td></tr>
-            <tr><td><span class="g-chmode cw">CW</span></td><td>Morse code</td><td>Military HF beacons, amateur</td><td>HF band</td></tr>
             <tr><td><span class="g-chmode ais">AIS</span></td><td>Ship auto-identification</td><td>Vessel position / ID</td><td>161.975 / 162.025 MHz</td></tr>
             <tr><td><span class="g-chmode adsb">ADS-B</span></td><td>Aircraft auto-surveillance</td><td>Aircraft position / altitude / speed</td><td>1090 MHz</td></tr>
             <tr><td><span class="g-chmode magic">MAGIC</span></td><td>BE_WE proprietary</td><td>Internal data link and control</td><td>Configurable</td></tr>
@@ -966,7 +964,7 @@
           </tr>
           <tr>
             <td>복조 방식 뱃지</td>
-            <td>AM · FM · USB · LSB · CW · ADS-B · AIS (아래 색상표 참고)</td>
+            <td>AM · FM · ADS-B · AIS (아래 색상표 참고)</td>
           </tr>
           <tr>
             <td>주파수 (MHz)</td>
@@ -1007,19 +1005,7 @@
             <td>FM 방송, 아마추어 교신, 업무용 무선</td>
             <td>87.5–108 MHz, 144–146 MHz</td>
           </tr>
-          <tr>
-            <td><span class="g-chmode usb">USB / LSB</span></td>
-            <td>단측파대</td>
-            <td>HF 단파 교신, 해상 무선</td>
-            <td>2–30 MHz</td>
-          </tr>
-          <tr>
-            <td><span class="g-chmode cw">CW</span></td>
-            <td>모스 부호</td>
-            <td>군용 HF 비컨, 아마추어</td>
-            <td>HF 대역</td>
-          </tr>
-          <tr>
+<tr>
             <td><span class="g-chmode ais">AIS</span></td>
             <td>선박 자동 식별</td>
             <td>선박 위치·ID 자동 수신</td>

@@ -834,7 +834,7 @@ app.get('/api/battery/:id/history', (req, res) => {
 const UPS_CSV        = process.env.UPS_CSV || '/home/raspb2/ups_history.csv';
 const UPS_POLL_MS    = 15000;
 const UPS_STALE_MS   = 5 * 60 * 1000;   // last sample older than this → logger considered down
-const UPS_SERIES_MAX = 720;             // ~12h at 1 row/min
+const UPS_SERIES_MAX = 1440;            // 24h at 1 row/min
 
 let cachedUps = { reachable: false, latest: null, series: [], lastUpdate: null };
 

@@ -592,7 +592,26 @@
         display: flex; justify-content: space-between; align-items: center;
         font-size: 11px; color: var(--text-dim); letter-spacing: .4px; margin-bottom: 6px;
     }
-    .ups-chart svg { width: 100%; height: auto; display: block; }
+    .ups-canvas-wrap { position: relative; width: 100%; }
+    .ups-canvas-wrap canvas { width: 100%; height: 190px; display: block; cursor: crosshair; touch-action: none; }
+    .ups-tip {
+        position: absolute; pointer-events: none; z-index: 6; opacity: 0; transition: opacity .1s;
+        background: var(--panel-strong); border: 1px solid var(--border-strong); border-radius: 8px;
+        padding: 7px 10px; font-size: 11.5px; color: var(--text); white-space: nowrap;
+        box-shadow: 0 4px 16px rgba(0,0,0,.45); font-variant-numeric: tabular-nums;
+    }
+    .ups-tip .t { color: var(--text-faint); font-size: 10px; margin-bottom: 4px; }
+    .ups-tip .r { display: flex; justify-content: space-between; gap: 16px; line-height: 1.5; }
+    .ups-ranges { display: flex; gap: 6px; }
+    .ups-ranges button {
+        background: var(--panel-strong); border: 1px solid var(--border); color: var(--text-dim);
+        font-size: 10.5px; font-weight: 600; letter-spacing: .4px; padding: 3px 9px; border-radius: 6px; cursor: pointer;
+    }
+    .ups-ranges button.active { color: var(--ok); border-color: var(--ok); background: var(--ok-bg); }
+    .ups-ranges button:hover { color: var(--text); }
+    .ups-legend { display: flex; gap: 12px; font-size: 10px; color: var(--text-faint); align-items: center; flex-wrap: wrap; }
+    .ups-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+    .ups-hint { font-size: 10px; color: var(--text-faint); margin-top: 6px; text-align: right; }
 </style>
 <div class="section-title">
     <span>Central UPS Power</span>
@@ -1152,53 +1171,174 @@ async function pollSonde() {
 }
 
 // ── Central UPS Power ────────────────────────────────────────────────
-function upsChartSvg(series) {
-    const W = 600, H = 130, padL = 4, padR = 4, padT = 8, padB = 14;
-    const pts = series.filter(s => isFinite(s.soc));
-    if (pts.length < 2) return '<div class="detail-empty" style="padding:6px 2px;">collecting samples…</div>';
-    const t0 = pts[0].t, t1 = pts[pts.length - 1].t;
-    const span = Math.max(1, t1 - t0);
-    const x = t => padL + (t - t0) / span * (W - padL - padR);
-    const y = soc => padT + (1 - Math.max(0, Math.min(100, soc)) / 100) * (H - padT - padB);
-    const line = pts.map((s, i) => (i ? 'L' : 'M') + x(s.t).toFixed(1) + ',' + y(s.soc).toFixed(1)).join(' ');
-    const area = line + ` L${x(t1).toFixed(1)},${(H - padB)} L${x(t0).toFixed(1)},${(H - padB)} Z`;
-    const onBatt = pts.filter(s => s.ac === 0);
-    const last = pts[pts.length - 1];
-    const col = last.ac === 0 ? 'var(--warn)' : (last.ac === 1 ? 'var(--ok)' : 'var(--accent)');
-    let grid = '';
-    for (const g of [25, 50, 75]) {
-        const yy = y(g).toFixed(1);
-        grid += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 4"/>`;
-        grid += `<text x="${padL + 2}" y="${(y(g) - 2).toFixed(1)}" fill="var(--text-faint)" font-size="9">${g}%</text>`;
-    }
-    const ticks = onBatt.map(s =>
-        `<rect x="${(x(s.t) - 1).toFixed(1)}" y="${H - padB + 1}" width="2" height="5" fill="var(--warn)"/>`).join('');
-    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="battery SOC trend">
-        <defs><linearGradient id="upsg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="${col}" stop-opacity="0.28"/>
-            <stop offset="1" stop-color="${col}" stop-opacity="0.02"/>
-        </linearGradient></defs>
-        ${grid}
-        <path d="${area}" fill="url(#upsg)"/>
-        <path d="${line}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>
-        <circle cx="${x(t1).toFixed(1)}" cy="${y(last.soc).toFixed(1)}" r="3.5" fill="${col}"/>
-        ${ticks}
-    </svg>`;
+function upsColors() {
+    const cs = getComputedStyle(document.documentElement);
+    const g = n => (cs.getPropertyValue(n) || '').trim() || '#888888';
+    return { ok: g('--ok'), warn: g('--warn'), accent: g('--accent'),
+        border: g('--border'), text: g('--text'), dim: g('--text-dim'), faint: g('--text-faint') };
 }
-
-function fmtSpan(ms) {
-    const m = Math.round(ms / 60000);
-    if (m < 60) return m + ' min';
-    const h = m / 60;
-    return (h % 1 === 0 ? h : h.toFixed(1)) + ' h';
+function upsHexA(hex, a) {
+    hex = String(hex).replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const n = parseInt(hex, 16);
+    if (!isFinite(n)) return `rgba(136,136,136,${a})`;
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
+function upsClock(t)  { const d = new Date(t); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+function upsClockS(t) { const d = new Date(t); return upsClock(t) + ':' + String(d.getSeconds()).padStart(2,'0'); }
 
+const GAP_MS = 150 * 1000;   // >2.5min between samples = downtime/off (grey gap)
+
+const upsChart = {
+    cv: null, ctx: null, tip: null, data: [], W: 600, H: 190, dpr: 1,
+    span: 24 * 3600 * 1000, follow: true, start: 0, end: 0, hoverX: null, drag: null, _ro: null,
+
+    init(canvas, tip) {
+        this.cv = canvas; this.tip = tip; this.ctx = canvas.getContext('2d');
+        if (this._ro) this._ro.disconnect();
+        this._ro = new ResizeObserver(() => { this.fit(); this.draw(); });
+        this._ro.observe(canvas.parentElement);
+        canvas.onmousemove = e => { const r = this.cv.getBoundingClientRect(); this.hoverX = e.clientX - r.left; this.draw(); };
+        canvas.onmouseleave = () => { this.hoverX = null; this.tip.style.opacity = 0; this.draw(); };
+        canvas.onwheel = e => this.onWheel(e);
+        canvas.onmousedown = e => { const w = this.win(); this.drag = { x: e.clientX, a: w[0], b: w[1] }; };
+        canvas.ondblclick = () => { this.follow = true; this.span = 24 * 3600 * 1000; this.draw(); };
+        if (!this._bound) {
+            window.addEventListener('mouseup', () => { this.drag = null; });
+            window.addEventListener('mousemove', e => this.onDragMove(e));
+            this._bound = true;
+        }
+        this.fit();
+    },
+    fit() {
+        const w = (this.cv.parentElement && this.cv.parentElement.clientWidth) || 600;
+        this.dpr = window.devicePixelRatio || 1;
+        this.W = w; this.H = 190;
+        this.cv.width = Math.round(w * this.dpr); this.cv.height = Math.round(this.H * this.dpr);
+    },
+    setData(series) { this.data = (series || []).filter(s => isFinite(s.t) && isFinite(s.soc)); this.draw(); },
+    setSpan(ms) { this.follow = true; this.span = ms; this.draw(); },
+    win() {
+        const d = this.data; if (!d.length) return [0, 1];
+        const firstT = d[0].t, lastT = d[d.length - 1].t;
+        if (this.follow) return [Math.max(firstT, lastT - this.span), lastT];
+        return [Math.max(firstT, this.start), Math.min(lastT, this.end)];
+    },
+    clampView() {
+        if (!this.data.length) return;
+        const f = this.data[0].t, l = this.data[this.data.length - 1].t;
+        let s = this.start, e = this.end, sp = e - s;
+        if (s < f) { s = f; e = f + sp; }
+        if (e > l) { e = l; s = l - sp; }
+        if (s < f) s = f;
+        this.start = s; this.end = e;
+    },
+    onWheel(e) {
+        e.preventDefault();
+        const r = this.cv.getBoundingClientRect(), px = e.clientX - r.left;
+        const [a, b] = this.win(), sp = b - a, padL = 6, plotW = this.W - 12;
+        const tc = a + (px - padL) / plotW * sp, f = e.deltaY < 0 ? 0.8 : 1.25;
+        const ns = Math.max(5 * 60 * 1000, Math.min(24 * 3600 * 1000, sp * f));
+        const ratio = (tc - a) / sp;
+        this.follow = false; this.start = tc - ratio * ns; this.end = this.start + ns;
+        this.clampView(); this.draw();
+    },
+    onDragMove(e) {
+        if (!this.drag) return;
+        const plotW = this.W - 12, sp = this.drag.b - this.drag.a;
+        const dt = -(e.clientX - this.drag.x) / plotW * sp;
+        this.follow = false; this.start = this.drag.a + dt; this.end = this.drag.b + dt;
+        this.clampView(); this.draw();
+    },
+    draw() {
+        const ctx = this.ctx; if (!ctx) return;
+        const W = this.W, H = this.H, dpr = this.dpr, C = upsColors();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+        const padL = 6, padR = 6, padT = 10, padB = 18, plotW = W - padL - padR, plotH = H - padT - padB;
+        const d = this.data;
+        if (d.length < 2) { ctx.fillStyle = C.faint; ctx.font = '12px sans-serif'; ctx.fillText('collecting samples…', padL, padT + 16); return; }
+        const [a, b] = this.win(), span = Math.max(1, b - a);
+        const X = t => padL + (t - a) / span * plotW;
+        const Y = s => padT + (1 - Math.max(0, Math.min(100, s)) / 100) * plotH;
+
+        // Y grid
+        ctx.font = '9px sans-serif'; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+        for (const g of [0, 25, 50, 75, 100]) {
+            const yy = Y(g);
+            ctx.strokeStyle = C.border; ctx.lineWidth = 1; ctx.setLineDash(g === 0 || g === 100 ? [] : [3, 4]);
+            ctx.beginPath(); ctx.moveTo(padL, yy + 0.5); ctx.lineTo(W - padR, yy + 0.5); ctx.stroke();
+            ctx.fillStyle = C.faint; ctx.fillText(g + '%', padL + 2, yy - 2);
+        }
+        ctx.setLineDash([]);
+        // X grid + time labels
+        const N = 5;
+        for (let i = 0; i <= N; i++) {
+            const t = a + span * i / N, xx = X(t);
+            ctx.strokeStyle = C.border; ctx.globalAlpha = 0.4;
+            ctx.beginPath(); ctx.moveTo(xx + 0.5, padT); ctx.lineTo(xx + 0.5, H - padB); ctx.stroke(); ctx.globalAlpha = 1;
+            ctx.fillStyle = C.faint; ctx.textAlign = i === 0 ? 'left' : (i === N ? 'right' : 'center');
+            ctx.fillText(upsClock(t), Math.min(Math.max(xx, padL), W - padR), H - padB + 11);
+        }
+        ctx.textAlign = 'left';
+
+        const vis = d.filter(p => p.t >= a - span * 0.03 && p.t <= b + span * 0.03);
+        // segments: colour by ac state; grey flat line across data gaps (downtime/off)
+        for (let i = 1; i < vis.length; i++) {
+            const p0 = vis[i - 1], p1 = vis[i];
+            if ((p1.t - p0.t) > GAP_MS) {
+                const x0 = X(p0.t), x1 = X(p1.t), yy = Y(p0.soc);
+                ctx.fillStyle = 'rgba(150,150,150,0.10)'; ctx.fillRect(x0, padT, x1 - x0, plotH);
+                ctx.strokeStyle = C.faint; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+                ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x1, yy); ctx.stroke(); ctx.setLineDash([]);
+                continue;
+            }
+            const col = p1.ac === 0 ? C.warn : (p1.ac === 1 ? C.ok : C.accent);
+            ctx.beginPath();
+            ctx.moveTo(X(p0.t), Y(p0.soc)); ctx.lineTo(X(p1.t), Y(p1.soc));
+            ctx.lineTo(X(p1.t), H - padB); ctx.lineTo(X(p0.t), H - padB); ctx.closePath();
+            ctx.fillStyle = upsHexA(col, 0.14); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(X(p0.t), Y(p0.soc)); ctx.lineTo(X(p1.t), Y(p1.soc));
+            ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke();
+        }
+        const last = vis[vis.length - 1];
+        if (last) {
+            const col = last.ac === 0 ? C.warn : (last.ac === 1 ? C.ok : C.accent);
+            ctx.beginPath(); ctx.arc(X(last.t), Y(last.soc), 3, 0, 7); ctx.fillStyle = col; ctx.fill();
+        }
+
+        // hover crosshair + tooltip
+        if (this.hoverX != null) {
+            const t = a + (this.hoverX - padL) / plotW * span;
+            let best = null, bd = 1e18;
+            for (const p of vis) { const dd = Math.abs(p.t - t); if (dd < bd) { bd = dd; best = p; } }
+            if (best) {
+                const hx = X(best.t), hy = Y(best.soc);
+                ctx.strokeStyle = C.dim; ctx.setLineDash([2, 3]); ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(hx + 0.5, padT); ctx.lineTo(hx + 0.5, H - padB); ctx.stroke(); ctx.setLineDash([]);
+                ctx.beginPath(); ctx.arc(hx, hy, 3.5, 0, 7); ctx.fillStyle = C.text; ctx.fill();
+                const st = best.ac === 1 ? 'Charging' : (best.ac === 0 ? 'On battery' : 'AC unknown');
+                this.tip.innerHTML = `<div class="t">${upsClockS(best.t)}</div>` +
+                    `<div class="r"><span>Charge</span><b>${best.soc.toFixed(1)}%</b></div>` +
+                    `<div class="r"><span>Voltage</span><b>${(best.volt || 0).toFixed(2)} V</b></div>` +
+                    `<div class="r"><span>State</span><b>${st}</b></div>`;
+                this.tip.style.opacity = 1;
+                const tw = this.tip.offsetWidth, th = this.tip.offsetHeight;
+                let lx = hx + 12; if (lx + tw > W) lx = hx - 12 - tw; if (lx < 0) lx = 4;
+                let ly = hy - th - 8; if (ly < 0) ly = hy + 12;
+                this.tip.style.left = lx + 'px'; this.tip.style.top = ly + 'px';
+            }
+        }
+    },
+};
+
+let upsBuilt = false;
 function renderUps(d) {
     const panel = document.getElementById('ups-panel');
     const countEl = document.getElementById('ups-count');
     if (!panel) return;
 
     if (!d || !d.reachable || !d.latest) {
+        upsBuilt = false;
         if (countEl) countEl.textContent = 'logger offline';
         panel.innerHTML = `
             <div class="ups-bar offline">
@@ -1217,35 +1357,64 @@ function renderUps(d) {
     const L = d.latest;
     const charging = L.ac === 1, onBatt = L.ac === 0;
     const soc = Math.max(0, Math.min(100, L.soc));
-    const fillCol = charging ? 'var(--ok)' : (onBatt ? 'var(--warn)' : 'var(--accent)');
+    const col = charging ? 'var(--ok)' : (onBatt ? 'var(--warn)' : 'var(--accent)');
     let badge, bcls;
     if (charging)     { badge = '⚡ Charging';  bcls = 'chg';  }
     else if (onBatt)  { badge = 'On Battery';   bcls = 'batt'; }
     else              { badge = 'AC Unknown';   bcls = 'unk';  }
     if (countEl) countEl.textContent = charging ? 'charging' : (onBatt ? 'on battery' : 'AC unknown');
 
-    const series = d.series || [];
-    const spanTxt = series.length >= 2 ? fmtSpan(series[series.length - 1].t - series[0].t) : '—';
-
-    panel.innerHTML = `
-        <div class="ups-bar">
-            <div class="ups-id">
-                <div class="ups-batt"><div class="ups-batt-fill" style="width:${soc}%;background:${fillCol}"></div></div>
-                <div>
-                    <span class="ups-recv-name">raspb2 · X1200 UPS</span>
-                    <div class="ups-recv-meta">Central power backup · MAX17040 fuel gauge</div>
+    if (!upsBuilt) {
+        panel.innerHTML = `
+            <div class="ups-bar">
+                <div class="ups-id">
+                    <div class="ups-batt"><div class="ups-batt-fill" id="ups-fill"></div></div>
+                    <div>
+                        <span class="ups-recv-name">raspb2 · X1200 UPS</span>
+                        <div class="ups-recv-meta">Central power backup · MAX17040 fuel gauge</div>
+                    </div>
                 </div>
+                <div class="ups-metrics">
+                    <div class="ups-soc" id="ups-socbox"><span id="ups-socv">—</span><span class="u">%</span></div>
+                    <div class="ups-volt" id="ups-voltbox">—</div>
+                </div>
+                <span class="ups-badge" id="ups-badge">—</span>
             </div>
-            <div class="ups-metrics">
-                <div class="ups-soc" style="color:${fillCol}">${soc.toFixed(1)}<span class="u">%</span></div>
-                <div class="ups-volt">${isFinite(L.volt) ? L.volt.toFixed(2) + ' V' : '—'}</div>
-            </div>
-            <span class="ups-badge ${bcls}">${badge}</span>
-        </div>
-        <div class="ups-chart">
-            <div class="ups-chart-head"><span>Battery charge — last ${spanTxt}</span><span>⧗ on-battery ticks in amber</span></div>
-            ${upsChartSvg(series)}
-        </div>`;
+            <div class="ups-chart">
+                <div class="ups-chart-head">
+                    <div class="ups-ranges">
+                        <button data-h="1">1h</button><button data-h="6">6h</button>
+                        <button data-h="24" class="active">24h</button><button data-h="0">All</button>
+                    </div>
+                    <div class="ups-legend">
+                        <span><i style="background:var(--ok)"></i>charging</span>
+                        <span><i style="background:var(--warn)"></i>on battery</span>
+                        <span><i style="background:var(--text-faint)"></i>offline / down</span>
+                    </div>
+                </div>
+                <div class="ups-canvas-wrap"><canvas id="ups-canvas"></canvas><div class="ups-tip" id="ups-tip"></div></div>
+                <div class="ups-hint">wheel = zoom · drag = pan · double-click = reset</div>
+            </div>`;
+        upsChart.init(document.getElementById('ups-canvas'), document.getElementById('ups-tip'));
+        panel.querySelectorAll('.ups-ranges button').forEach(btn => {
+            btn.onclick = () => {
+                panel.querySelectorAll('.ups-ranges button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const h = +btn.dataset.h;
+                if (h === 0) { upsChart.follow = true; upsChart.span = 1e15; upsChart.draw(); }
+                else upsChart.setSpan(h * 3600 * 1000);
+            };
+        });
+        upsBuilt = true;
+    }
+
+    document.getElementById('ups-socv').textContent = soc.toFixed(1);
+    document.getElementById('ups-socbox').style.color = col;
+    document.getElementById('ups-voltbox').textContent = isFinite(L.volt) ? L.volt.toFixed(2) + ' V' : '—';
+    const bd = document.getElementById('ups-badge'); bd.className = 'ups-badge ' + bcls; bd.textContent = badge;
+    const fill = document.getElementById('ups-fill'); fill.style.width = soc + '%'; fill.style.background = col;
+
+    upsChart.setData(d.series || []);
 }
 
 async function pollUps() {

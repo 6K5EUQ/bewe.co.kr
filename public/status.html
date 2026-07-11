@@ -552,6 +552,54 @@
 </div>
 <div id="fr24-panel"></div>
 
+<!-- Central UPS Power -->
+<style>
+    .ups-bar {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 16px 18px; flex-wrap: wrap;
+    }
+    .ups-bar.offline { opacity: .8; }
+    .ups-id { display: flex; align-items: center; gap: 14px; min-width: 220px; }
+    .ups-batt {
+        position: relative; width: 62px; height: 30px; border: 2px solid var(--border-strong);
+        border-radius: 5px; flex: none;
+    }
+    .ups-batt::after {
+        content: ''; position: absolute; right: -6px; top: 8px; width: 4px; height: 12px;
+        background: var(--border-strong); border-radius: 0 2px 2px 0;
+    }
+    .ups-batt-fill { position: absolute; inset: 3px; width: 0; border-radius: 2px; transition: width .5s ease, background .3s; }
+    .ups-recv-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .ups-recv-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; letter-spacing: .3px; }
+    .ups-metrics { display: flex; align-items: baseline; gap: 22px; }
+    .ups-soc { font-size: 30px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .ups-soc .u { font-size: 12px; font-weight: 500; color: var(--text-dim); margin-left: 3px; }
+    .ups-volt { font-size: 15px; font-weight: 600; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+    .ups-badge {
+        font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
+        padding: 5px 11px; border-radius: 999px; white-space: nowrap;
+    }
+    .ups-badge.chg  { color: var(--ok);   background: var(--ok-bg);   border: 1px solid var(--ok); }
+    .ups-badge.batt { color: var(--warn); background: var(--warn-bg); border: 1px solid var(--warn); }
+    .ups-badge.unk  { color: var(--text-dim); background: var(--panel-strong); border: 1px solid var(--border); }
+    .ups-badge.off  { color: var(--err);  background: var(--err-bg);  border: 1px solid var(--err); }
+    .ups-chart {
+        margin-top: 10px; background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 14px 16px 10px;
+    }
+    .ups-chart-head {
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 11px; color: var(--text-dim); letter-spacing: .4px; margin-bottom: 6px;
+    }
+    .ups-chart svg { width: 100%; height: auto; display: block; }
+</style>
+<div class="section-title">
+    <span>Central UPS Power</span>
+    <span class="count" id="ups-count">–</span>
+</div>
+<div id="ups-panel"></div>
+
 <div class="footer">
     <span class="live"><span class="pill-dot" style="color:var(--ok);background:var(--ok)"></span> LIVE · auto-refresh every 3s</span>
     <span>BEWE Operations Console · 2026</span>
@@ -561,6 +609,7 @@
 const POLL_MS = 3000;
 const DETAIL_POLL_MS = 5000;
 const SONDE_POLL_MS = 6000;
+const UPS_POLL_MS = 15000;
 const BAT_DETAIL_STATIONS = new Set(['DGS-2', 'DGS-2_DGS-2']);
 const expanded = new Set();
 const detailCache = new Map();
@@ -1102,6 +1151,113 @@ async function pollSonde() {
     }
 }
 
+// ── Central UPS Power ────────────────────────────────────────────────
+function upsChartSvg(series) {
+    const W = 600, H = 130, padL = 4, padR = 4, padT = 8, padB = 14;
+    const pts = series.filter(s => isFinite(s.soc));
+    if (pts.length < 2) return '<div class="detail-empty" style="padding:6px 2px;">collecting samples…</div>';
+    const t0 = pts[0].t, t1 = pts[pts.length - 1].t;
+    const span = Math.max(1, t1 - t0);
+    const x = t => padL + (t - t0) / span * (W - padL - padR);
+    const y = soc => padT + (1 - Math.max(0, Math.min(100, soc)) / 100) * (H - padT - padB);
+    const line = pts.map((s, i) => (i ? 'L' : 'M') + x(s.t).toFixed(1) + ',' + y(s.soc).toFixed(1)).join(' ');
+    const area = line + ` L${x(t1).toFixed(1)},${(H - padB)} L${x(t0).toFixed(1)},${(H - padB)} Z`;
+    const onBatt = pts.filter(s => s.ac === 0);
+    const last = pts[pts.length - 1];
+    const col = last.ac === 0 ? 'var(--warn)' : (last.ac === 1 ? 'var(--ok)' : 'var(--accent)');
+    let grid = '';
+    for (const g of [25, 50, 75]) {
+        const yy = y(g).toFixed(1);
+        grid += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 4"/>`;
+        grid += `<text x="${padL + 2}" y="${(y(g) - 2).toFixed(1)}" fill="var(--text-faint)" font-size="9">${g}%</text>`;
+    }
+    const ticks = onBatt.map(s =>
+        `<rect x="${(x(s.t) - 1).toFixed(1)}" y="${H - padB + 1}" width="2" height="5" fill="var(--warn)"/>`).join('');
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="battery SOC trend">
+        <defs><linearGradient id="upsg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="${col}" stop-opacity="0.28"/>
+            <stop offset="1" stop-color="${col}" stop-opacity="0.02"/>
+        </linearGradient></defs>
+        ${grid}
+        <path d="${area}" fill="url(#upsg)"/>
+        <path d="${line}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="${x(t1).toFixed(1)}" cy="${y(last.soc).toFixed(1)}" r="3.5" fill="${col}"/>
+        ${ticks}
+    </svg>`;
+}
+
+function fmtSpan(ms) {
+    const m = Math.round(ms / 60000);
+    if (m < 60) return m + ' min';
+    const h = m / 60;
+    return (h % 1 === 0 ? h : h.toFixed(1)) + ' h';
+}
+
+function renderUps(d) {
+    const panel = document.getElementById('ups-panel');
+    const countEl = document.getElementById('ups-count');
+    if (!panel) return;
+
+    if (!d || !d.reachable || !d.latest) {
+        if (countEl) countEl.textContent = 'logger offline';
+        panel.innerHTML = `
+            <div class="ups-bar offline">
+                <div class="ups-id">
+                    <div class="ups-batt"><div class="ups-batt-fill" style="background:var(--err)"></div></div>
+                    <div>
+                        <span class="ups-recv-name">raspb2 · X1200 UPS</span>
+                        <div class="ups-recv-meta">battery logger unreachable</div>
+                    </div>
+                </div>
+                <span class="ups-badge off">Offline</span>
+            </div>`;
+        return;
+    }
+
+    const L = d.latest;
+    const charging = L.ac === 1, onBatt = L.ac === 0;
+    const soc = Math.max(0, Math.min(100, L.soc));
+    const fillCol = charging ? 'var(--ok)' : (onBatt ? 'var(--warn)' : 'var(--accent)');
+    let badge, bcls;
+    if (charging)     { badge = '⚡ Charging';  bcls = 'chg';  }
+    else if (onBatt)  { badge = 'On Battery';   bcls = 'batt'; }
+    else              { badge = 'AC Unknown';   bcls = 'unk';  }
+    if (countEl) countEl.textContent = charging ? 'charging' : (onBatt ? 'on battery' : 'AC unknown');
+
+    const series = d.series || [];
+    const spanTxt = series.length >= 2 ? fmtSpan(series[series.length - 1].t - series[0].t) : '—';
+
+    panel.innerHTML = `
+        <div class="ups-bar">
+            <div class="ups-id">
+                <div class="ups-batt"><div class="ups-batt-fill" style="width:${soc}%;background:${fillCol}"></div></div>
+                <div>
+                    <span class="ups-recv-name">raspb2 · X1200 UPS</span>
+                    <div class="ups-recv-meta">Central power backup · MAX17040 fuel gauge</div>
+                </div>
+            </div>
+            <div class="ups-metrics">
+                <div class="ups-soc" style="color:${fillCol}">${soc.toFixed(1)}<span class="u">%</span></div>
+                <div class="ups-volt">${isFinite(L.volt) ? L.volt.toFixed(2) + ' V' : '—'}</div>
+            </div>
+            <span class="ups-badge ${bcls}">${badge}</span>
+        </div>
+        <div class="ups-chart">
+            <div class="ups-chart-head"><span>Battery charge — last ${spanTxt}</span><span>⧗ on-battery ticks in amber</span></div>
+            ${upsChartSvg(series)}
+        </div>`;
+}
+
+async function pollUps() {
+    try {
+        const r = await fetch('/api/ups');
+        if (!r.ok) throw new Error('ups unreachable');
+        renderUps(await r.json());
+    } catch (e) {
+        renderUps(null);
+    }
+}
+
 // ── Flightradar24 ───────────────────────────────────────────────────
 function renderFr24(d) {
     const panel = document.getElementById('fr24-panel');
@@ -1218,6 +1374,8 @@ async function poll() {
     setInterval(pollSonde, SONDE_POLL_MS);
     pollFr24();
     setInterval(pollFr24, SONDE_POLL_MS);
+    pollUps();
+    setInterval(pollUps, UPS_POLL_MS);
 })();
 </script>
 </body>

@@ -830,6 +830,45 @@ app.get('/api/battery/:id/history', (req, res) => {
     res.json(batHistory);
 });
 
+// ── Central UPS (X1200) — CSV logged by ups_logd.py on raspb2, 1 row/min ─────
+const UPS_CSV        = process.env.UPS_CSV || '/home/raspb2/ups_history.csv';
+const UPS_POLL_MS    = 15000;
+const UPS_STALE_MS   = 5 * 60 * 1000;   // last sample older than this → logger considered down
+const UPS_SERIES_MAX = 720;             // ~12h at 1 row/min
+
+let cachedUps = { reachable: false, latest: null, series: [], lastUpdate: null };
+
+function readUps() {
+    let text;
+    try { text = fs.readFileSync(UPS_CSV, 'utf8'); }
+    catch (e) { cachedUps = { ...cachedUps, reachable: false }; return; }
+
+    const lines = text.split('\n').filter(l => l && !l.startsWith('timestamp'));
+    const rows = [];
+    for (const line of lines.slice(-UPS_SERIES_MAX)) {
+        const p = line.split(',');
+        if (p.length < 5) continue;
+        const t = Date.parse(p[0].replace(' ', 'T'));   // 'YYYY-MM-DD HH:MM:SS' (server-local KST)
+        if (!isFinite(t)) continue;
+        const ac = p[3] === '1' ? 1 : (p[3] === '0' ? 0 : null);
+        rows.push({ t, volt: parseFloat(p[1]), soc: parseFloat(p[2]), ac, status: p[4] });
+    }
+    if (!rows.length) { cachedUps = { ...cachedUps, reachable: false }; return; }
+
+    const last = rows[rows.length - 1];
+    cachedUps = {
+        reachable: (Date.now() - last.t) < UPS_STALE_MS,
+        latest: last,
+        series: rows,
+        lastUpdate: Date.now(),
+    };
+}
+
+function upsPollLoop() { readUps(); setInterval(readUps, UPS_POLL_MS); }
+upsPollLoop();
+
+app.get('/api/ups', (req, res) => { res.json(cachedUps); });
+
 app.listen(PORT, () => {
     console.log(`BEWE Web running on http://localhost:${PORT}`);
 });

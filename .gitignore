@@ -1,5 +1,9 @@
 node_modules/
 .env
 
+# Runtime data written by the server (see NOTES_FILE / BAT_LOG_FILE in server.js)
+data/station_notes.json
+data/battery_DGS-*.json
+
 # Claude guidance pointer (synced via private claude.md repo)
 CLAUDE.md

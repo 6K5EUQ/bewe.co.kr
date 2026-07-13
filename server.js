@@ -626,6 +626,13 @@ function saveNotes() {
 }
 
 // ── Express ─────────────────────────────────────────────────────────────────
+// www.bewe.co.kr → bewe.co.kr (canonical host, 301)
+app.use((req, res, next) => {
+    if (req.hostname === 'www.bewe.co.kr') {
+        return res.redirect(301, 'https://bewe.co.kr' + req.originalUrl);
+    }
+    next();
+});
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');

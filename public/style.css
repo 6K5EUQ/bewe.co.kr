@@ -491,6 +491,21 @@ body.lang-kr .i18n-kr { display: revert; }
     border-color: rgba(255,255,255,0.25);
 }
 
+/* Account entry (globe view) — plain, unemphasized */
+.account-link {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    z-index: 15;
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: color 0.25s;
+}
+.account-link:hover { color: #fff; }
+
 /* ── Title Bar ──────────────────────────────────────────────────────────── */
 .title-bar {
     position: fixed;

@@ -9,26 +9,16 @@ const landing = document.getElementById('landing');
 const globeUiEls = document.querySelectorAll('.globe-ui');
 let landingVisible = true;
 
-function enterGlobe() {
-    landing.classList.add('fade-out');
-    landingVisible = false;
-    setTimeout(() => {
-        landing.style.display = 'none';
-        globeUiEls.forEach(el => el.style.display = '');
-    }, 800);
-}
+// Globe is the default (and only) view — no landing gate.
+landing.style.display = 'none';
+landingVisible = false;
+globeUiEls.forEach(el => el.style.display = '');
 
-function showLanding() {
-    globeUiEls.forEach(el => el.style.display = 'none');
-    landing.style.display = '';
-    landing.classList.remove('fade-out');
-    landingVisible = true;
-    closePopup();
-}
-
-document.getElementById('btn-discover').addEventListener('click', enterGlobe);
-document.getElementById('nav-discover').addEventListener('click', (e) => { e.preventDefault(); enterGlobe(); });
-document.getElementById('btn-back').addEventListener('click', showLanding);
+// Account entry: "Login" when logged out, "My Page" when logged in.
+fetch('/api/auth/me').then(r => r.json()).then(d => {
+    const a = document.getElementById('account-link');
+    if (a) a.textContent = d.user ? 'My Page' : 'Login';
+}).catch(() => {});
 
 // ── About / PPT Modal ──────────────────────────────────────────────────────
 (function setupAboutModal() {

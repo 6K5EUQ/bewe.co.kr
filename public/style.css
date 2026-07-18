@@ -34,7 +34,7 @@ body {
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
 .landing-nav {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     padding: 24px 48px;
     position: relative;
@@ -77,12 +77,13 @@ body {
 }
 
 /* ── Language toggle (nav) ───────────────────────────────────────────────── */
-.nav-right-group {
+.nav-right {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 5px;
+    align-items: flex-end;
+    gap: 10px;
 }
+.nav-right .lang-switch { margin-top: 0; }
 .lang-switch {
     display: flex;
     align-items: center;

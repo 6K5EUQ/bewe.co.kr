@@ -21,7 +21,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <canvas id="globe"></canvas>
@@ -31,17 +31,17 @@
         <!-- Nav -->
         <nav class="landing-nav">
             <div class="nav-logo">BEWE</div>
-            <div class="nav-links">
-                <a href="#" class="nav-link" id="nav-about">About</a>
-                <a href="/status.html" class="nav-link" id="nav-status">Operations</a>
-                <a href="/guide.html" class="nav-link">Guide</a>
-                <div class="nav-right-group">
+            <div class="nav-right">
+                <div class="lang-switch">
+                    <button class="lang-btn-main active" data-lang="en" onclick="setLang('en')">EN</button>
+                    <span class="lang-sep-main">/</span>
+                    <button class="lang-btn-main" data-lang="kr" onclick="setLang('kr')">KR</button>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link" id="nav-about">About</a>
+                    <a href="/status.html" class="nav-link" id="nav-status">Operations</a>
+                    <a href="/guide.html" class="nav-link">Guide</a>
                     <a href="/mail.html" class="nav-login" id="nav-login">Login</a>
-                    <div class="lang-switch">
-                        <button class="lang-btn-main active" data-lang="en" onclick="setLang('en')">EN</button>
-                        <span class="lang-sep-main">/</span>
-                        <button class="lang-btn-main" data-lang="kr" onclick="setLang('kr')">KR</button>
-                    </div>
                 </div>
             </div>
         </nav>
@@ -941,7 +941,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
     <script>
       function setLang(lang) {
         localStorage.setItem('bewe_lang', lang);

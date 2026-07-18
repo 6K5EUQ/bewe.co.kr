@@ -1,0 +1,11 @@
+name = "bewe-email"
+main = "src/worker.js"
+compatibility_date = "2024-11-01"
+
+# Origin webhook the Worker POSTs parsed inbound mail to.
+[vars]
+INBOUND_URL = "https://bewe.co.kr/api/mail/inbound"
+
+# INBOUND_SECRET is a secret, not a plain var — set it with:
+#   wrangler secret put INBOUND_SECRET
+# (must equal the origin's INBOUND_SECRET in .env)

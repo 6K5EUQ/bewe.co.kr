@@ -8,5 +8,10 @@ data/battery_DGS-*.json
 # systemd service log
 web.log
 
+# SQLite app database (users + mailbox) — runtime data, per-host
+data/app.db
+data/app.db-wal
+data/app.db-shm
+
 # Claude guidance pointer (synced via private claude.md repo)
 CLAUDE.md

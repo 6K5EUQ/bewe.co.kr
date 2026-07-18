@@ -4,6 +4,8 @@ const net = require('net');
 const path = require('path');
 const https = require('https');
 const http = require('http');
+const db = require('./db');
+const auth = require('./auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -641,8 +643,246 @@ app.use((req, res, next) => {
     res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
     next();
 });
+app.use('/api/mail/send', express.json({ limit: '1mb' }));      // mail bodies need headroom
+app.use('/api/mail/inbound', express.json({ limit: '2mb' }));   // inbound (parsed MIME from Email Worker)
 app.use(express.json({ limit: '8kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Auth & mailbox (each user owns username@MAIL_DOMAIN) ────────────────────
+const MAIL_DOMAIN = process.env.MAIL_DOMAIN || 'bewe.co.kr';
+
+// Bootstrap an admin from .env (ADMIN_USER/ADMIN_PASS) so approvals are possible
+// on a fresh DB. Existing user with that name is promoted; password untouched.
+function bootstrapAdmin() {
+    const user = process.env.ADMIN_USER;
+    const pass = process.env.ADMIN_PASS;
+    if (!user || !pass) return;
+    const uname = String(user).trim().toLowerCase();
+    const existing = db.prepare('SELECT * FROM users WHERE username = ?').get(uname);
+    if (existing) {
+        if (existing.status !== 'admin') {
+            db.prepare("UPDATE users SET status='admin' WHERE id=?").run(existing.id);
+            console.log(`auth: promoted '${uname}' to admin`);
+        }
+    } else {
+        db.prepare('INSERT INTO users (username, pass_hash, status, created_at) VALUES (?,?,?,?)')
+          .run(uname, auth.hashPassword(pass), 'admin', Date.now());
+        console.log(`auth: bootstrapped admin '${uname}'`);
+    }
+}
+bootstrapAdmin();
+
+// Per-username login throttle: 5 fails → 60 s lock (brute-force dampener).
+const loginFails = new Map();
+function throttled(uname) { const e = loginFails.get(uname); return !!e && e.until > Date.now(); }
+function recordFail(uname) {
+    const e = loginFails.get(uname) || { n: 0, until: 0 };
+    e.n += 1;
+    if (e.n >= 5) { e.until = Date.now() + 60000; e.n = 0; }
+    loginFails.set(uname, e);
+}
+
+app.post('/api/auth/signup', (req, res) => {
+    const uname = auth.normalizeUsername(req.body && req.body.username);
+    const pass = String((req.body && req.body.password) || '');
+    if (!uname) return res.status(400).json({ error: 'invalid username (3–32 chars: a–z 0–9 . _ -, not reserved)' });
+    if (pass.length < 8) return res.status(400).json({ error: 'password must be at least 8 characters' });
+    if (db.prepare('SELECT 1 FROM users WHERE username = ?').get(uname)) {
+        return res.status(409).json({ error: 'username already taken' });
+    }
+    db.prepare('INSERT INTO users (username, pass_hash, status, created_at) VALUES (?,?,?,?)')
+      .run(uname, auth.hashPassword(pass), 'pending', Date.now());
+    res.json({ ok: true, status: 'pending', email: `${uname}@${MAIL_DOMAIN}` });
+});
+
+app.post('/api/auth/login', (req, res) => {
+    const uname = String((req.body && req.body.username) || '').trim().toLowerCase();
+    const pass = String((req.body && req.body.password) || '');
+    if (!uname || !pass) return res.status(400).json({ error: 'missing credentials' });
+    if (throttled(uname)) return res.status(429).json({ error: 'too many attempts, try again in a minute' });
+    const u = db.prepare('SELECT * FROM users WHERE username = ?').get(uname);
+    if (!u || !auth.verifyPassword(pass, u.pass_hash)) {
+        recordFail(uname);
+        return res.status(401).json({ error: 'invalid username or password' });
+    }
+    if (u.status === 'pending') return res.status(403).json({ error: 'account pending admin approval' });
+    loginFails.delete(uname);
+    auth.setSessionCookie(req, res, u.username);
+    res.json({ ok: true, user: { username: u.username, status: u.status, email: `${u.username}@${MAIL_DOMAIN}` } });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+    auth.clearSessionCookie(req, res);
+    res.json({ ok: true });
+});
+
+app.get('/api/auth/me', (req, res) => {
+    const u = auth.currentUser(req);
+    if (!u) return res.json({ user: null });
+    res.json({ user: { username: u.username, status: u.status, email: `${u.username}@${MAIL_DOMAIN}`, backup_email: u.backup_email || null } });
+});
+
+app.get('/api/admin/pending', auth.requireAdmin, (req, res) => {
+    const rows = db.prepare("SELECT username, created_at FROM users WHERE status='pending' ORDER BY created_at").all();
+    res.json(rows.map(r => ({ username: r.username, email: `${r.username}@${MAIL_DOMAIN}`, created_at: r.created_at })));
+});
+
+app.post('/api/admin/approve', auth.requireAdmin, (req, res) => {
+    const uname = String((req.body && req.body.username) || '').trim().toLowerCase();
+    const u = db.prepare('SELECT * FROM users WHERE username = ?').get(uname);
+    if (!u) return res.status(404).json({ error: 'no such user' });
+    db.prepare("UPDATE users SET status='active' WHERE id=?").run(u.id);
+    res.json({ ok: true, username: uname, status: 'active' });
+});
+
+app.post('/api/admin/reject', auth.requireAdmin, (req, res) => {
+    const uname = String((req.body && req.body.username) || '').trim().toLowerCase();
+    const u = db.prepare("SELECT * FROM users WHERE username = ? AND status='pending'").get(uname);
+    if (!u) return res.status(404).json({ error: 'no such pending user' });
+    db.prepare('DELETE FROM users WHERE id=?').run(u.id);
+    res.json({ ok: true, username: uname, status: 'rejected' });
+});
+
+// ── mailbox ──
+function userEmail(u) { return `${u.username}@${MAIL_DOMAIN}`; }
+
+// Extract the bare address from a possibly-decorated header ("Name <a@b>").
+function bareAddr(s) {
+    const m = String(s || '').match(/<([^>]+)>/);
+    return (m ? m[1] : String(s || '')).trim().toLowerCase();
+}
+
+// Inbound webhook — called by the Cloudflare Email Worker for each message that
+// arrives at *@MAIL_DOMAIN. Authenticated by a shared secret header. Stores the
+// message in the recipient's mailbox, or reports no_mailbox so the Worker can
+// reject (bounce) unknown recipients.
+app.post('/api/mail/inbound', (req, res) => {
+    const secret = process.env.INBOUND_SECRET;
+    if (!secret || req.get('X-Inbound-Secret') !== secret) return res.status(401).json({ error: 'unauthorized' });
+
+    const b = req.body || {};
+    const to = bareAddr(b.to);
+    const from = String(b.from || '').trim().slice(0, 320);
+    const subject = String(b.subject || '').slice(0, 500);
+    let text = String(b.text || '');
+    const html = b.html ? String(b.html) : null;
+    if (!text && html) text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+    const atDomain = '@' + MAIL_DOMAIN;
+    if (!to.endsWith(atDomain)) return res.json({ delivered: false, reason: 'wrong_domain' });
+    const localpart = to.slice(0, -atDomain.length);
+    const u = db.prepare("SELECT * FROM users WHERE username=? AND status IN ('active','admin')").get(localpart);
+    if (!u) return res.json({ delivered: false, reason: 'no_mailbox' });
+
+    db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, body_html, seen, created_at) VALUES (?,?,?,?,?,?,?,0,?)')
+      .run(u.id, 'in', from, to, subject, text, html, Date.now());
+    res.json({ delivered: true, backup_email: u.backup_email || null });
+});
+
+app.get('/api/mail/list', auth.requireAuth, (req, res) => {
+    const box = req.query.box === 'sent' ? 'out' : 'in';
+    const emails = db.prepare(
+        'SELECT id, direction, from_addr, to_addr, subject, seen, created_at FROM emails WHERE user_id=? AND direction=? ORDER BY created_at DESC LIMIT 200'
+    ).all(req.user.id, box);
+    const unread = db.prepare("SELECT COUNT(*) n FROM emails WHERE user_id=? AND direction='in' AND seen=0").get(req.user.id).n;
+    res.json({ box: box === 'out' ? 'sent' : 'inbox', unread, emails });
+});
+
+app.get('/api/mail/:id', auth.requireAuth, (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const m = db.prepare('SELECT * FROM emails WHERE id=? AND user_id=?').get(id, req.user.id);
+    if (!m) return res.status(404).json({ error: 'not found' });
+    if (m.direction === 'in' && !m.seen) db.prepare('UPDATE emails SET seen=1 WHERE id=?').run(id);
+    res.json(m);
+});
+
+app.delete('/api/mail/:id', auth.requireAuth, (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const info = db.prepare('DELETE FROM emails WHERE id=? AND user_id=?').run(id, req.user.id);
+    if (!info.changes) return res.status(404).json({ error: 'not found' });
+    res.json({ ok: true });
+});
+
+// External outbound via Resend (https://resend.com). The `from` domain must be
+// verified in Resend (DKIM). Returns {sent} / {reason:'not_configured'} / error.
+async function resendSend({ from, to, subject, text }) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) return { sent: false, reason: 'not_configured' };
+    try {
+        const resp = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from, to, subject: subject || '(no subject)', text: text || '' }),
+            signal: AbortSignal.timeout(10000),
+        });
+        if (!resp.ok) {
+            const detail = (await resp.text().catch(() => '')).slice(0, 300);
+            return { sent: false, reason: 'resend_error', status: resp.status, detail };
+        }
+        const data = await resp.json().catch(() => ({}));
+        return { sent: true, id: data.id || null };
+    } catch (e) {
+        return { sent: false, reason: 'resend_error', detail: e.message };
+    }
+}
+
+function saveOut(user, from, to, subject, body, ts) {
+    db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, seen, created_at) VALUES (?,?,?,?,?,?,1,?)')
+      .run(user.id, 'out', from, to, subject, body, ts);
+}
+
+app.post('/api/mail/send', auth.requireAuth, async (req, res) => {
+    const to = String((req.body && req.body.to) || '').trim().toLowerCase();
+    const subject = String((req.body && req.body.subject) || '').slice(0, 300);
+    const body = String((req.body && req.body.body) || '');
+    if (body.length > 512 * 1024) return res.status(413).json({ error: 'body too large' });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return res.status(400).json({ error: 'invalid recipient address' });
+
+    const from = userEmail(req.user);
+    const now = Date.now();
+    const atDomain = '@' + MAIL_DOMAIN;
+
+    // 1) local recipient → in-app delivery (no external hop)
+    if (to.endsWith(atDomain)) {
+        const localpart = to.slice(0, -atDomain.length);
+        const rcpt = db.prepare("SELECT * FROM users WHERE username=? AND status IN ('active','admin')").get(localpart);
+        if (rcpt) {
+            saveOut(req.user, from, to, subject, body, now);
+            db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, seen, created_at) VALUES (?,?,?,?,?,?,0,?)')
+              .run(rcpt.id, 'in', from, to, subject, body, now);
+            return res.json({ ok: true, delivered_internally: true });
+        }
+    }
+
+    // 2) external recipient → Resend
+    const r = await resendSend({ from, to, subject, text: body });
+    if (r.sent) {
+        saveOut(req.user, from, to, subject, body, now);
+        return res.json({ ok: true, delivered_internally: false, sent_external: true, id: r.id });
+    }
+    if (r.reason === 'not_configured') {
+        saveOut(req.user, from, to, subject, body, now);
+        return res.json({
+            ok: true, delivered_internally: false, sent_external: false,
+            note: '외부 발송(Resend)이 아직 설정되지 않았습니다. 보낸편지함에는 저장됨 — RESEND_API_KEY 설정 후 실제 전송됩니다.',
+        });
+    }
+    return res.status(502).json({ ok: false, error: '외부 발송 실패', detail: r.detail || null, status: r.status || null });
+});
+
+// Backup forward address (P5). The Email Worker forwards a copy of inbound mail
+// here via message.forward(), which requires the address to be verified in
+// Cloudflare Email Routing (Destination addresses). Empty string clears it.
+app.post('/api/mail/settings/backup', auth.requireAuth, (req, res) => {
+    const raw = String((req.body && req.body.backup_email) || '').trim().toLowerCase();
+    if (raw === '') {
+        db.prepare('UPDATE users SET backup_email=NULL WHERE id=?').run(req.user.id);
+        return res.json({ ok: true, backup_email: null });
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(raw)) return res.status(400).json({ error: 'invalid email' });
+    db.prepare('UPDATE users SET backup_email=? WHERE id=?').run(raw, req.user.id);
+    res.json({ ok: true, backup_email: raw });
+});
 
 app.get('/api/notes', (req, res) => { res.json(stationNotes); });
 

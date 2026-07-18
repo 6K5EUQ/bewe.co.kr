@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEWE Mail</title>
+    <meta name="robots" content="noindex">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; background: #000; color: #e0e0e0;
+            font-family: 'Inter', 'Segoe UI', 'Noto Sans KR', sans-serif;
+            display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px;
+        }
+        a { color: #60a5fa; }
+        .card {
+            width: 100%; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px;
+        }
+        .card.auth { max-width: 440px; }
+        .card.app  { max-width: 760px; }
+        h1 { margin: 0 0 4px; font-size: 22px; font-weight: 700; color: #fff; letter-spacing: .5px; }
+        .sub { margin: 0 0 22px; font-size: 13px; color: rgba(148,163,184,0.9); }
+        .tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+        .tab {
+            flex: 1; padding: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: none; color: rgba(255,255,255,0.55);
+        }
+        .tab.active { background: rgba(59,130,246,0.25); border-color: rgba(59,130,246,0.6); color: #fff; }
+        label { display: block; font-size: 12px; color: rgba(148,163,184,0.9); margin: 12px 0 5px; }
+        input, textarea {
+            width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff;
+        }
+        textarea { resize: vertical; min-height: 140px; line-height: 1.5; }
+        input:focus, textarea:focus { outline: none; border-color: rgba(59,130,246,0.7); }
+        .suffix { font-size: 12px; color: rgba(148,163,184,0.7); margin-top: 4px; }
+        button.primary {
+            margin-top: 4px; padding: 11px 18px; font-size: 14px; font-weight: 600; font-family: inherit;
+            color: #fff; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none; border-radius: 8px; cursor: pointer;
+        }
+        button.primary.full { width: 100%; margin-top: 18px; }
+        button.primary:hover { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        button:disabled { opacity: .5; cursor: not-allowed; }
+        .msg { margin-top: 14px; font-size: 13px; min-height: 18px; }
+        .msg.err { color: #f87171; }
+        .msg.ok  { color: #4ade80; }
+        .hidden { display: none !important; }
+        .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .email-badge { font-family: monospace; font-size: 14px; color: #93c5fd; }
+        .status-pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+        .linkbtn { background: none; border: none; color: #60a5fa; cursor: pointer; font-size: 13px; font-family: inherit; padding: 0; }
+        hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 18px 0; }
+        .pending-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+        .acts { display: flex; gap: 6px; }
+        .mini { padding: 5px 10px; font-size: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: none; color: #e0e0e0; cursor: pointer; font-family: inherit; }
+        .mini.approve { border-color: rgba(74,222,128,0.5); color: #4ade80; }
+        .mini.reject  { border-color: rgba(248,113,113,0.5); color: #f87171; }
+        .section-title { font-size: 13px; font-weight: 600; color: #fff; margin: 0 0 6px; }
+
+        /* mailbox */
+        .toolbar { display: flex; align-items: center; gap: 8px; margin: 18px 0 12px; }
+        .boxbtn {
+            padding: 7px 14px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: none; color: rgba(255,255,255,0.6);
+        }
+        .boxbtn.active { background: rgba(59,130,246,0.22); border-color: rgba(59,130,246,0.55); color: #fff; }
+        .badge-count { display: inline-block; margin-left: 6px; padding: 0 6px; font-size: 11px; border-radius: 999px; background: #2563eb; color: #fff; }
+        .maillist { border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; }
+        .mailitem { display: flex; gap: 10px; padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .mailitem:last-child { border-bottom: none; }
+        .mailitem:hover { background: rgba(255,255,255,0.03); }
+        .mailitem.unseen .mi-sub { font-weight: 700; color: #fff; }
+        .mailitem.unseen::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #3b82f6; margin-top: 6px; flex: none; }
+        .mailitem.seen::before { content: ''; width: 7px; flex: none; }
+        .mi-main { flex: 1; min-width: 0; }
+        .mi-who { font-size: 12px; color: rgba(148,163,184,0.9); }
+        .mi-sub { font-size: 14px; color: #e0e0e0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mi-time { font-size: 11px; color: rgba(148,163,184,0.6); white-space: nowrap; }
+        .empty { padding: 28px; text-align: center; font-size: 13px; color: rgba(148,163,184,0.7); }
+
+        /* modal */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+        .modal { width: 100%; max-width: 620px; max-height: 88vh; overflow: auto; background: #0a0a0a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 22px; }
+        .modal h2 { margin: 0 0 4px; font-size: 18px; color: #fff; }
+        .kv { font-size: 12px; color: rgba(148,163,184,0.9); margin: 2px 0; }
+        .kv b { color: #cbd5e1; font-weight: 500; }
+        .body-view { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+        .modal-acts { display: flex; gap: 8px; margin-top: 18px; }
+    </style>
+</head>
+<body>
+    <!-- ── Logged-out ─────────────────────────────────────────── -->
+    <div class="card auth" id="auth-card">
+        <h1>BEWE Mail</h1>
+        <p class="sub">계정 하나당 <span style="font-family:monospace">아이디@bewe.co.kr</span> 메일주소가 발급됩니다.</p>
+        <div class="tabs">
+            <button class="tab active" id="tab-login" onclick="showTab('login')">로그인</button>
+            <button class="tab" id="tab-signup" onclick="showTab('signup')">회원가입</button>
+        </div>
+        <form id="form-login" onsubmit="return doLogin(event)">
+            <label>아이디</label>
+            <input id="login-user" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+            <label>비밀번호</label>
+            <input id="login-pass" type="password" autocomplete="current-password" required>
+            <button class="primary full" type="submit">로그인</button>
+        </form>
+        <form id="form-signup" class="hidden" onsubmit="return doSignup(event)">
+            <label>원하는 아이디</label>
+            <input id="signup-user" autocapitalize="none" spellcheck="false" placeholder="예: hong" required>
+            <div class="suffix">메일주소: <span id="signup-preview">아이디</span>@bewe.co.kr</div>
+            <label>비밀번호 (8자 이상)</label>
+            <input id="signup-pass" type="password" autocomplete="new-password" required>
+            <button class="primary full" type="submit">가입 신청</button>
+            <div class="suffix" style="margin-top:10px">가입 후 관리자 승인이 있어야 로그인·메일 사용이 가능합니다.</div>
+        </form>
+        <div class="msg" id="auth-msg"></div>
+    </div>
+
+    <!-- ── Logged-in ──────────────────────────────────────────── -->
+    <div class="card app hidden" id="app-card">
+        <div class="row">
+            <div>
+                <div class="email-badge" id="me-email">—</div>
+                <div class="suffix" id="me-status"></div>
+            </div>
+            <button class="linkbtn" onclick="doLogout()">로그아웃</button>
+        </div>
+
+        <div class="toolbar">
+            <button class="boxbtn active" id="box-inbox" onclick="loadBox('inbox')">받은편지함<span class="badge-count hidden" id="unread-badge">0</span></button>
+            <button class="boxbtn" id="box-sent" onclick="loadBox('sent')">보낸편지함</button>
+            <div style="flex:1"></div>
+            <button class="primary" onclick="openCompose()">✎ 새 메일</button>
+        </div>
+
+        <div class="maillist" id="maillist"><div class="empty">불러오는 중…</div></div>
+
+        <!-- 메일 관리: 백업 수신 주소 -->
+        <hr>
+        <p class="section-title">메일 관리 · 백업 수신 주소</p>
+        <div class="suffix" style="margin-bottom:8px">받은 메일 사본을 아래 주소로도 전달합니다. Cloudflare Email Routing에서 이 주소를 <b>인증</b>해야 실제 전달됩니다.</div>
+        <div style="display:flex; gap:8px; align-items:center">
+            <input id="backup-input" placeholder="backup@example.com" autocapitalize="none" spellcheck="false" style="flex:1">
+            <button class="primary" onclick="saveBackup()">저장</button>
+        </div>
+        <div class="msg" id="backup-msg"></div>
+
+        <!-- admin only -->
+        <div id="admin-panel" class="hidden">
+            <hr>
+            <p class="section-title">가입 승인 대기</p>
+            <div id="pending-list" style="font-size:13px; color:rgba(148,163,184,0.8)">불러오는 중…</div>
+        </div>
+    </div>
+
+    <!-- read modal -->
+    <div class="overlay hidden" id="read-overlay">
+        <div class="modal">
+            <h2 id="rd-subject"></h2>
+            <div class="kv"><b>From</b> <span id="rd-from"></span></div>
+            <div class="kv"><b>To</b> <span id="rd-to"></span></div>
+            <div class="kv"><b>Date</b> <span id="rd-date"></span></div>
+            <div class="body-view" id="rd-body"></div>
+            <div class="modal-acts">
+                <button class="primary" id="rd-reply">답장</button>
+                <button class="mini reject" id="rd-delete">삭제</button>
+                <div style="flex:1"></div>
+                <button class="mini" onclick="closeOverlay('read-overlay')">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- compose modal -->
+    <div class="overlay hidden" id="compose-overlay">
+        <div class="modal">
+            <h2>새 메일</h2>
+            <form onsubmit="return doSend(event)">
+                <label>받는사람</label>
+                <input id="cp-to" placeholder="someone@bewe.co.kr" autocapitalize="none" spellcheck="false" required>
+                <label>제목</label>
+                <input id="cp-subject">
+                <label>내용</label>
+                <textarea id="cp-body"></textarea>
+                <div class="modal-acts">
+                    <button class="primary" type="submit">보내기</button>
+                    <div style="flex:1"></div>
+                    <button class="mini" type="button" onclick="closeOverlay('compose-overlay')">취소</button>
+                </div>
+                <div class="msg" id="cp-msg"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+        let currentBox = 'inbox';
+        let me = null;
+
+        async function api(path, opts) {
+            const r = await fetch(path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
+            let data = {}; try { data = await r.json(); } catch {}
+            return { ok: r.ok, status: r.status, data };
+        }
+        function setMsg(text, kind) { const m = $('auth-msg'); m.textContent = text || ''; m.className = 'msg ' + (kind || ''); }
+        function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function fmtTime(ms) {
+            const d = new Date(ms), now = new Date();
+            const sameDay = d.toDateString() === now.toDateString();
+            return sameDay ? d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+                           : d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
+        }
+        function closeOverlay(id) { $(id).classList.add('hidden'); }
+
+        // ── auth ──
+        function showTab(which) {
+            $('tab-login').classList.toggle('active', which === 'login');
+            $('tab-signup').classList.toggle('active', which === 'signup');
+            $('form-login').classList.toggle('hidden', which !== 'login');
+            $('form-signup').classList.toggle('hidden', which !== 'signup');
+            setMsg('');
+        }
+        $('signup-user').addEventListener('input', (e) => { $('signup-preview').textContent = (e.target.value || '아이디').toLowerCase(); });
+
+        async function doSignup(e) {
+            e.preventDefault();
+            const username = $('signup-user').value.trim().toLowerCase();
+            const password = $('signup-pass').value;
+            const { ok, data } = await api('/api/auth/signup', { method: 'POST', body: JSON.stringify({ username, password }) });
+            if (!ok) { setMsg(data.error || '가입 실패', 'err'); return false; }
+            setMsg(`가입 신청 완료: ${data.email} — 관리자 승인 후 로그인하세요.`, 'ok');
+            showTab('login'); $('login-user').value = username;
+            return false;
+        }
+        async function doLogin(e) {
+            e.preventDefault();
+            const username = $('login-user').value.trim().toLowerCase();
+            const password = $('login-pass').value;
+            const { ok, data } = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+            if (!ok) { setMsg(data.error || '로그인 실패', 'err'); return false; }
+            await refresh();
+            return false;
+        }
+        async function doLogout() { await api('/api/auth/logout', { method: 'POST' }); location.reload(); }
+
+        // ── mailbox ──
+        async function loadBox(box) {
+            currentBox = box;
+            $('box-inbox').classList.toggle('active', box === 'inbox');
+            $('box-sent').classList.toggle('active', box === 'sent');
+            const { ok, data } = await api('/api/mail/list?box=' + box);
+            if (!ok) return;
+            const badge = $('unread-badge');
+            if (data.unread > 0) { badge.textContent = data.unread; badge.classList.remove('hidden'); }
+            else badge.classList.add('hidden');
+            const list = $('maillist');
+            if (!data.emails.length) { list.innerHTML = `<div class="empty">${box === 'inbox' ? '받은 메일이 없습니다.' : '보낸 메일이 없습니다.'}</div>`; return; }
+            list.innerHTML = '';
+            for (const m of data.emails) {
+                const who = box === 'inbox' ? m.from_addr : ('→ ' + m.to_addr);
+                const div = document.createElement('div');
+                div.className = 'mailitem ' + (box === 'inbox' && !m.seen ? 'unseen' : 'seen');
+                div.innerHTML = `<div class="mi-main">
+                        <div class="mi-who">${esc(who)}</div>
+                        <div class="mi-sub">${esc(m.subject || '(제목 없음)')}</div>
+                    </div><div class="mi-time">${fmtTime(m.created_at)}</div>`;
+                div.onclick = () => openMail(m.id);
+                list.appendChild(div);
+            }
+        }
+
+        async function openMail(id) {
+            const { ok, data: m } = await api('/api/mail/' + id);
+            if (!ok) return;
+            $('rd-subject').textContent = m.subject || '(제목 없음)';
+            $('rd-from').textContent = m.from_addr;
+            $('rd-to').textContent = m.to_addr;
+            $('rd-date').textContent = new Date(m.created_at).toLocaleString('ko-KR');
+            $('rd-body').textContent = m.body_text || '';
+            $('rd-reply').onclick = () => {
+                closeOverlay('read-overlay');
+                openCompose({ to: m.direction === 'in' ? m.from_addr : m.to_addr, subject: 'Re: ' + (m.subject || ''), });
+            };
+            $('rd-delete').onclick = async () => {
+                await api('/api/mail/' + id, { method: 'DELETE' });
+                closeOverlay('read-overlay'); loadBox(currentBox);
+            };
+            $('read-overlay').classList.remove('hidden');
+        }
+
+        function openCompose(prefill) {
+            prefill = prefill || {};
+            $('cp-to').value = prefill.to || '';
+            $('cp-subject').value = prefill.subject || '';
+            $('cp-body').value = prefill.body || '';
+            $('cp-msg').textContent = '';
+            $('compose-overlay').classList.remove('hidden');
+            $('cp-to').focus();
+        }
+        async function doSend(e) {
+            e.preventDefault();
+            const to = $('cp-to').value.trim();
+            const subject = $('cp-subject').value;
+            const body = $('cp-body').value;
+            const m = $('cp-msg');
+            const { ok, data } = await api('/api/mail/send', { method: 'POST', body: JSON.stringify({ to, subject, body }) });
+            if (!ok) { m.className = 'msg err'; m.textContent = data.error || '발송 실패'; return false; }
+            m.className = 'msg ok';
+            m.textContent = data.delivered_internally ? '전송 완료 (내부 배달됨).' : (data.note || '전송 완료.');
+            setTimeout(() => { closeOverlay('compose-overlay'); loadBox(currentBox); }, 900);
+            return false;
+        }
+
+        // ── settings: backup address ──
+        function initSettings() { $('backup-input').value = (me && me.backup_email) || ''; }
+        async function saveBackup() {
+            const backup_email = $('backup-input').value.trim();
+            const m = $('backup-msg');
+            const { ok, data } = await api('/api/mail/settings/backup', { method: 'POST', body: JSON.stringify({ backup_email }) });
+            if (!ok) { m.className = 'msg err'; m.textContent = data.error || '저장 실패'; return; }
+            me.backup_email = data.backup_email;
+            m.className = 'msg ok';
+            m.textContent = data.backup_email
+                ? `저장됨: ${data.backup_email} — Cloudflare Email Routing에서 이 주소를 인증하면 전달됩니다.`
+                : '백업 주소 해제됨.';
+        }
+
+        // ── admin ──
+        async function loadPending() {
+            const { ok, data } = await api('/api/admin/pending');
+            if (!ok) return;
+            const box = $('pending-list');
+            if (!data.length) { box.textContent = '대기 중인 신청이 없습니다.'; return; }
+            box.innerHTML = '';
+            for (const u of data) {
+                const row = document.createElement('div');
+                row.className = 'pending-item';
+                row.innerHTML = `<span class="email-badge">${esc(u.email)}</span>
+                    <span class="acts"><button class="mini approve">승인</button><button class="mini reject">거절</button></span>`;
+                row.querySelector('.approve').onclick = async () => { await api('/api/admin/approve', { method: 'POST', body: JSON.stringify({ username: u.username }) }); loadPending(); };
+                row.querySelector('.reject').onclick  = async () => { await api('/api/admin/reject',  { method: 'POST', body: JSON.stringify({ username: u.username }) }); loadPending(); };
+                box.appendChild(row);
+            }
+        }
+
+        // ── boot ──
+        async function refresh() {
+            const { data } = await api('/api/auth/me');
+            me = data.user;
+            if (!me) { $('auth-card').classList.remove('hidden'); $('app-card').classList.add('hidden'); return; }
+            $('auth-card').classList.add('hidden');
+            $('app-card').classList.remove('hidden');
+            $('me-email').textContent = me.email;
+            $('me-status').innerHTML = `<span class="status-pill">${me.status}</span>`;
+            initSettings();
+            if (me.status === 'admin') { $('admin-panel').classList.remove('hidden'); loadPending(); }
+            loadBox('inbox');
+        }
+        refresh();
+    </script>
+</body>
+</html>

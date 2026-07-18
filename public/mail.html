@@ -103,6 +103,9 @@
         .kv b { color: #cbd5e1; font-weight: 500; display: inline-block; width: 42px; }
         .body-view { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
         .reader-acts { display: flex; gap: 8px; margin-top: 20px; }
+        .rd-atts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+        .att-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 13px; text-decoration: none; color: #cbd5e1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; }
+        .att-chip:hover { color: #fff; border-color: rgba(59,130,246,0.6); background: rgba(59,130,246,0.12); }
 
         /* settings panel */
         .settings-panel { margin-top: 22px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px; }
@@ -174,13 +177,14 @@
         <div class="mail-layout">
             <div class="maillist" id="maillist"><div class="empty">불러오는 중…</div></div>
             <div class="reader" id="reader">
-                <div class="reader-empty" id="reader-empty">읽을 메일을 선택하세요.</div>
+                <div class="reader-empty" id="reader-empty">읽을 메일을 선택하십시오.</div>
                 <div class="hidden" id="reader-content">
                     <h2 id="rd-subject"></h2>
                     <div class="kv"><b>From</b> <span id="rd-from"></span></div>
                     <div class="kv"><b>To</b> <span id="rd-to"></span></div>
                     <div class="kv"><b>Date</b> <span id="rd-date"></span></div>
                     <div class="body-view" id="rd-body"></div>
+                    <div class="rd-atts" id="rd-atts"></div>
                     <div class="reader-acts">
                         <button class="primary" id="rd-reply">답장</button>
                         <button class="mini reject" id="rd-delete">삭제</button>
@@ -192,7 +196,7 @@
         <!-- settings (toggle) -->
         <div class="settings-panel hidden" id="settings-panel">
             <p class="section-title">백업 수신 주소</p>
-            <div class="suffix" style="margin-bottom:8px">받은 메일 사본을 이 주소로도 전달 (Cloudflare 인증 필요).</div>
+            <div class="suffix" style="margin-bottom:8px">받은 메일 사본을 이 주소로도 전달합니다.</div>
             <div class="backup-row">
                 <input id="backup-input" placeholder="backup@example.com" autocapitalize="none" spellcheck="false">
                 <button class="primary" onclick="saveBackup()">저장</button>
@@ -218,6 +222,8 @@
                 <input id="cp-subject">
                 <label>내용</label>
                 <textarea id="cp-body"></textarea>
+                <label>첨부파일 <span class="suffix" style="margin:0">(최대 10MB)</span></label>
+                <input id="cp-files" type="file" multiple>
                 <div class="modal-acts">
                     <button class="primary" type="submit">보내기</button>
                     <div style="flex:1"></div>
@@ -247,6 +253,7 @@
             return sameDay ? d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
                            : d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
         }
+        function fmtSize(n) { n = n || 0; return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
         function closeOverlay(id) { $(id).classList.add('hidden'); }
 
         // ── auth ──
@@ -264,8 +271,8 @@
             const username = $('signup-user').value.trim().toLowerCase();
             const password = $('signup-pass').value;
             const { ok, data } = await api('/api/auth/signup', { method: 'POST', body: JSON.stringify({ username, password }) });
-            if (!ok) { setMsg(data.error || '가입 실패', 'err'); return false; }
-            setMsg('가입 신청 완료. 관리자 승인 후 로그인하세요.', 'ok');
+            if (!ok) { setMsg(data.error || '가입에 실패했습니다.', 'err'); return false; }
+            setMsg('가입 신청이 접수되었습니다. 관리자 승인 후 로그인하십시오.', 'ok');
             showTab('login'); $('login-user').value = username;
             return false;
         }
@@ -274,7 +281,7 @@
             const username = $('login-user').value.trim().toLowerCase();
             const password = $('login-pass').value;
             const { ok, data } = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
-            if (!ok) { setMsg(data.error || '로그인 실패', 'err'); return false; }
+            if (!ok) { setMsg(data.error || '로그인에 실패했습니다.', 'err'); return false; }
             await refresh();
             return false;
         }
@@ -324,6 +331,15 @@
             $('rd-to').textContent = m.to_addr;
             $('rd-date').textContent = new Date(m.created_at).toLocaleString('ko-KR');
             $('rd-body').textContent = m.body_text || '';
+            const aw = $('rd-atts'); aw.innerHTML = '';
+            for (const a of (m.attachments || [])) {
+                const link = document.createElement('a');
+                link.className = 'att-chip';
+                link.href = '/api/mail/' + id + '/att/' + a.id;
+                link.setAttribute('download', a.filename || 'file');
+                link.textContent = '📎 ' + (a.filename || 'file') + ' (' + fmtSize(a.size) + ')';
+                aw.appendChild(link);
+            }
             $('rd-reply').onclick = () => openCompose({ to: m.direction === 'in' ? m.from_addr : m.to_addr, subject: 'Re: ' + (m.subject || '') });
             $('rd-delete').onclick = async () => {
                 await api('/api/mail/' + id, { method: 'DELETE' });
@@ -351,9 +367,18 @@
             $('cp-to').value = prefill.to || '';
             $('cp-subject').value = prefill.subject || '';
             $('cp-body').value = prefill.body || '';
+            $('cp-files').value = '';
             $('cp-msg').textContent = '';
             $('compose-overlay').classList.remove('hidden');
             $('cp-to').focus();
+        }
+        function fileToB64(file) {
+            return new Promise((resolve, reject) => {
+                const r = new FileReader();
+                r.onload = () => resolve(String(r.result).split(',')[1] || '');
+                r.onerror = reject;
+                r.readAsDataURL(file);
+            });
         }
         async function doSend(e) {
             e.preventDefault();
@@ -361,11 +386,17 @@
             const subject = $('cp-subject').value;
             const body = $('cp-body').value;
             const m = $('cp-msg');
-            const { ok, data } = await api('/api/mail/send', { method: 'POST', body: JSON.stringify({ to, subject, body }) });
-            if (!ok) { m.className = 'msg err'; m.textContent = data.error || '발송 실패'; return false; }
-            m.className = 'msg ok';
-            m.textContent = data.delivered_internally ? '전송 완료 (내부 배달됨).' : (data.note || '전송 완료.');
-            setTimeout(() => { closeOverlay('compose-overlay'); loadBox(currentBox); }, 900);
+            const files = Array.from($('cp-files').files || []);
+            if (files.reduce((a, f) => a + f.size, 0) > 10 * 1024 * 1024) {
+                m.className = 'msg err'; m.textContent = '첨부파일이 너무 큽니다. (최대 10MB)'; return false;
+            }
+            m.className = 'msg'; m.textContent = '전송 중…';
+            const attachments = [];
+            for (const f of files) attachments.push({ filename: f.name, mime: f.type || 'application/octet-stream', content: await fileToB64(f) });
+            const { ok, data } = await api('/api/mail/send', { method: 'POST', body: JSON.stringify({ to, subject, body, attachments }) });
+            if (!ok) { m.className = 'msg err'; m.textContent = data.error || '보내지 못했습니다.'; return false; }
+            m.className = 'msg ok'; m.textContent = '보냈습니다.';
+            setTimeout(() => { closeOverlay('compose-overlay'); loadBox(currentBox); }, 800);
             return false;
         }
 
@@ -381,12 +412,10 @@
             const backup_email = $('backup-input').value.trim();
             const m = $('backup-msg');
             const { ok, data } = await api('/api/mail/settings/backup', { method: 'POST', body: JSON.stringify({ backup_email }) });
-            if (!ok) { m.className = 'msg err'; m.textContent = data.error || '저장 실패'; return; }
+            if (!ok) { m.className = 'msg err'; m.textContent = data.error || '저장에 실패했습니다.'; return; }
             me.backup_email = data.backup_email;
             m.className = 'msg ok';
-            m.textContent = data.backup_email
-                ? '저장됨. Cloudflare 인증 후 전달됩니다.'
-                : '해제됨.';
+            m.textContent = data.backup_email ? '저장되었습니다.' : '해제되었습니다.';
         }
 
         // ── admin ──

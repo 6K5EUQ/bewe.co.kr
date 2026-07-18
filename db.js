@@ -11,6 +11,7 @@ fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
 
 const db = new Database(DB_FILE);
 db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS users (
@@ -36,6 +37,17 @@ CREATE TABLE IF NOT EXISTS emails (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_emails_user ON emails(user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS attachments (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  email_id   INTEGER NOT NULL,
+  filename   TEXT,
+  mime       TEXT,
+  size       INTEGER NOT NULL,
+  content    BLOB NOT NULL,
+  FOREIGN KEY (email_id) REFERENCES emails(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_att_email ON attachments(email_id);
 `);
 
 module.exports = db;

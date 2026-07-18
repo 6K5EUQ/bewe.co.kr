@@ -643,8 +643,8 @@ app.use((req, res, next) => {
     res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
     next();
 });
-app.use('/api/mail/send', express.json({ limit: '1mb' }));      // mail bodies need headroom
-app.use('/api/mail/inbound', express.json({ limit: '2mb' }));   // inbound (parsed MIME from Email Worker)
+app.use('/api/mail/send', express.json({ limit: '15mb' }));     // mail bodies + base64 attachments
+app.use('/api/mail/inbound', express.json({ limit: '15mb' }));  // inbound (parsed MIME + attachments)
 app.use(express.json({ limit: '8kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -685,10 +685,10 @@ function recordFail(uname) {
 app.post('/api/auth/signup', (req, res) => {
     const uname = auth.normalizeUsername(req.body && req.body.username);
     const pass = String((req.body && req.body.password) || '');
-    if (!uname) return res.status(400).json({ error: 'invalid username (3–32 chars: a–z 0–9 . _ -, not reserved)' });
-    if (pass.length < 8) return res.status(400).json({ error: 'password must be at least 8 characters' });
+    if (!uname) return res.status(400).json({ error: '아이디는 3~32자의 영문·숫자와 . _ - 만 사용할 수 있습니다.' });
+    if (pass.length < 8) return res.status(400).json({ error: '비밀번호는 8자 이상이어야 합니다.' });
     if (db.prepare('SELECT 1 FROM users WHERE username = ?').get(uname)) {
-        return res.status(409).json({ error: 'username already taken' });
+        return res.status(409).json({ error: '이미 사용 중인 아이디입니다.' });
     }
     db.prepare('INSERT INTO users (username, pass_hash, status, created_at) VALUES (?,?,?,?)')
       .run(uname, auth.hashPassword(pass), 'pending', Date.now());
@@ -698,14 +698,14 @@ app.post('/api/auth/signup', (req, res) => {
 app.post('/api/auth/login', (req, res) => {
     const uname = String((req.body && req.body.username) || '').trim().toLowerCase();
     const pass = String((req.body && req.body.password) || '');
-    if (!uname || !pass) return res.status(400).json({ error: 'missing credentials' });
-    if (throttled(uname)) return res.status(429).json({ error: 'too many attempts, try again in a minute' });
+    if (!uname || !pass) return res.status(400).json({ error: '아이디와 비밀번호를 입력해 주십시오.' });
+    if (throttled(uname)) return res.status(429).json({ error: '시도가 너무 많습니다. 잠시 후 다시 시도해 주십시오.' });
     const u = db.prepare('SELECT * FROM users WHERE username = ?').get(uname);
     if (!u || !auth.verifyPassword(pass, u.pass_hash)) {
         recordFail(uname);
-        return res.status(401).json({ error: 'invalid username or password' });
+        return res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' });
     }
-    if (u.status === 'pending') return res.status(403).json({ error: 'account pending admin approval' });
+    if (u.status === 'pending') return res.status(403).json({ error: '관리자 승인 대기 중입니다.' });
     loginFails.delete(uname);
     auth.setSessionCookie(req, res, u.username);
     res.json({ ok: true, user: { username: u.username, status: u.status, email: `${u.username}@${MAIL_DOMAIN}` } });
@@ -730,7 +730,7 @@ app.get('/api/admin/pending', auth.requireAdmin, (req, res) => {
 app.post('/api/admin/approve', auth.requireAdmin, (req, res) => {
     const uname = String((req.body && req.body.username) || '').trim().toLowerCase();
     const u = db.prepare('SELECT * FROM users WHERE username = ?').get(uname);
-    if (!u) return res.status(404).json({ error: 'no such user' });
+    if (!u) return res.status(404).json({ error: '존재하지 않는 사용자입니다.' });
     db.prepare("UPDATE users SET status='active' WHERE id=?").run(u.id);
     res.json({ ok: true, username: uname, status: 'active' });
 });
@@ -738,7 +738,7 @@ app.post('/api/admin/approve', auth.requireAdmin, (req, res) => {
 app.post('/api/admin/reject', auth.requireAdmin, (req, res) => {
     const uname = String((req.body && req.body.username) || '').trim().toLowerCase();
     const u = db.prepare("SELECT * FROM users WHERE username = ? AND status='pending'").get(uname);
-    if (!u) return res.status(404).json({ error: 'no such pending user' });
+    if (!u) return res.status(404).json({ error: '대기 중인 신청이 아닙니다.' });
     db.prepare('DELETE FROM users WHERE id=?').run(u.id);
     res.json({ ok: true, username: uname, status: 'rejected' });
 });
@@ -767,6 +767,7 @@ app.post('/api/mail/inbound', (req, res) => {
     let text = String(b.text || '');
     const html = b.html ? String(b.html) : null;
     if (!text && html) text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const atts = Array.isArray(b.attachments) ? b.attachments : [];
 
     const atDomain = '@' + MAIL_DOMAIN;
     if (!to.endsWith(atDomain)) return res.json({ delivered: false, reason: 'wrong_domain' });
@@ -774,9 +775,21 @@ app.post('/api/mail/inbound', (req, res) => {
     const u = db.prepare("SELECT * FROM users WHERE username=? AND status IN ('active','admin')").get(localpart);
     if (!u) return res.json({ delivered: false, reason: 'no_mailbox' });
 
-    db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, body_html, seen, created_at) VALUES (?,?,?,?,?,?,?,0,?)')
+    const info = db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, body_html, seen, created_at) VALUES (?,?,?,?,?,?,?,0,?)')
       .run(u.id, 'in', from, to, subject, text, html, Date.now());
-    res.json({ delivered: true, backup_email: u.backup_email || null });
+    storeAttachments(info.lastInsertRowid, atts);
+
+    // Copy to the user's backup address (if set) via Resend — the user only has
+    // to save the address; no verification or setup on their part.
+    if (u.backup_email) {
+        resendSend({
+            from: userEmail(u), to: u.backup_email,
+            subject: subject || '(제목 없음)',
+            text: `${from} 님이 ${to} 로 보낸 메일입니다.\n\n${text}`,
+            attachments: attsForResend(atts),
+        }).catch(() => {});
+    }
+    res.json({ delivered: true });
 });
 
 app.get('/api/mail/list', auth.requireAuth, (req, res) => {
@@ -791,29 +804,76 @@ app.get('/api/mail/list', auth.requireAuth, (req, res) => {
 app.get('/api/mail/:id', auth.requireAuth, (req, res) => {
     const id = parseInt(req.params.id, 10);
     const m = db.prepare('SELECT * FROM emails WHERE id=? AND user_id=?').get(id, req.user.id);
-    if (!m) return res.status(404).json({ error: 'not found' });
+    if (!m) return res.status(404).json({ error: '메일을 찾을 수 없습니다.' });
     if (m.direction === 'in' && !m.seen) db.prepare('UPDATE emails SET seen=1 WHERE id=?').run(id);
-    res.json(m);
+    const attachments = db.prepare('SELECT id, filename, mime, size FROM attachments WHERE email_id=?').all(id);
+    res.json({ ...m, attachments });
+});
+
+// Download one attachment (must belong to the requesting user's mail).
+app.get('/api/mail/:id/att/:aid', auth.requireAuth, (req, res) => {
+    const id = parseInt(req.params.id, 10), aid = parseInt(req.params.aid, 10);
+    if (!db.prepare('SELECT 1 FROM emails WHERE id=? AND user_id=?').get(id, req.user.id)) {
+        return res.status(404).json({ error: '메일을 찾을 수 없습니다.' });
+    }
+    const a = db.prepare('SELECT filename, mime, content FROM attachments WHERE id=? AND email_id=?').get(aid, id);
+    if (!a) return res.status(404).json({ error: '첨부파일을 찾을 수 없습니다.' });
+    res.setHeader('Content-Type', a.mime || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(a.filename || 'file')}`);
+    res.send(a.content);
 });
 
 app.delete('/api/mail/:id', auth.requireAuth, (req, res) => {
     const id = parseInt(req.params.id, 10);
     const info = db.prepare('DELETE FROM emails WHERE id=? AND user_id=?').run(id, req.user.id);
-    if (!info.changes) return res.status(404).json({ error: 'not found' });
+    if (!info.changes) return res.status(404).json({ error: '메일을 찾을 수 없습니다.' });
     res.json({ ok: true });
 });
 
-// External outbound via Resend (https://resend.com). The `from` domain must be
-// verified in Resend (DKIM). Returns {sent} / {reason:'not_configured'} / error.
-async function resendSend({ from, to, subject, text }) {
+// ── attachments ──
+const MAX_ATTACH_BYTES = 10 * 1024 * 1024;   // 10 MB total per message
+
+function b64bytes(s) {
+    s = s || '';
+    if (!s.length) return 0;
+    return Math.floor(s.length * 3 / 4) - (s.endsWith('==') ? 2 : s.endsWith('=') ? 1 : 0);
+}
+function totalAttachBytes(atts) { return (atts || []).reduce((a, x) => a + b64bytes(x && x.content), 0); }
+
+// Persist [{filename, mime, content(base64)}] against an email row.
+function storeAttachments(emailId, atts) {
+    if (!Array.isArray(atts) || !atts.length) return;
+    const stmt = db.prepare('INSERT INTO attachments (email_id, filename, mime, size, content) VALUES (?,?,?,?,?)');
+    const tx = db.transaction((rows) => {
+        for (const a of rows) {
+            const buf = Buffer.from((a && a.content) || '', 'base64');
+            if (!buf.length) continue;
+            stmt.run(emailId, String((a && a.filename) || 'file').slice(0, 255),
+                     String((a && a.mime) || 'application/octet-stream').slice(0, 127), buf.length, buf);
+        }
+    });
+    tx(atts);
+}
+
+// base64 attachments → Resend attachment shape ([{filename, content}]).
+function attsForResend(atts) {
+    if (!Array.isArray(atts) || !atts.length) return undefined;
+    const out = atts.filter(a => a && a.content).map(a => ({ filename: String(a.filename || 'file'), content: String(a.content) }));
+    return out.length ? out : undefined;
+}
+
+// External outbound via Resend. Returns {sent} / {reason} / error.
+async function resendSend({ from, to, subject, text, attachments }) {
     const key = process.env.RESEND_API_KEY;
     if (!key) return { sent: false, reason: 'not_configured' };
     try {
+        const payload = { from, to, subject: subject || '(제목 없음)', text: text || ' ' };
+        if (attachments && attachments.length) payload.attachments = attachments;
         const resp = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ from, to, subject: subject || '(no subject)', text: text || '' }),
-            signal: AbortSignal.timeout(10000),
+            body: JSON.stringify(payload),
+            signal: AbortSignal.timeout(15000),
         });
         if (!resp.ok) {
             const detail = (await resp.text().catch(() => '')).slice(0, 300);
@@ -827,59 +887,59 @@ async function resendSend({ from, to, subject, text }) {
 }
 
 function saveOut(user, from, to, subject, body, ts) {
-    db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, seen, created_at) VALUES (?,?,?,?,?,?,1,?)')
-      .run(user.id, 'out', from, to, subject, body, ts);
+    return db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, seen, created_at) VALUES (?,?,?,?,?,?,1,?)')
+      .run(user.id, 'out', from, to, subject, body, ts).lastInsertRowid;
 }
 
 app.post('/api/mail/send', auth.requireAuth, async (req, res) => {
-    const to = String((req.body && req.body.to) || '').trim().toLowerCase();
-    const subject = String((req.body && req.body.subject) || '').slice(0, 300);
-    const body = String((req.body && req.body.body) || '');
-    if (body.length > 512 * 1024) return res.status(413).json({ error: 'body too large' });
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return res.status(400).json({ error: 'invalid recipient address' });
+    const rb = req.body || {};
+    const to = String(rb.to || '').trim().toLowerCase();
+    const subject = String(rb.subject || '').slice(0, 300);
+    const body = String(rb.body || '');
+    const atts = Array.isArray(rb.attachments) ? rb.attachments : [];
+    if (body.length > 512 * 1024) return res.status(413).json({ error: '본문이 너무 깁니다.' });
+    if (totalAttachBytes(atts) > MAX_ATTACH_BYTES) return res.status(413).json({ error: '첨부파일이 너무 큽니다. (최대 10MB)' });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return res.status(400).json({ error: '받는사람 주소가 올바르지 않습니다.' });
 
     const from = userEmail(req.user);
     const now = Date.now();
     const atDomain = '@' + MAIL_DOMAIN;
 
-    // 1) local recipient → in-app delivery (no external hop)
+    // 1) local recipient → in-app delivery
     if (to.endsWith(atDomain)) {
         const localpart = to.slice(0, -atDomain.length);
         const rcpt = db.prepare("SELECT * FROM users WHERE username=? AND status IN ('active','admin')").get(localpart);
         if (rcpt) {
-            saveOut(req.user, from, to, subject, body, now);
-            db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, seen, created_at) VALUES (?,?,?,?,?,?,0,?)')
-              .run(rcpt.id, 'in', from, to, subject, body, now);
-            return res.json({ ok: true, delivered_internally: true });
+            storeAttachments(saveOut(req.user, from, to, subject, body, now), atts);
+            const inId = db.prepare('INSERT INTO emails (user_id, direction, from_addr, to_addr, subject, body_text, seen, created_at) VALUES (?,?,?,?,?,?,0,?)')
+              .run(rcpt.id, 'in', from, to, subject, body, now).lastInsertRowid;
+            storeAttachments(inId, atts);
+            if (rcpt.backup_email) {
+                resendSend({ from: userEmail(rcpt), to: rcpt.backup_email, subject: subject || '(제목 없음)',
+                             text: `${from} 님이 보낸 메일입니다.\n\n${body}`, attachments: attsForResend(atts) }).catch(() => {});
+            }
+            return res.json({ ok: true });
         }
     }
 
     // 2) external recipient → Resend
-    const r = await resendSend({ from, to, subject, text: body });
+    const r = await resendSend({ from, to, subject, text: body, attachments: attsForResend(atts) });
     if (r.sent) {
-        saveOut(req.user, from, to, subject, body, now);
-        return res.json({ ok: true, delivered_internally: false, sent_external: true, id: r.id });
+        storeAttachments(saveOut(req.user, from, to, subject, body, now), atts);
+        return res.json({ ok: true });
     }
-    if (r.reason === 'not_configured') {
-        saveOut(req.user, from, to, subject, body, now);
-        return res.json({
-            ok: true, delivered_internally: false, sent_external: false,
-            note: '외부 발송(Resend)이 아직 설정되지 않았습니다. 보낸편지함에는 저장됨 — RESEND_API_KEY 설정 후 실제 전송됩니다.',
-        });
-    }
-    return res.status(502).json({ ok: false, error: '외부 발송 실패', detail: r.detail || null, status: r.status || null });
+    return res.status(502).json({ ok: false, error: '메일을 보내지 못했습니다. 잠시 후 다시 시도해 주십시오.' });
 });
 
-// Backup forward address (P5). The Email Worker forwards a copy of inbound mail
-// here via message.forward(), which requires the address to be verified in
-// Cloudflare Email Routing (Destination addresses). Empty string clears it.
+// Backup receive address. A copy of every received mail is re-sent here via
+// Resend, so the user only needs to save the address — nothing else to do.
 app.post('/api/mail/settings/backup', auth.requireAuth, (req, res) => {
     const raw = String((req.body && req.body.backup_email) || '').trim().toLowerCase();
     if (raw === '') {
         db.prepare('UPDATE users SET backup_email=NULL WHERE id=?').run(req.user.id);
         return res.json({ ok: true, backup_email: null });
     }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(raw)) return res.status(400).json({ error: 'invalid email' });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(raw)) return res.status(400).json({ error: '올바른 이메일 주소를 입력해 주십시오.' });
     db.prepare('UPDATE users SET backup_email=? WHERE id=?').run(raw, req.user.id);
     res.json({ ok: true, backup_email: raw });
 });

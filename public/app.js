@@ -9,14 +9,9 @@ const landing = document.getElementById('landing');
 const globeUiEls = document.querySelectorAll('.globe-ui');
 let landingVisible = true;
 
-// Globe is the default (and only) view — no landing gate.
-landing.style.display = 'none';
-landingVisible = false;
-globeUiEls.forEach(el => el.style.display = '');
-
-// Account entry: "Login" when logged out, "My Page" when logged in.
+// Login entry in the landing nav: "Login" when logged out, "My Page" when in.
 fetch('/api/auth/me').then(r => r.json()).then(d => {
-    const a = document.getElementById('account-link');
+    const a = document.getElementById('nav-login');
     if (a) a.textContent = d.user ? 'My Page' : 'Login';
 }).catch(() => {});
 

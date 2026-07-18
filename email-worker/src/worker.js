@@ -14,7 +14,9 @@ export default {
     async email(message, env, ctx) {
         let parsed;
         try {
-            parsed = await PostalMime.parse(message.raw);
+            // message.raw is a single-use stream — buffer before parsing.
+            const raw = await new Response(message.raw).arrayBuffer();
+            parsed = await PostalMime.parse(raw);
         } catch (e) {
             // Can't parse → don't lose it; ask sender to retry.
             message.setReject('Temporary processing error, please retry');

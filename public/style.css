@@ -209,6 +209,28 @@ body.lang-kr .i18n-kr { display: revert; }
 .btn-primary:active {
     transform: translateY(0);
 }
+.btn-secondary {
+    display: inline-block;
+    margin-left: 14px;
+    padding: 16px 40px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #dbeafe;
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    color: #fff;
+    background: rgba(59,130,246,0.18);
+    border-color: rgba(59,130,246,0.7);
+}
 
 .lang-switch {
     margin-top: 14px;

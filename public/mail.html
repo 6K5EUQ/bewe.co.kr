@@ -92,7 +92,13 @@
         .mi-main { flex: 1; min-width: 0; }
         .mi-who { font-size: 12px; color: rgba(148,163,184,0.9); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .mi-sub { font-size: 14px; color: #e0e0e0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mi-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
         .mi-time { font-size: 11px; color: rgba(148,163,184,0.6); white-space: nowrap; }
+        .mi-acts { display: flex; gap: 10px; opacity: 0; transition: opacity .12s; }
+        .mailitem:hover .mi-acts, .mailitem.active .mi-acts { opacity: 1; }
+        .mi-act { font-size: 11px; color: rgba(148,163,184,0.65); cursor: pointer; white-space: nowrap; user-select: none; }
+        .mi-act:hover { color: #cbd5e1; }
+        .mi-act.del:hover { color: #f87171; }
         .empty { padding: 30px; text-align: center; font-size: 13px; color: rgba(148,163,184,0.7); }
 
         /* reading pane */
@@ -104,10 +110,8 @@
         .kv { font-size: 12px; color: rgba(148,163,184,0.9); margin: 2px 0; }
         .kv b { color: #cbd5e1; font-weight: 500; display: inline-block; width: 42px; }
         .body-view { flex: 1; overflow-y: auto; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
-        /* pinned footer: attachments + actions */
+        /* pinned footer: attachments */
         .reader-footer { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
-        .reader-acts { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
-        .reader-acts .spacer { margin-left: auto; }
         .rd-atts { display: flex; flex-wrap: wrap; gap: 8px; }
         .rd-atts:empty { display: none; }
         .att-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 13px; text-decoration: none; color: #cbd5e1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; }
@@ -191,12 +195,8 @@
                     <div class="kv"><b>To</b> <span id="rd-to"></span></div>
                     <div class="kv"><b>Date</b> <span id="rd-date"></span></div>
                     <div class="body-view" id="rd-body"></div>
-                    <div class="reader-footer">
+                    <div class="reader-footer" id="reader-footer">
                         <div class="rd-atts" id="rd-atts"></div>
-                        <div class="reader-acts">
-                            <button class="primary" id="rd-reply">답장</button>
-                            <button class="mini reject spacer" id="rd-delete">삭제</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -325,8 +325,25 @@
                 div.innerHTML = `<div class="mi-main">
                         <div class="mi-who">${esc(who)}</div>
                         <div class="mi-sub">${esc(m.subject || '(제목 없음)')}</div>
-                    </div><div class="mi-time">${fmtTime(m.created_at)}</div>`;
+                    </div><div class="mi-side">
+                        <div class="mi-time">${fmtTime(m.created_at)}</div>
+                        <div class="mi-acts">
+                            <span class="mi-act rep" title="답장">↩ 답장</span>
+                            <span class="mi-act del" title="삭제">✕ 삭제</span>
+                        </div>
+                    </div>`;
                 div.onclick = () => openMail(m.id);
+                const replyTo = box === 'inbox' ? m.from_addr : m.to_addr;
+                div.querySelector('.mi-act.rep').onclick = (e) => {
+                    e.stopPropagation();
+                    openCompose({ to: replyTo, subject: 'Re: ' + (m.subject || '') });
+                };
+                div.querySelector('.mi-act.del').onclick = async (e) => {
+                    e.stopPropagation();
+                    await api('/api/mail/' + m.id, { method: 'DELETE' });
+                    if (m.id === currentMailId) clearReader();
+                    loadBox(currentBox);
+                };
                 list.appendChild(div);
             }
         }
@@ -349,11 +366,7 @@
                 link.textContent = '📎 ' + (a.filename || 'file') + ' (' + fmtSize(a.size) + ')';
                 aw.appendChild(link);
             }
-            $('rd-reply').onclick = () => openCompose({ to: m.direction === 'in' ? m.from_addr : m.to_addr, subject: 'Re: ' + (m.subject || '') });
-            $('rd-delete').onclick = async () => {
-                await api('/api/mail/' + id, { method: 'DELETE' });
-                clearReader(); loadBox(currentBox);
-            };
+            $('reader-footer').style.display = aw.children.length ? '' : 'none';
             $('reader-empty').classList.add('hidden');
             $('reader-content').classList.remove('hidden');
             $('reader').classList.add('has-mail');

@@ -122,11 +122,12 @@
         .backup-row { display: flex; gap: 8px; align-items: center; max-width: 520px; }
         .backup-row input { flex: 1; }
 
-        /* compose modal */
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
-        .modal { width: 100%; max-width: 640px; max-height: 88vh; overflow: auto; background: #0a0a0a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 22px; }
-        .modal h2 { margin: 0 0 12px; font-size: 18px; color: #fff; }
-        .modal-acts { display: flex; gap: 8px; align-items: center; margin-top: 18px; }
+        /* compose (reuses reader pane) */
+        #compose-content { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+        #compose-content h2 { margin: 0 0 12px; font-size: 19px; color: #fff; }
+        #compose-content label { margin-top: 10px; }
+        #compose-content #cp-body { flex: 1; min-height: 120px; margin-bottom: 0; }
+        .compose-acts { display: flex; gap: 8px; align-items: center; margin-top: 14px; }
 
         @media (max-width: 760px) {
             .toolbar { flex-wrap: wrap; }
@@ -199,6 +200,24 @@
                         <div class="rd-atts" id="rd-atts"></div>
                     </div>
                 </div>
+                <form class="hidden" id="compose-content" onsubmit="return doSend(event)">
+                    <h2 id="cp-title">새 메일</h2>
+                    <label>받는사람</label>
+                    <input id="cp-to" placeholder="someone@bewe.co.kr" autocapitalize="none" spellcheck="false" required>
+                    <label>제목</label>
+                    <input id="cp-subject">
+                    <label>내용</label>
+                    <textarea id="cp-body"></textarea>
+                    <div class="reader-footer">
+                        <label style="margin-top:0">첨부파일 <span class="suffix" style="margin:0">(최대 10MB)</span></label>
+                        <input id="cp-files" type="file" multiple>
+                        <div class="compose-acts">
+                            <button class="primary" type="submit">보내기</button>
+                            <button class="mini" type="button" onclick="closeCompose()">취소</button>
+                        </div>
+                        <div class="msg" id="cp-msg"></div>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -217,29 +236,6 @@
                 <p class="section-title">가입 승인 대기</p>
                 <div id="pending-list" style="font-size:13px; color:rgba(148,163,184,0.8)">불러오는 중…</div>
             </div>
-        </div>
-    </div>
-
-    <!-- compose modal -->
-    <div class="overlay hidden" id="compose-overlay">
-        <div class="modal">
-            <h2>새 메일</h2>
-            <form onsubmit="return doSend(event)">
-                <label>받는사람</label>
-                <input id="cp-to" placeholder="someone@bewe.co.kr" autocapitalize="none" spellcheck="false" required>
-                <label>제목</label>
-                <input id="cp-subject">
-                <label>내용</label>
-                <textarea id="cp-body"></textarea>
-                <label>첨부파일 <span class="suffix" style="margin:0">(최대 10MB)</span></label>
-                <input id="cp-files" type="file" multiple>
-                <div class="modal-acts">
-                    <button class="primary" type="submit">보내기</button>
-                    <div style="flex:1"></div>
-                    <button class="mini" type="button" onclick="closeOverlay('compose-overlay')">취소</button>
-                </div>
-                <div class="msg" id="cp-msg"></div>
-            </form>
         </div>
     </div>
 
@@ -263,7 +259,14 @@
                            : d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
         }
         function fmtSize(n) { n = n || 0; return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
-        function closeOverlay(id) { $(id).classList.add('hidden'); }
+
+        // reader pane has 3 states: 'empty' | 'mail' | 'compose'
+        function showReaderPane(state) {
+            $('reader-empty').classList.toggle('hidden', state !== 'empty');
+            $('reader-content').classList.toggle('hidden', state !== 'mail');
+            $('compose-content').classList.toggle('hidden', state !== 'compose');
+            $('reader').classList.toggle('has-mail', state !== 'empty');
+        }
 
         // ── auth ──
         function showTab(which) {
@@ -299,9 +302,7 @@
         // ── mailbox ──
         function clearReader() {
             currentMailId = null;
-            $('reader-content').classList.add('hidden');
-            $('reader-empty').classList.remove('hidden');
-            $('reader').classList.remove('has-mail');
+            showReaderPane('empty');
         }
 
         async function loadBox(box) {
@@ -367,9 +368,7 @@
                 aw.appendChild(link);
             }
             $('reader-footer').style.display = aw.children.length ? '' : 'none';
-            $('reader-empty').classList.add('hidden');
-            $('reader-content').classList.remove('hidden');
-            $('reader').classList.add('has-mail');
+            showReaderPane('mail');
             document.querySelectorAll('.mailitem.active').forEach(e => e.classList.remove('active'));
             const el = document.querySelector('.mailitem[data-id="' + id + '"]');
             if (el) {
@@ -386,14 +385,19 @@
 
         function openCompose(prefill) {
             prefill = prefill || {};
+            $('cp-title').textContent = prefill.to ? '답장' : '새 메일';
             $('cp-to').value = prefill.to || '';
             $('cp-subject').value = prefill.subject || '';
             $('cp-body').value = prefill.body || '';
             $('cp-files').value = '';
             $('cp-msg').textContent = '';
-            $('compose-overlay').classList.remove('hidden');
+            document.querySelectorAll('.mailitem.active').forEach(e => e.classList.remove('active'));
+            currentMailId = null;
+            showReaderPane('compose');
             $('cp-to').focus();
+            if (window.matchMedia('(max-width: 760px)').matches) $('reader').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+        function closeCompose() { clearReader(); }
         function fileToB64(file) {
             return new Promise((resolve, reject) => {
                 const r = new FileReader();
@@ -418,7 +422,7 @@
             const { ok, data } = await api('/api/mail/send', { method: 'POST', body: JSON.stringify({ to, subject, body, attachments }) });
             if (!ok) { m.className = 'msg err'; m.textContent = data.error || '보내지 못했습니다.'; return false; }
             m.className = 'msg ok'; m.textContent = '보냈습니다.';
-            setTimeout(() => { closeOverlay('compose-overlay'); loadBox(currentBox); }, 800);
+            setTimeout(() => { clearReader(); loadBox(currentBox); }, 800);
             return false;
         }
 

@@ -19,9 +19,9 @@
             --text-faint: #7c8798;   /* tertiary / timestamps */
             --border: rgba(255,255,255,0.11);
             --border-soft: rgba(255,255,255,0.07);
-            --accent: #2dd4bf;       /* teal accent */
-            --accent-2: #14b8a6;     /* deeper teal for buttons */
-            --accent-soft: rgba(45,212,191,0.16); /* selected/active fills */
+            --accent: #e8edf4;       /* neutral white accent (links, active) */
+            --accent-2: #3d4757;     /* raised grey for buttons/badges */
+            --accent-soft: rgba(255,255,255,0.09); /* selected/active fills */
         }
         * { box-sizing: border-box; }
         body {
@@ -55,11 +55,11 @@
         .suffix { font-size: 12px; color: var(--text-faint); margin-top: 4px; }
         button.primary {
             padding: 10px 18px; font-size: 14px; font-weight: 600; font-family: inherit; white-space: nowrap;
-            color: #06201d; background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
-            border: none; border-radius: 8px; cursor: pointer;
+            color: #fff; background: #3d4757;
+            border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; cursor: pointer;
         }
         button.primary.full { width: 100%; margin-top: 18px; padding: 11px; }
-        button.primary:hover { background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 100%); }
+        button.primary:hover { background: #4a5568; }
         button:disabled { opacity: .5; cursor: not-allowed; }
         .msg { margin-top: 12px; font-size: 13px; min-height: 18px; }
         .msg.err { color: #f87171; }
@@ -90,7 +90,7 @@
             border: 1px solid var(--border); border-radius: 8px; background: none; color: var(--text-dim);
         }
         .boxbtn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
-        .badge-count { display: inline-block; margin-left: 6px; padding: 0 6px; font-size: 11px; border-radius: 999px; background: var(--accent-2); color: #06201d; font-weight: 700; }
+        .badge-count { display: inline-block; margin-left: 6px; padding: 0 6px; font-size: 11px; border-radius: 999px; background: var(--accent-2); color: #fff; font-weight: 700; }
 
         /* master-detail layout */
         .mail-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; align-items: start; }
